@@ -1,0 +1,28 @@
+@import './variables';
+
+@mixin flex($align: flex-start, $justify: flex-start, $wrap: nowrap, $dir: row) {
+    display: flex;
+    align-items: $align;
+    justify-content: $justify;
+    flex-wrap: $wrap;
+    flex-direction: $dir;
+}
+
+@mixin flex-center($direct: row, $wrap: nowrap) {
+    display: flex;
+    flex-direction: $direct;
+    flex-wrap: $wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin btn-base {
+    display: inline-block;
+    cursor: pointer;
+    outline: none;
+    font-size: 1.4rem;
+    text-align: center;
+    padding: 0.6rem 1.2rem;
+    border: 0;
+    background-color: transparent;
+}

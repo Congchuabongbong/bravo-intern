@@ -1,0 +1,22 @@
+.sideNav {
+    width: 100%;
+    height: 100%;
+    background-color: #F0F0F0;
+
+    &__header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 100%;
+        height: 3rem;
+
+        &:nth-child(2) {
+            color: #757575;
+        }
+
+        .btn {
+            font-size: 1.6rem;
+        }
+    }
+
+}

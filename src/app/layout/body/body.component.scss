@@ -1,0 +1,32 @@
+.main-content {
+    position: relative;
+}
+
+.app-main {
+    position: absolute;
+
+    left: 27rem;
+    min-height: calc(100vh - 5rem) !important;
+    width: calc(100vw - 27rem);
+    transition: all 0.25s ease-in-out;
+    background-color: bisque;
+}
+
+.app-main.active {
+    width: 100vw !important;
+    left: 0;
+}
+
+.app-sidebar {
+    position: fixed;
+    top: 5rem;
+    left: 0;
+    width: 27rem;
+    height: calc(100vh - 5rem);
+    transition: all 0.25s ease-in-out;
+
+}
+
+.app-side-bar.active {
+    transform: translateX(-100%);
+}
