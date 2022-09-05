@@ -1,2 +1,2 @@
-<app-header class="app_header"></app-header>
-<app-body class="app-body"></app-body>
+<app-header (sideBarEvent)="sideBarEvent($event)" class="app_header"></app-header>
+<app-body [isSideBar]="isSideBar" class="app-body"></app-body>

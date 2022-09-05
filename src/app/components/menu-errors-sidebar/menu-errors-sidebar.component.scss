@@ -1,0 +1,54 @@
+.sideNav {
+    &__btn {
+        width: 100%;
+        padding: 0.8rem 0.8rem 0.8rem 1.4rem;
+        text-align: left;
+        outline: none;
+        border: none;
+        cursor: pointer;
+        word-wrap: break-word;
+        transition: all 0.25s ease-in-out;
+        border: 1px solid #A0A0A0;
+        border-radius: 0.3rem;
+
+        &--title {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #646464;
+        }
+
+        &--index {
+            text-decoration: underline;
+            text-decoration-thickness: 0.1rem;
+        }
+    }
+
+    &__error {
+        width: 100%;
+        min-height: 5rem;
+        border-bottom: 1px solid #A0A0A0;
+        padding-left: 1.4rem;
+        background-color: #EAECF5;
+
+        &--header {
+            font-weight: 500;
+            margin-bottom: 0.7rem;
+            padding-top: 1rem;
+
+
+            i {
+                color: red;
+                margin-right: 0.8rem;
+            }
+        }
+
+        &--title {
+            display: inline-block;
+            font-weight: normal;
+            color: #747474;
+            font-size: 1.2rem;
+            padding-bottom: 1rem;
+        }
+    }
+
+}

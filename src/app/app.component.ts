@@ -7,4 +7,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'bravo-intern';
+  public isSideBar!: boolean;
+  public sideBarEvent(event: boolean) {
+    this.isSideBar = event;
+  }
 }

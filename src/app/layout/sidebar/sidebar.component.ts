@@ -1,20 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import { MenuItem } from '../../data-type';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, AfterViewInit {
   public menuList!: [MenuItem];
-  constructor() {}
+  public btnSubMenu!: ElementRef[];
+  constructor(private el: ElementRef) {}
 
   ngOnInit(): void {
     this.menuList = [
       {
-        title: '1. Công cụ nhập liệu',
+        title: 'Công cụ nhập liệu',
         submenu: ['Nhóm vật tư', 'Vật tư', 'Lấy nhà cung cấp', 'Lấy phân loại'],
       },
     ];
   }
+  ngAfterViewInit() {}
 }

@@ -1,12 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  ElementRef,
+  AfterViewInit,
+} from '@angular/core';
+import { HandleStringService } from 'src/app/services/handle-string.service';
+import { MenuItem } from '../../data-type';
 
 @Component({
   selector: 'app-menu-item-sidebar',
   templateUrl: './menu-item-sidebar.component.html',
   styleUrls: ['./menu-item-sidebar.component.scss'],
 })
-export class MenuItemSidebarComponent implements OnInit {
-  constructor() {}
+export class MenuItemSidebarComponent implements OnInit, AfterViewInit {
+  @Input() menuList!: [MenuItem];
+  public btnSubMenu!: ElementRef[];
+  constructor(
+    private handleStringService: HandleStringService,
+    private el: ElementRef
+  ) {}
 
   ngOnInit(): void {}
+  ngAfterViewInit(): void {
+    this.btnSubMenu = this.el.nativeElement.querySelectorAll(
+      '.sideNav__sub-menu--item'
+    );
+
+    // this.btnSubMenu.forEach((btn: any) => {
+    //   if (btn.classList.includes('active')) {
+    //     btn.classList.remove('active');
+    //   }
+    //   btn.addEventListener('click', () => {
+    //     btn.classList.toggle('active');
+    //   });
+    // });
+  }
+  public convertStringToRoute(value: string): string {
+    return this.handleStringService.handleSpecialCharacter(value);
+  }
 }

@@ -1,4 +1,4 @@
 <div class="main-content">
-    <app-sidebar class="app-sidebar"></app-sidebar>
-    <app-main-content class="app-main"></app-main-content>
+    <app-sidebar class="app-sidebar" [ngClass]="isSideBar ? 'active' : ''"></app-sidebar>
+    <app-main-content class="app-main" [ngClass]="isSideBar ? 'active' : ''"></app-main-content>
 </div>

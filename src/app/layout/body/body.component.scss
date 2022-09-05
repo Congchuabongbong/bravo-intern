@@ -4,12 +4,10 @@
 
 .app-main {
     position: absolute;
-
     left: 27rem;
     min-height: calc(100vh - 5rem) !important;
     width: calc(100vw - 27rem);
     transition: all 0.25s ease-in-out;
-    background-color: bisque;
 }
 
 .app-main.active {
@@ -27,6 +25,6 @@
 
 }
 
-.app-side-bar.active {
+.app-sidebar.active {
     transform: translateX(-100%);
 }

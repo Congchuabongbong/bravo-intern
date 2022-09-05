@@ -1,15 +1,13 @@
-<li class="sideNav__menu--item">
-    <button class="sideNav__btn" routerLink="" routerLinkActive="active" ariaCurrentWhenActive="page">
+<li class="sideNav__item" *ngFor="let item of menuList; let index = index">
+    <button class="sideNav__btn">
         <span class="sideNav__btn--title">
-            1. Công cụ nhập liệu
+            <span class="sideNav__btn--index">{{index + 1}}</span>. {{item.title}}
         </span>
     </button>
     <div class="sideNav__sub-menu lev--1">
-        <button class="btn sideNav__sub-menu--item" routerLink="/" routerLinkActive="active"
-            ariaCurrentWhenActive="page"><span class="sideNav__sub-menu--title">Nhóm vật tư</span></button>
-        <button class="btn sideNav__sub-menu--item" routerLink="/" routerLinkActive="active"
-            ariaCurrentWhenActive="page"><span class="sideNav__sub-menu--title">Lấy nhà cung cấp</span></button>
-        <button class="btn sideNav__sub-menu--item" routerLink="/" routerLinkActive="active"
-            ariaCurrentWhenActive="page"><span class="sideNav__sub-menu--title">Lấy phân loại</span></button>
+        <button *ngFor="let subItem of item.submenu" class="btn sideNav__sub-menu--item"
+            routerLink="/{{convertStringToRoute(subItem)}}" routerLinkActive="active" ariaCurrentWhenActive="page">
+            <span class="sideNav__sub-menu--title">{{subItem}}</span>
+        </button>
     </div>
 </li>

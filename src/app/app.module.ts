@@ -8,6 +8,8 @@ import { HeaderComponent } from './layout/header/header.component';
 import { MainContentComponent } from './layout/main-content/main-content.component';
 import { BodyComponent } from './layout/body/body.component';
 import { MenuItemSidebarComponent } from './components/menu-item-sidebar/menu-item-sidebar.component';
+import { MenuErrorsSidebarComponent } from './components/menu-errors-sidebar/menu-errors-sidebar.component';
+import { ProductFormComponent } from './pages/product-form/product-form.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +18,9 @@ import { MenuItemSidebarComponent } from './components/menu-item-sidebar/menu-it
     HeaderComponent,
     MainContentComponent,
     BodyComponent,
-    MenuItemSidebarComponent
+    MenuItemSidebarComponent,
+    MenuErrorsSidebarComponent,
+    ProductFormComponent
   ],
   imports: [
     BrowserModule,
