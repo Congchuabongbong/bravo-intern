@@ -1,7 +1,55 @@
-.main-content {
-    width: 100%;
-    height: 100%;
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
+
+input[type='checkbox'] {
+    width: fit-content;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    outline: none;
+
+}
+
+textarea {
+    outline: none;
+}
+
+label {
+    font-size: 1.3rem;
+    font-weight: normal;
+    color: #000000;
+}
+
+.form__title {
+    display: inline-block;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    span {
+        display: inline-block;
+        margin-right: 0.8rem;
+        font-size: 1.3rem;
+        color: #6D6D6D;
+        text-decoration: underline;
+        min-width: 1rem;
+    }
+}
+
+.main-content {
+    min-height: calc(100vh - 5rem) !important;
+    width: 100%;
+    background-color: #ffff;
+    background-color: #F5F5F5;
+}
+
+
 
 .tab {
     &__box {
@@ -11,7 +59,7 @@
         border: 1px solid #ccc;
     }
 
-    &__btn {
+    &__link {
         display: inline-block;
         cursor: pointer;
         outline: none;
@@ -26,8 +74,309 @@
         transition: background-color 0.1 ease-in-out;
     }
 
-    &__btn.active {
+    &__link.active {
         background-color: #fff;
     }
 
+}
+
+.product_form {
+    padding-left: 1.2rem;
+}
+
+.info {
+    &__container {
+        display: grid;
+        grid-template-columns: 80% 20%;
+
+        &--image {
+            display: grid;
+            grid-template-rows: repeat(8, 1fr);
+
+            label {
+                grid-row-start: 2;
+                grid-row-end: 3;
+                margin-left: 0.8rem;
+                margin-top: auto;
+                margin-bottom: auto;
+            }
+
+            textarea {
+                grid-row-start: 3;
+                grid-row-end: 9;
+                margin-left: 2rem;
+                margin-right: 1rem;
+                background-color: #F0F0F0;
+                min-width: 10rem;
+            }
+        }
+    }
+}
+
+#info__general {
+    display: grid;
+    // display: none;
+    overflow-x: auto;
+}
+
+#info__general .form {
+
+    &__group {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        margin-top: 0.5rem;
+
+        .form__title {
+            min-width: 10rem;
+        }
+
+        &:first-child {
+            label[for='product_id'] {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            input[id='product_id'] {
+                grid-column-start: 3;
+                grid-column-end: 8;
+            }
+        }
+
+        &:nth-child(2),
+        &:nth-child(3) {
+            label {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            input {
+                grid-column-start: 3;
+                grid-column-end: 13;
+            }
+        }
+
+        &:nth-child(4) {
+            label[for='product_unit'] {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            input[id='product_unit'] {
+                grid-column-start: 3;
+                grid-column-end: 8;
+            }
+        }
+
+        &:nth-child(5) {
+            label[for='product_type'] {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            select[id='product_type'] {
+                grid-column-start: 3;
+                grid-column-end: 10;
+            }
+        }
+
+        &:nth-child(6) {
+            label[for='product_group'] {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            select[id='product_group'] {
+                grid-column-start: 3;
+                grid-column-end: 10;
+            }
+        }
+
+        //**7
+        &:nth-child(7) {
+            label[for='item_id--auto'] {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            input[id="item_id--auto"] {
+                grid-column-start: 3;
+                grid-column-end: 4;
+            }
+
+            label[for='item_id--create'] {
+                grid-column-start: 4;
+                grid-column-end: 5;
+            }
+
+            input[id="item_id--create"] {
+                grid-column-start: 5;
+                grid-column-end: 13;
+            }
+        }
+
+        &:last-child {
+            label[for='product_note'] {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            input[id='product_note'] {
+                grid-column-start: 3;
+                grid-column-end: 13;
+            }
+        }
+    }
+}
+
+// **info-attribute
+#info-attribute {
+    display: grid;
+    overflow-x: scroll;
+}
+
+#info-attribute .form {
+    &__group {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        margin-top: 0.5rem;
+
+        .form__title {
+            min-width: 20rem;
+        }
+
+        &:first-child,
+        &:nth-child(2),
+        &:nth-child(3),
+        &:nth-child(4),
+        &:nth-child(5),
+        &:nth-child(6),
+        &:nth-child(7) {
+            label {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            input[type="number"],
+            select {
+                grid-column-start: 3;
+                grid-column-end: 6;
+            }
+        }
+
+        &:nth-child(8) {
+
+            // input[type="checkbox"] {
+            //     padding-top: 0.3rem;
+            //     padding-bottom: 0.3rem;
+            // }
+
+            // **Mặt hàng theo dõi số serial
+            label[for='item_serial'] {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            input[id="item_serial"] {
+                grid-column-start: 3;
+                grid-column-end: 4;
+            }
+
+            // **Theo dõi tồn kho theo vị trí
+            label[for='item_inventory'] {
+                grid-column-start: 4;
+                grid-column-end: 6;
+                text-align: right;
+            }
+
+            input[id="item_inventory"] {
+                grid-column-start: 6;
+                grid-column-end: 7;
+            }
+
+            // **Là đồng phục
+            label[for='uniform_ironing'] {
+                grid-column-start: 7;
+                grid-column-end: 9;
+                text-align: right;
+            }
+
+            input[id="uniform_ironing"] {
+                grid-column-start: 9;
+                grid-column-end: 10;
+            }
+
+        }
+
+        &:nth-child(9) {
+
+            // **Có tem từ cân điện tử
+            label[for='stamp_scale'] {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+
+            input[id="stamp_scale"] {
+                grid-column-start: 3;
+                grid-column-end: 4;
+            }
+
+            // **Sử dụng lô hàng
+            label[for='item_using'] {
+                grid-column-start: 4;
+                grid-column-end: 6;
+                text-align: right;
+            }
+
+            input[id="item_using"] {
+                grid-column-start: 6;
+                grid-column-end: 7;
+            }
+
+            // **Hạn dùng/ bảo hành
+            label[for='due-date'] {
+                grid-column-start: 7;
+                grid-column-end: 9;
+                text-align: right;
+            }
+
+            input[id="due-date"] {
+                grid-column-start: 9;
+                grid-column-end: 11;
+                min-width: 10rem;
+            }
+
+            .form__title--month {
+                font-size: 1.3rem;
+                font-weight: normal;
+                grid-column-start: 11;
+                grid-column-end: 12;
+                margin: auto 0;
+                margin-left: 0.3rem;
+            }
+        }
+
+        &:nth-child(8),
+        &:nth-child(9) {
+            input {
+                margin-left: 0.5rem;
+            }
+        }
+
+    }
+}
+
+.tabContent {
+    animation: fadeEffect 1s;
+    /* Fading effect takes 1 second */
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }

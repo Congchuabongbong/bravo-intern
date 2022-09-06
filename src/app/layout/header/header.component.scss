@@ -6,6 +6,8 @@
     height: 5rem;
     background-color: #F4F4F4;
     color: $color-primary;
+    border-bottom: 1px solid #EEE8AA;
+    z-index: 9999;
 
     &__container {
         height: 100%;
@@ -70,4 +72,10 @@
         opacity: .6;
     }
 
+}
+
+@media (max-width: 587px) {
+    .header__tool {
+        display: none;
+    }
 }
