@@ -7,41 +7,44 @@
         <!-- <button class="tab__link">Thông tin khác</button> -->
     </div>
 
-    <form class="product_form" novalidate>
+    <form [formGroup]="productForm" class="product_form" novalidate>
         <!-- **Thông tin chung** -->
         <div class="tabContent info__container" id="info__general">
             <div class="info__container--input">
                 <!-- **Mã vật tư -->
                 <div class="form__group">
                     <label for="product_id" class="form__title"><span>1.</span>Mã Vật Tư</label>
-                    <input type="text" id="product_id">
+                    <input type="text" id="product_id" name="idProduct" formControlName="idProduct">
                 </div>
                 <!-- **tên vật tư -->
                 <div class="form__group">
                     <label for="product_name" class="form__title"><span>2.</span>Tên Vật Tư</label>
-                    <input type="text" id="prodcut_name">
+                    <input type="text" id="prodcut_name" name="nameProduct" formControlName="nameProduct">
                 </div>
                 <!-- **tên thứ 2 -->
                 <div class="form__group">
                     <label for="product_name--second" class="form__title"><span>3.</span>Tên Thứ 2</label>
-                    <input type="text" id="name_product--second">
+                    <input type="text" id="name_product--second" name="secondNameProduct"
+                        formControlName="secondNameProduct">
                 </div>
                 <!-- **Đơn vị tính -->
                 <div class="form__group">
                     <label for="product_unit" class="form__title"><span>4.</span>Đơn Vị Tính</label>
-                    <input type="text" id="product_unit">
+                    <input type="text" id="product_unit" name="unitProduct" formControlName="unitProduct">
                 </div>
                 <!-- **Loại vật tư -->
                 <div class="form__group">
                     <label for="product_type" class="form__title"><span>5.</span>Loại Vật Tư</label>
-                    <select id="product_type">
-                        <option value="1">ex 1</option>
+                    <select id="product_type" name="typeProduct" formControlName="typeProduct">
+                        <option value="1">Type 1</option>
+                        <option value="2">Type 2</option>
+                        <option value="3">Type 3</option>
                     </select>
                 </div>
                 <!-- **Nhóm hàng -->
                 <div class="form__group">
                     <label for="product_group" class="form__title"><span>6.</span>Nhóm Hàng</label>
-                    <select id="product_group">
+                    <select id="product_group" name="groupProduct" formControlName="groupProduct">
                         <option value="1">Nhóm 1</option>
                         <option value="2">Nhóm 2</option>
                         <option value="3">Nhóm 3</option>
@@ -50,20 +53,22 @@
                 <!-- **tự tạo mã và mã sản phẩm -->
                 <div class="form__group">
                     <label for="item_id--auto" class="form__title"><span>7.</span>Tự Tạo Mã SP</label>
-                    <input type="checkbox" id="item_id--auto">
+                    <input type="checkbox" id="item_id--auto" name="isAutoItemCodeProduct"
+                        formControlName="isAutoItemCodeProduct">
                     <label for="item_id--create" class="form__title">Mã SP</label>
-                    <input type="text" id="item_id--create">
+                    <input type="text" id="item_id--create" name="itemCodeProduct" formControlName="itemCodeProduct">
                 </div>
                 <!-- **Ghi chú -->
                 <div class="form__group">
                     <label for="product_note" class="form__title"><span>8.</span>Ghi Chú</label>
-                    <input type="text" id="product_note">
+                    <input type="text" id="product_note" name="noteProduct" formControlName="noteProduct">
                 </div>
             </div>
             <!-- **Ảnh** -->
             <div class="info__container--image">
                 <label for="product_image" class="form__title">Ảnh đại diện</label>
-                <textarea name="product_image" id=""></textarea>
+                <textarea name="product_image" id="" name="thumbnailProduct"
+                    formControlName="thumbnailProduct"></textarea>
             </div>
         </div>
         <!-- **Thuộc tính** -->
@@ -72,60 +77,62 @@
                 <!-- **Dài -->
                 <div class="form__group">
                     <label for="product_length" class="form__title"><span>1.</span>Dài</label>
-                    <input type="number" id="product_length">
+                    <input type="number" id="product_length" name="lengthProduct" formControlName="lengthProduct">
                 </div>
                 <!-- **Rộng -->
                 <div class="form__group">
                     <label for="product_width" class="form__title"><span>2.</span>Rộng</label>
-                    <input type="number" id="product_width">
+                    <input type="number" id="product_width" name="widthProduct" formControlName="widthProduct">
                 </div>
                 <!-- **Cao -->
                 <div class="form__group">
                     <label for="product_height" class="form__title"><span>3.</span>Cao</label>
-                    <input type="number" id="product_height">
+                    <input type="number" id="product_height" name="heightProduct" formControlName="heightProduct">
                 </div>
                 <!-- **Trọng lượng -->
                 <div class="form__group">
                     <label for="product_weight" class="form__title"><span>4.</span>Trọng lượng</label>
-                    <input type="number" id="product_weight">
+                    <input type="number" id="product_weight" name="weightProduct" formControlName="weightProduct">
                 </div>
                 <!-- **Nhóm tiêu chuẩn -->
                 <div class="form__group">
                     <label for="product_standard" class="form__title"><span>5.</span>Nhóm Tiêu chuẩn QC</label>
-                    <select id="product_standard">
+                    <select id="product_standard" name="standardGroupQc" formControlName="standardGroupQc">
                         <option value="1">ex 1</option>
                     </select>
                 </div>
                 <!-- **Loại duyệt giá mua-->
                 <div class="form__group">
                     <label for="product_type-of-purchase" class="form__title"><span>6.</span>Loại duyệt giá mua</label>
-                    <select id="product_type-of-purchase">
+                    <select id="product_type-of-purchase" name="typeOfPurchase" formControlName="typeOfPurchase">
                         <option value="1">1: Không cần lập đơn hàng</option>
                     </select>
                 </div>
                 <!-- **Ghi chú -->
                 <div class="form__group">
                     <label for="product_short-code" class="form__title"><span>7.</span>Mã ngắn</label>
-                    <input type="number" id="product_short-code">
+                    <input type="number" id="product_short-code" name="shortCode" formControlName="shortCode">
                 </div>
                 <!-- **tự tạo mã và mã sản phẩm -->
                 <div class="form__group">
                     <label for="item_serial" class="form__title"><span>8.</span>Mặt hàng theo dõi số serial</label>
-                    <input type="checkbox" id="item_serial">
+                    <input type="checkbox" id="item_serial" name="isSerial" formControlName="isSerial">
                     <label for="item_inventory" class="form__title">Theo dõi tồn kho theo vị trí</label>
-                    <input type="checkbox" id="item_inventory">
+                    <input type="checkbox" id="item_inventory" name="isInventoryByLocation"
+                        formControlName="isInventoryByLocation">
                     <label for="uniform_ironing" class="form__title">Là Đồng phục</label>
-                    <input type="checkbox" id="uniform_ironing">
+                    <input type="checkbox" id="uniform_ironing" name="isIroningUniform"
+                        formControlName="isIroningUniform">
                 </div>
                 <!-- **tự tạo mã và mã sản phẩm -->
                 <div class="form__group">
                     <label for="stamp_scale" class="form__title"><span>9.</span>Có tem in từ cân điện tử</label>
-                    <input type="checkbox" id="stamp_scale">
+                    <input type="checkbox" id="stamp_scale" name="isStampScale" formControlName="isStampScale">
                     <label for="item_using" class="form__title">Sử dụng lô hàng</label>
-                    <input type="checkbox" id="item_using">
+                    <input type="checkbox" id="item_using" name="isUsingItem" formControlName="isUsingItem">
                     <label for="due-date" class="form__title">Hạn dùng/bảo hành</label>
                     <input type="number" id="due-date">
-                    <span class="form__title--month">tháng</span>
+                    <span class="form__title--month" name="dueDateProduct" formControlName="dueDateProduct">tháng</span>
                 </div>
             </div>
         </div>

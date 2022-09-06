@@ -114,8 +114,8 @@ label {
 }
 
 #info__general {
-    display: grid;
-    // display: none;
+    // display: grid;
+    display: none;
     overflow-x: auto;
 }
 
@@ -230,7 +230,7 @@ label {
 
 // **info-attribute
 #info-attribute {
-    display: grid;
+    display: none;
     overflow-x: scroll;
 }
 
@@ -365,12 +365,12 @@ label {
     }
 }
 
+//** Fading effect takes 1 second **/
 .tabContent {
     animation: fadeEffect 1s;
-    /* Fading effect takes 1 second */
 }
 
-/* Go from zero to full opacity */
+//** Go from zero to full opacity 
 @keyframes fadeEffect {
     from {
         opacity: 0;
