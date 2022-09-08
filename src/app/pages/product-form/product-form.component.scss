@@ -8,6 +8,11 @@ input[type='checkbox'] {
     width: fit-content;
 }
 
+input.ng-touched.ng-invalid,
+select.ng-touched.ng-invalid {
+    border: 1px solid red;
+}
+
 input[type="text"],
 input[type="number"],
 select {

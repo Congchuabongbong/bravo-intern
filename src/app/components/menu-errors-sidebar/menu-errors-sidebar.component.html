@@ -5,13 +5,98 @@
         </span>
     </button>
 
-    <div class="sideNav__error">
-        <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Đơn vị tính</p>
-        <span class="sideNav__error--title">Không được bỏ trắng giá trị.</span>
-    </div>
-    <div class="sideNav__error">
-        <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Nhóm hàng</p>
-        <span class="sideNav__error--title">Không được bỏ trắng giá trị.</span>
-    </div>
-
+    <ng-container *ngIf="productForm">
+        <!-- **Info product** -->
+        <!-- Mã Vật tư  -->
+        <div class="sideNav__error" *ngIf="idProduct?.invalid && (idProduct?.dirty || idProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Mã vật tư</p>
+            <span class="sideNav__error--title" [hidden]="idProduct?.errors?.['required']">Không được bỏ trắng
+                giá trị.</span>
+        </div>
+        <!-- Tên Vật Tư  -->
+        <div class="sideNav__error" *ngIf="nameProduct?.invalid && (nameProduct?.dirty || nameProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Tên vật tư</p>
+            <span class="sideNav__error--title" [hidden]="nameProduct?.errors?.['required']">Không được bỏ
+                trắng giá trị.</span>
+        </div>
+        <!-- Đơn vị tính  -->
+        <div class="sideNav__error" *ngIf="unitProduct?.invalid && (unitProduct?.dirty || unitProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Đơn vị tính</p>
+            <span class="sideNav__error--title" [hidden]="unitProduct?.errors?.['required']">Không được bỏ
+                trắng giá trị.</span>
+        </div>
+        <!-- Loại vật tư  -->
+        <div class="sideNav__error" *ngIf="typeProduct?.invalid && (typeProduct?.dirty || typeProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Loại vật tư</p>
+            <span class="sideNav__error--title" [hidden]="typeProduct?.errors?.['required']">Không được bỏ
+                trắng giá trị.</span>
+        </div>
+        <!-- Nhóm vật tư -->
+        <div class="sideNav__error" *ngIf="groupProduct?.invalid && (groupProduct?.dirty || groupProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Nhóm hàng</p>
+            <span class="sideNav__error--title" [hidden]="groupProduct?.errors?.['required']">Không được bỏ
+                trắng giá trị.</span>
+        </div>
+        <!-- Mã sản phẩm -->
+        <div class="sideNav__error"
+            *ngIf="itemCodeProduct?.invalid && (itemCodeProduct?.dirty || itemCodeProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Mã sản phẩm</p>
+            <span class="sideNav__error--title" [hidden]="itemCodeProduct?.errors?.['required']">Không được bỏ
+                trắng giá trị.</span>
+        </div>
+        <!-- **attribute product** -->
+        <!-- Chiều dài -->
+        <div class="sideNav__error" *ngIf="lengthProduct?.invalid && (lengthProduct?.dirty || lengthProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Chiều dài</p>
+            <span class="sideNav__error--title" [hidden]="lengthProduct?.errors?.['required']">Không được bỏ trắng giá
+                trị.</span>
+        </div>
+        <!-- Chiều rộng -->
+        <div class="sideNav__error" *ngIf="widthProduct?.invalid && (widthProduct?.dirty || widthProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Chiều rộng</p>
+            <span class="sideNav__error--title" [hidden]="widthProduct?.errors?.['required']">Không được bỏ trắng giá
+                trị.</span>
+        </div>
+        <!-- Chiều cao -->
+        <div class="sideNav__error" *ngIf="heightProduct?.invalid && (heightProduct?.dirty || heightProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Chiều cao</p>
+            <span class="sideNav__error--title" [hidden]="heightProduct?.errors?.['required']">Không được bỏ trắng giá
+                trị.</span>
+        </div>
+        <!-- Trọng lượng -->
+        <div class="sideNav__error" *ngIf="weightProduct?.invalid && (weightProduct?.dirty || weightProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Trọng lượng</p>
+            <span class="sideNav__error--title" [hidden]="weightProduct?.errors?.['required']">Không được bỏ trắng giá
+                trị.</span>
+        </div>
+        <!-- Nhóm tiêu chuẩn -->
+        <div class="sideNav__error"
+            *ngIf="standardGroupQc?.invalid && (standardGroupQc?.dirty || standardGroupQc?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Nhóm Tiêu chuẩn QC</p>
+            <span class="sideNav__error--title" [hidden]="standardGroupQc?.errors?.['required']">Không được bỏ trắng giá
+                trị.</span>
+        </div>
+        <!-- Loại duyệt giá mua -->
+        <div class="sideNav__error"
+            *ngIf="typeOfPurchase?.invalid && (typeOfPurchase?.dirty || typeOfPurchase?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Loại duyệt giá mua</p>
+            <span class="sideNav__error--title" [hidden]="typeOfPurchase?.errors?.['required']">Không được bỏ trắng giá
+                trị.</span>
+        </div>
+        <!-- Mã ngắn -->
+        <div class="sideNav__error" *ngIf="shortCode?.invalid && (shortCode?.dirty || shortCode?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Mã ngắn</p>
+            <span class="sideNav__error--title" [hidden]="shortCode?.errors?.['required']">Không được bỏ trắng giá
+                trị.</span>
+        </div>
+        <!-- Hạn dùng bảo hành -->
+        <div class="sideNav__error"
+            *ngIf="dueDateProduct?.invalid && (dueDateProduct?.dirty || dueDateProduct?.touched )">
+            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Hạn dùng/bảo hành</p>
+            <span class="sideNav__error--title" *ngIf="dueDateProduct?.errors?.['required']">Không được bỏ trắng giá
+                trị.</span>
+            <span class="sideNav__error--title"
+                *ngIf="dueDateProduct?.errors?.['maxMonth']">{{dueDateProduct?.errors?.['requiredValue']}}</span>
+        </div>
+    </ng-container>
 </li>

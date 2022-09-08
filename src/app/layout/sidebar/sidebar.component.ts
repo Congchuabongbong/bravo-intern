@@ -1,4 +1,11 @@
-import { Component, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  ElementRef,
+  Input,
+} from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { MenuItem } from '../../data-type';
 @Component({
   selector: 'app-sidebar',
@@ -8,6 +15,7 @@ import { MenuItem } from '../../data-type';
 export class SidebarComponent implements OnInit, AfterViewInit {
   public menuList!: [MenuItem];
   public btnSubMenu!: ElementRef[];
+
   constructor(private el: ElementRef) {}
 
   ngOnInit(): void {
