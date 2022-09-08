@@ -9,6 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { v4 as uuidV4 } from 'uuid';
 import { DataService } from 'src/app/services/data.service';
 import { maxMonth } from 'src/app/shared/custom-validator/maxMonth.validator';
+
 @Component({
   selector: 'app-product-form',
   templateUrl: './product-form.component.html',
@@ -39,9 +40,9 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
         unitProduct: ['', [Validators.required]],
         typeProduct: [null, [Validators.required]],
         groupProduct: [null, [Validators.required]],
-        isAutoItemCodeProduct: [false],
+        isAutoItemCodeProduct: [true],
         itemCodeProduct: [
-          { value: '', disabled: false },
+          { value: uuidV4(), disabled: true },
           [Validators.required],
         ],
         noteProduct: [''],
@@ -164,12 +165,14 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     elRef.classList.add('active');
     this.renderer.setStyle(currentTab, 'display', 'grid');
     this.checkTab(tabName);
+    console.log(this.isGeneralTab);
+    console.log(this.isAttributeTab);
   }
   public checkTab(nameTab: string): void {
     switch (nameTab) {
       case 'info__general':
         this.isGeneralTab = true;
-        this.isGeneralTab = false;
+        this.isAttributeTab = false;
         break;
       case 'info-attribute':
         this.isAttributeTab = true;

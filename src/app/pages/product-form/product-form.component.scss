@@ -10,7 +10,8 @@ input[type='checkbox'] {
 
 input.ng-touched.ng-invalid,
 select.ng-touched.ng-invalid {
-    border: 1px solid red;
+    border: 1px solid red !important;
+    outline-color: red;
 }
 
 input[type="text"],
@@ -18,8 +19,6 @@ input[type="number"],
 select {
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
-    outline: none;
-
 }
 
 textarea {
@@ -142,9 +141,11 @@ label {
             }
 
             input[id='product_id'] {
+
                 grid-column-start: 3;
                 grid-column-end: 8;
             }
+
         }
 
         &:nth-child(2),

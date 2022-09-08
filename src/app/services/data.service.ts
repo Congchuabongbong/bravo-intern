@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
   providedIn: 'root',
 })
 export class DataService {
-  private dataSource: Subject<any> = new Subject<any>();
+  private dataSource: BehaviorSubject<any> = new BehaviorSubject<any>('');
   public data: Observable<any> = this.dataSource.asObservable();
   constructor() {}
   public sendData(data: any) {
