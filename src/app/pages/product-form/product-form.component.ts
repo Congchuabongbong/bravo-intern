@@ -174,4 +174,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
       this.itemCodeProduct?.setValue('');
     }
   }
+  public _layout = {
+    rows: {},
+    columns: {},
+  };
 }
