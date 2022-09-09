@@ -20,8 +20,6 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   public tabLinks!: ElementRef[];
   public tabContents!: ElementRef[];
   public productForm!: FormGroup;
-  public isGeneralTab!: boolean;
-  public isAttributeTab!: boolean;
 
   //**constructor */
   constructor(
@@ -164,21 +162,6 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     });
     elRef.classList.add('active');
     this.renderer.setStyle(currentTab, 'display', 'grid');
-    this.checkTab(tabName);
-    console.log(this.isGeneralTab);
-    console.log(this.isAttributeTab);
-  }
-  public checkTab(nameTab: string): void {
-    switch (nameTab) {
-      case 'info__general':
-        this.isGeneralTab = true;
-        this.isAttributeTab = false;
-        break;
-      case 'info-attribute':
-        this.isAttributeTab = true;
-        this.isGeneralTab = false;
-        break;
-    }
   }
 
   //**isAutoItemCodeProduct changed

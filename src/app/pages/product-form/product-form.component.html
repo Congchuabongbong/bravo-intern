@@ -4,7 +4,7 @@
             chung</button>
         <button class="tab__link" #btn_attribute (click)="openTab(btn_attribute ,'info-attribute')">Thuộc
             tính</button>
-        <!-- <button class="tab__link">Thông tin khác</button> -->
+        <button class="tab__link">Thông tin khác</button>
     </div>
 
     <form [formGroup]="productForm" class="product_form" novalidate>
@@ -15,7 +15,6 @@
                 <div class="form__group">
                     <label for="product_id" class="form__title"><span>1.</span>Mã Vật Tư</label>
                     <input type="text" id="product_id" name="idProduct" formControlName="idProduct">
-
                 </div>
                 <!-- **tên vật tư -->
                 <div class="form__group">
@@ -145,10 +144,5 @@
                 </div>
             </div>
         </div>
-
     </form>
-
-    <!-- <p>{{productForm.value | json}}</p> -->
-
-
 </div>
