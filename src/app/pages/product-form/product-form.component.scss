@@ -12,6 +12,10 @@ input.ng-invalid,
 select.ng-invalid {
     border: 1px solid red !important;
     outline-color: red;
+    background: url(/assets/svg-icon/error-icon.svg);
+    background-repeat: no-repeat;
+    background-position: right calc(0.4em + 0.1875rem) center;
+    background-size: calc(0.8em + 0.375rem) calc(0.8em + 0.375rem);
 }
 
 input[type="text"],
@@ -26,7 +30,7 @@ textarea {
 }
 
 label {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: normal;
     color: #000000;
 }
@@ -39,13 +43,14 @@ label {
     span {
         display: inline-block;
         margin-right: 0.8rem;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         color: #6D6D6D;
         text-decoration: underline;
         min-width: 1rem;
     }
 }
 
+//**main content
 .main-content {
     min-height: calc(100vh - 5rem) !important;
     width: 100%;
@@ -53,8 +58,13 @@ label {
     background-color: #F5F5F5;
 }
 
+//** product  form
+.product_form {
+    overflow-x: scroll;
+    padding: 0.5rem 1.2rem 0 1.2rem;
+}
 
-
+//** tab links
 .tab {
     &__box {
         width: 100%;
@@ -84,289 +94,323 @@ label {
 
 }
 
-.product_form {
-    padding-left: 1.2rem;
-}
-
-.info {
-    &__container {
-        display: grid;
-        grid-template-columns: 80% 20%;
-
-        &--image {
-            display: grid;
-            grid-template-rows: repeat(8, 1fr);
-
-            label {
-                grid-row-start: 2;
-                grid-row-end: 3;
-                margin-left: 0.8rem;
-                margin-top: auto;
-                margin-bottom: auto;
-            }
-
-            textarea {
-                grid-row-start: 3;
-                grid-row-end: 9;
-                margin-left: 2rem;
-                margin-right: 1rem;
-                background-color: #F0F0F0;
-                min-width: 10rem;
-            }
-        }
-    }
-}
+//** info general
 
 #info__general {
-    // display: grid;
     display: none;
-    overflow-x: auto;
-}
+    // display: grid;
+    grid-template-columns: minmax(10rem, 15rem) minmax(10rem, 20rem) min(10rem) repeat(2, minmax(10rem, 1fr)) minmax(5rem, 15%);
+    grid-template-rows: repeat(8, 1fr);
+    row-gap: 0.3rem;
+    column-gap: 1rem;
 
-#info__general .form {
+    label {
+        grid-column-start: 1;
+        grid-column-end: 2;
+    }
 
-    &__group {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        margin-top: 0.5rem;
+    // mã sản phẩm
+    label[for='product_id'],
+    input[id='product_id'] {
+        grid-row-start: 1;
+        grid-row-end: 2;
+    }
 
-        .form__title {
-            min-width: 10rem;
+    input[id='product_id'] {
+        grid-column-start: 2;
+        grid-column-end: 4;
+    }
+
+    // tên vật tư
+    label[for='product_name'],
+    input[id='product_name'] {
+        grid-row-start: 2;
+        grid-row-end: 3;
+    }
+
+    input[id='product_name'] {
+        grid-column-start: 2;
+        grid-column-end: 6;
+    }
+
+    //tên thứ hai
+    label[for='product_name--second'],
+    input[id='product_name--second'] {
+        grid-row-start: 3;
+        grid-row-end: 4;
+    }
+
+    input[id='product_name--second'] {
+        grid-column-start: 2;
+        grid-column-end: 6;
+    }
+
+    //đơn vị tính
+    label[for='product_unit'],
+    input[id='product_unit'] {
+        grid-row-start: 4;
+        grid-row-end: 5;
+    }
+
+    input[id='product_unit'] {
+        grid-column-start: 2;
+        grid-column-end: 4;
+    }
+
+    //loại vật tư
+    label[for='product_type'],
+    select[id='product_type'] {
+        grid-row-start: 5;
+        grid-row-end: 6;
+    }
+
+    select[id='product_type'] {
+        grid-column-start: 2;
+        grid-column-end: 5;
+    }
+
+    //nhóm hàng
+    label[for='product_group'],
+    select[id='product_group'] {
+        grid-row-start: 6;
+        grid-row-end: 7;
+    }
+
+    select[id='product_group'] {
+
+        grid-column-start: 2;
+        grid-column-end: 5;
+    }
+
+    //tự tạo mã sản phẩm
+    label[for='item_id--auto'],
+    input[id='item_id--auto'] {
+        grid-row-start: 7;
+        grid-row-end: 8;
+    }
+
+    input[id='item_id--auto'] {
+        grid-column-start: 2;
+        grid-column-end: 3;
+        width: fit-content;
+    }
+
+    //tạo mã sản phẩm
+    .row78-col23 {
+        display: flex;
+        grid-row-start: 7;
+        grid-row-end: 8;
+        grid-column-start: 2;
+        grid-column-end: 3;
+
+        label[for='item_id--create'] {
+            margin-top: auto;
+            margin-bottom: auto;
+            margin-left: auto;
         }
 
-        &:first-child {
-            label[for='product_id'] {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
+    }
 
-            input[id='product_id'] {
+    input[id='item_id--create'] {
+        grid-row-start: 7;
+        grid-row-end: 8;
+        grid-column-start: 3;
+        grid-column-end: 6;
+    }
 
-                grid-column-start: 3;
-                grid-column-end: 8;
-            }
+    // ghi chú
+    label[for='product_note'],
+    input[id='product_note'] {
+        grid-row-start: 8;
+        grid-row-end: 9;
+    }
 
-        }
+    input[id='product_note'] {
+        grid-column-start: 2;
+        grid-column-end: 6;
+    }
 
-        &:nth-child(2),
-        &:nth-child(3) {
-            label {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
+    // ảnh
+    label[for='product_image'] {
+        grid-column-start: 6;
+        grid-column-end: 7;
+        grid-row-start: 2;
+        grid-row-end: 3;
+    }
 
-            input {
-                grid-column-start: 3;
-                grid-column-end: 13;
-            }
-        }
-
-        &:nth-child(4) {
-            label[for='product_unit'] {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
-
-            input[id='product_unit'] {
-                grid-column-start: 3;
-                grid-column-end: 8;
-            }
-        }
-
-        &:nth-child(5) {
-            label[for='product_type'] {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
-
-            select[id='product_type'] {
-                grid-column-start: 3;
-                grid-column-end: 10;
-            }
-        }
-
-        &:nth-child(6) {
-            label[for='product_group'] {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
-
-            select[id='product_group'] {
-                grid-column-start: 3;
-                grid-column-end: 10;
-            }
-        }
-
-        //**7
-        &:nth-child(7) {
-            label[for='item_id--auto'] {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
-
-            input[id="item_id--auto"] {
-                grid-column-start: 3;
-                grid-column-end: 4;
-            }
-
-            label[for='item_id--create'] {
-                grid-column-start: 4;
-                grid-column-end: 5;
-            }
-
-            input[id="item_id--create"] {
-                grid-column-start: 5;
-                grid-column-end: 13;
-            }
-        }
-
-        &:last-child {
-            label[for='product_note'] {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
-
-            input[id='product_note'] {
-                grid-column-start: 3;
-                grid-column-end: 13;
-            }
-        }
+    textarea[id='product_image'] {
+        grid-row-start: 3;
+        grid-row-end: 9;
+        grid-column-start: 6;
+        grid-column-end: 7;
     }
 }
 
 // **info-attribute
+
 #info-attribute {
-    display: none;
-    overflow-x: scroll;
-}
+    display: grid;
+    grid-template-columns: minmax(10rem, 15rem) minmax(10rem, 30%) 1fr;
+    grid-template-rows: repeat(9, 1fr);
+    row-gap: 0.3rem;
+    column-gap: 1rem;
 
-#info-attribute .form {
-    &__group {
+    label {
+        grid-column-start: 1;
+        grid-column-end: 2;
+
+    }
+
+    //** Đô dài
+    label[for='product_length'] {
+        grid-row-start: 1;
+        grid-row-end: 2;
+    }
+
+    //** Độ rộng
+    label[for='product_width'] {
+        grid-row-start: 2;
+        grid-row-end: 3;
+    }
+
+    //** Chiều cao
+    label[for='product_height'] {
+        grid-row-start: 3;
+        grid-row-end: 4;
+    }
+
+    //** Trọng lượng
+    label[for='product_weight'] {
+        grid-row-start: 4;
+        grid-row-end: 5;
+    }
+
+    //** Nhóm tiêu chuẩn Qc
+    label[for='product_standard'] {
+        grid-row-start: 5;
+        grid-row-end: 6;
+    }
+
+    //** Loại duyệt giá mua
+    label[for='product_type-of-purchase'] {
+        grid-row-start: 6;
+        grid-row-end: 7;
+    }
+
+    //** mã ngắn
+    label[for='product_short-code'] {
+        grid-row-start: 7;
+        grid-row-end: 8;
+    }
+
+    .input-box {
+        grid-column-start: 2;
+        grid-column-end: 3;
+
+        input,
+        select {
+            width: 70%;
+        }
+    }
+
+    .group-checkbox {
         display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        margin-top: 0.5rem;
+        grid-template-columns: minmax(15rem, 20rem) minmax(1rem, 1.5rem) minmax(15rem, 20rem) minmax(1rem, 1.5rem) minmax(10rem, 15rem) minmax(10rem, 15rem) 1fr;
+        grid-template-rows: repeat(2, 1fr);
+        row-gap: 0.3rem;
+        column-gap: 0.5rem;
+        grid-column-start: 1;
+        grid-column-end: 4;
+        grid-row-start: 8;
+        grid-row-end: 10;
 
-        .form__title {
-            min-width: 20rem;
+        //** 2 last line mark index
+        label[for='item_serial'],
+        label[for='stamp_scale'] {
+            grid-column-start: 1;
+            grid-column-end: 2;
         }
 
-        &:first-child,
-        &:nth-child(2),
-        &:nth-child(3),
-        &:nth-child(4),
-        &:nth-child(5),
-        &:nth-child(6),
-        &:nth-child(7) {
-            label {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
-
-            input[type="number"],
-            select {
-                grid-column-start: 3;
-                grid-column-end: 6;
-            }
+        //** Mặt hàng theo dõi số serial - mark index 8
+        label[for='item_serial'],
+        input[id='item_serial'] {
+            grid-row-start: 1;
+            grid-row-end: 2;
         }
 
-        &:nth-child(8) {
-
-            // input[type="checkbox"] {
-            //     padding-top: 0.3rem;
-            //     padding-bottom: 0.3rem;
-            // }
-
-            // **Mặt hàng theo dõi số serial
-            label[for='item_serial'] {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
-
-            input[id="item_serial"] {
-                grid-column-start: 3;
-                grid-column-end: 4;
-            }
-
-            // **Theo dõi tồn kho theo vị trí
-            label[for='item_inventory'] {
-                grid-column-start: 4;
-                grid-column-end: 6;
-                text-align: right;
-            }
-
-            input[id="item_inventory"] {
-                grid-column-start: 6;
-                grid-column-end: 7;
-            }
-
-            // **Là đồng phục
-            label[for='uniform_ironing'] {
-                grid-column-start: 7;
-                grid-column-end: 9;
-                text-align: right;
-            }
-
-            input[id="uniform_ironing"] {
-                grid-column-start: 9;
-                grid-column-end: 10;
-            }
-
+        input[id='item_serial'] {
+            grid-column-start: 2;
+            grid-column-end: 3;
         }
 
-        &:nth-child(9) {
-
-            // **Có tem từ cân điện tử
-            label[for='stamp_scale'] {
-                grid-column-start: 1;
-                grid-column-end: 3;
-            }
-
-            input[id="stamp_scale"] {
-                grid-column-start: 3;
-                grid-column-end: 4;
-            }
-
-            // **Sử dụng lô hàng
-            label[for='item_using'] {
-                grid-column-start: 4;
-                grid-column-end: 6;
-                text-align: right;
-            }
-
-            input[id="item_using"] {
-                grid-column-start: 6;
-                grid-column-end: 7;
-            }
-
-            // **Hạn dùng/ bảo hành
-            label[for='due-date'] {
-                grid-column-start: 7;
-                grid-column-end: 9;
-                text-align: right;
-            }
-
-            input[id="due-date"] {
-                grid-column-start: 9;
-                grid-column-end: 11;
-                min-width: 10rem;
-            }
-
-            .form__title--month {
-                font-size: 1.3rem;
-                font-weight: normal;
-                grid-column-start: 11;
-                grid-column-end: 12;
-                margin: auto 0;
-                margin-left: 0.3rem;
-            }
+        //**theo dõi tồn kho theo vị trí
+        label[for='item_inventory'] {
+            grid-column-start: 3;
+            grid-column-end: 4;
         }
 
-        &:nth-child(8),
-        &:nth-child(9) {
-            input {
-                margin-left: 0.5rem;
-            }
+        input[in='item_inventory'] {
+            grid-column-start: 4;
+            grid-column-end: 5;
         }
+
+        //** Là đồng phục
+        label[for='uniform_ironing'] {
+            grid-column-start: 5;
+            grid-column-end: 6;
+        }
+
+        input[in='uniform_ironing'] {
+            grid-column-start: 6;
+            grid-column-end: 7;
+        }
+
+        //** có tem in từ cân điện tử - mark index 9
+
+        label[for='stamp_scale'],
+        input[id='stamp_scale'] {
+            grid-row-start: 2;
+            grid-row-end: 3;
+        }
+
+        input[id='stamp_scale'] {
+            grid-column-start: 2;
+            grid-column-end: 3;
+        }
+
+        //**Sử dụng lô hàng
+        label[for='item_using'] {
+            grid-column-start: 3;
+            grid-column-end: 4;
+        }
+
+        input[id='item_using'] {
+            grid-column-start: 4;
+            grid-column-end: 5;
+        }
+
+        //**hạn dùng bảo hành
+        label[for='due-date'] {
+            grid-column-start: 5;
+            grid-column-end: 6;
+        }
+
+        input[id='due-date'] {
+            grid-column-start: 6;
+            grid-column-end: 7;
+        }
+
+        .form__title--month {
+            display: inline-block;
+            margin-top: auto;
+            margin-bottom: auto;
+            font-size: 1.2rem;
+            font-weight: normal;
+            color: #000000;
+            grid-column-start: 7;
+            grid-column-end: 8;
+        }
+
 
     }
 }
