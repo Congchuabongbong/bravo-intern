@@ -10,6 +10,7 @@ import { BodyComponent } from './layout/body/body.component';
 import { MenuItemSidebarComponent } from './components/menu-item-sidebar/menu-item-sidebar.component';
 import { MenuErrorsSidebarComponent } from './components/menu-errors-sidebar/menu-errors-sidebar.component';
 import { ProductFormComponent } from './pages/product-form/product-form.component';
+import { ControlLayoutComponent } from './components/control-layout/control-layout.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { ProductFormComponent } from './pages/product-form/product-form.componen
     MenuItemSidebarComponent,
     MenuErrorsSidebarComponent,
     ProductFormComponent,
+    ControlLayoutComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
   providers: [],

@@ -2,13 +2,13 @@
     <div class="tab__box">
         <button class="tab__link" id="defaultOpen" #btn_general (click)="openTab(btn_general,'info__general')">Thông tin
             chung</button>
-        <button class="tab__link" #btn_attribute (click)="openTab(btn_attribute ,'info-attribute')">Thuộc
+        <button class="tab__link" #btn_attribute (click)="openTab(btn_attribute ,'info__attribute')">Thuộc
             tính</button>
     </div>
 
     <form [formGroup]="productForm" class="product_form" novalidate>
         <!-- **Thông tin chung** -->
-        <div class="tabContent info__container" id="info__general" formGroupName="info">
+        <div class='tabContent' id="info__general" formGroupName="info" #info__general>
             <!-- **Mã vật tư -->
 
             <label for="product_id" class="form__title"><span>1.</span>Mã Vật Tư</label>
@@ -64,7 +64,7 @@
 
         </div>
         <!-- **Thuộc tính** -->
-        <div class="tabContent" id="info-attribute" formGroupName="attribute">
+        <div class="tabContent" id="info__attribute" formGroupName="attribute">
             <!-- **Dài -->
             <label for="product_length" class="form__title"><span>1.</span>Dài</label>
             <div class="input-box"><input type="number" id="product_length" name="lengthProduct"
@@ -130,7 +130,6 @@
                 <input type="number" id="due-date" name="dueDateProduct" formControlName="dueDateProduct">
                 <span class="form__title--month">tháng</span>
             </div>
-
         </div>
     </form>
 </div>

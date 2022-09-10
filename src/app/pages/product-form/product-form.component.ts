@@ -4,6 +4,7 @@ import {
   ElementRef,
   AfterViewInit,
   Renderer2,
+  ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { v4 as uuidV4 } from 'uuid';
@@ -20,7 +21,26 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   public tabLinks!: ElementRef[];
   public tabContents!: ElementRef[];
   public productForm!: FormGroup;
-
+  @ViewChild('info__general') infoGeneral!: ElementRef;
+  @ViewChild('info__attribute') infoAttribute!: ElementRef;
+  public _layoutInfoGeneral = {
+    rows: ['1fr', '1fr', '1fr', '1fr', '1fr', '1fr', '1fr', '1fr'],
+    columns: [],
+  };
+  public _layoutInfoAttribute = {};
+  // grid-template-columns: minmax(10rem, 15rem) minmax(10rem, 20rem) min(10rem) repeat(2, minmax(10rem, 1fr))
+  setLayout() {
+    this.renderer.setStyle(
+      this.infoGeneral.nativeElement,
+      'grid-template-columns',
+      'minmax(10rem, 15rem) minmax(10rem, 20rem) min(10rem) repeat(2, minmax(10rem, 1fr))'
+    );
+    this.renderer.setStyle(
+      this.infoGeneral.nativeElement,
+      'grid-template-rows',
+      'repeat(8,1fr)'
+    );
+  }
   //**constructor */
   constructor(
     private dataService: DataService,
@@ -72,6 +92,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     this.tabLinks = this.el.nativeElement.querySelectorAll('.tab__link');
     this.tabContents = this.el.nativeElement.querySelectorAll('.tabContent');
     this.el.nativeElement.querySelector('#defaultOpen').click();
+    this.setLayout();
   }
   //**Getter Form */
   //**get information of product */
@@ -174,8 +195,4 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
       this.itemCodeProduct?.setValue('');
     }
   }
-  public _layout = {
-    rows: {},
-    columns: {},
-  };
 }
