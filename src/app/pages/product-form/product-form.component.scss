@@ -109,8 +109,8 @@ label {
 
 #info__general {
     display: grid;
-    grid-template-columns: minmax(10rem, 15rem) minmax(10rem, 20rem) min(10rem) repeat(2, minmax(10rem, 1fr)) minmax(5rem, 15%);
-    grid-template-rows: repeat(8, 1fr);
+    // grid-template-columns: minmax(10rem, 15rem) minmax(10rem, 20rem) min(10rem) repeat(2, minmax(10rem, 1fr)) minmax(5rem, 15%);
+    // grid-template-rows: repeat(8, 1fr);
     row-gap: 0.3rem;
     column-gap: 1rem;
 

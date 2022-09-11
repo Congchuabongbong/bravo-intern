@@ -1,3 +1,4 @@
+//*Import form core angular */
 import {
   Component,
   OnInit,
@@ -7,9 +8,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+//**Import from library */
 import { v4 as uuidV4 } from 'uuid';
+//**import from source */
 import { DataService } from 'src/app/services/data.service';
 import { maxMonth } from 'src/app/shared/custom-validator/maxMonth.validator';
+import GridLayout from 'src/app/shared/grid-layout.class';
 
 @Component({
   selector: 'app-product-form',
@@ -24,7 +28,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   @ViewChild('info__general') infoGeneral!: ElementRef;
   @ViewChild('info__attribute') infoAttribute!: ElementRef;
   @ViewChild('product_id') lb_productId!: ElementRef;
-  public layout = new GridLayout(8, 4, this.renderer); // init layout
+  public infoGeneralLayout = new GridLayout(8, 4, this.renderer); // init layout
   //**constructor */
   constructor(
     private dataService: DataService,
@@ -76,8 +80,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     this.tabLinks = this.el.nativeElement.querySelectorAll('.tab__link');
     this.tabContents = this.el.nativeElement.querySelectorAll('.tabContent');
     this.el.nativeElement.querySelector('#defaultOpen').click();
-    //declare height row
-    this.layout.widthColumn = [
+    //declare css for layout here:
+    this.infoGeneralLayout.widthColumn = [
       { min: '10rem', max: '15rem' },
       { min: '10rem', max: '20rem' },
       { min: '10rem', max: '20rem' },
@@ -85,8 +89,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
       { min: '10rem', max: '1fr' },
       { min: '5rem', max: '15%' },
     ];
-    this.layout.generateGridLayout(this.infoGeneral);
-    this.layout.setPositionGirdItem(
+    this.infoGeneralLayout.generateGridLayout(this.infoGeneral);
+    this.infoGeneralLayout.setPositionGirdItem(
       this.lb_productId,
       { startLine: 1, endLine: 2 },
       { startLine: 4, endLine: 5 }
@@ -195,107 +199,3 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   }
 }
 //**Class Grid layout */
-class GridLayout {
-  public numberOfRows: number;
-  public numberOfColumns: number;
-  public arrayUnitRow!: unitOfMeasure[];
-  public arrayUnitColumn!: unitOfMeasure[];
-  private renderer!: Renderer2;
-
-  constructor(row: number, column: number, renderer: Renderer2) {
-    this.numberOfRows = row;
-    this.numberOfColumns = column;
-    this.renderer = renderer;
-  }
-  generateGridLayout(girdContainer: ElementRef) {
-    if (this.arrayUnitRow !== undefined) {
-      let preParedStatement = '';
-      this.arrayUnitRow.forEach((unitRow) => {
-        if (typeof unitRow !== 'string' && this.isMinMax(unitRow)) {
-          preParedStatement += `minmax(${unitRow.min}, ${unitRow.max}) `;
-        } else {
-          preParedStatement += `${unitRow} `;
-        }
-      });
-
-      this.renderer.setStyle(
-        girdContainer.nativeElement,
-        'grid-template-rows',
-        preParedStatement
-      );
-    } else {
-      this.renderer.setStyle(
-        girdContainer.nativeElement,
-        'grid-template-rows',
-        `repeat(${this.numberOfRows},1fr)`
-      );
-    }
-    if (this.arrayUnitColumn !== undefined) {
-      let preParedStatement: string = '';
-      this.arrayUnitColumn.forEach((unitColumn) => {
-        if (typeof unitColumn !== 'string' && this.isMinMax(unitColumn)) {
-          preParedStatement += `minmax(${unitColumn.min}, ${unitColumn.max}) `;
-        } else {
-          preParedStatement += `${unitColumn} `;
-        }
-      });
-      this.renderer.setStyle(
-        girdContainer.nativeElement,
-        'grid-template-columns',
-        preParedStatement
-      );
-    } else {
-      this.renderer.setStyle(
-        girdContainer.nativeElement,
-        'grid-template-columns',
-        `repeat(${this.numberOfColumns},1fr)`
-      );
-    }
-  }
-
-  set heightRow(arrayUnitRow: unitOfMeasure[]) {
-    this.arrayUnitRow = arrayUnitRow;
-  }
-  set widthColumn(arrayUnitColumn: unitOfMeasure[]) {
-    this.arrayUnitColumn = arrayUnitColumn;
-  }
-  setPositionGirdItem(
-    girdItem: ElementRef,
-    rowLine: positionLine,
-    columnLine: positionLine
-  ) {
-    this.renderer.setStyle(
-      girdItem.nativeElement,
-      'grid-row-start',
-      `${rowLine.startLine}`
-    );
-    this.renderer.setStyle(
-      girdItem.nativeElement,
-      'grid-row-end',
-      `${rowLine.endLine}`
-    );
-    this.renderer.setStyle(
-      girdItem.nativeElement,
-      'grid-column-start',
-      `${columnLine.startLine}`
-    );
-    this.renderer.setStyle(
-      girdItem.nativeElement,
-      'grid-column-end',
-      `${columnLine.endLine}`
-    );
-  }
-  private isMinMax(obj: any): obj is minMax {
-    return 'min' in obj && 'max' in obj;
-  }
-}
-
-type unitOfMeasure = minMax | string;
-interface minMax {
-  min: string;
-  max: string;
-}
-interface positionLine {
-  startLine: number;
-  endLine: number;
-}
