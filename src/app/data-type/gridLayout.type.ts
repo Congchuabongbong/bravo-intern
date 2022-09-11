@@ -6,33 +6,67 @@ class GridLayout {
   public arrayUnitRow!: [UnitMaxMin];
   public arrayUnitColumn!: [UnitMaxMin];
 
-  constructor(
-    row: number,
-    column: number,
-    option?: {},
-    private renderer?: Renderer2
-  ) {
+  constructor(row: number, column: number, private renderer?: Renderer2) {
     this.numberOfRows = row;
     this.numberOfColumns = column;
   }
   generateGridLayout(girdContainer: ElementRef) {
-    if (this.setHeightRow()) {
+    if (this.arrayUnitRow.length > 0) {
+      let preParedStatement = '';
+      this.arrayUnitRow.forEach((unitRow) => {
+        preParedStatement += `minmax(${unitRow.min}, ${unitRow.max}) `;
+      });
+      this.renderer?.setStyle(
+        girdContainer,
+        'grid-template-rows',
+        preParedStatement
+      );
     } else {
+      this.renderer?.setStyle(
+        girdContainer,
+        'grid-template-rows',
+        `repeat(${this.numberOfRows},1fr)`
+      );
     }
-    if (this.setWidthColumn()) {
+    if (this.arrayUnitColumn.length > 0) {
+      let preParedStatement: string = '';
+      this.arrayUnitColumn.forEach((unitColumn) => {
+        preParedStatement += `minmax(${unitColumn.min}, ${unitColumn.max}) `;
+      });
+      this.renderer?.setStyle(
+        girdContainer,
+        'grid-template-columns',
+        preParedStatement
+      );
     } else {
+      this.renderer?.setStyle(
+        girdContainer,
+        'grid-template-columns',
+        `repeat(${this.numberOfColumns},1fr)`
+      );
     }
   }
 
-  setHeightRow(): [UnitMaxMin] {
-    return this.arrayUnitRow;
+  set heightRow(arrayUnitRow: [UnitMaxMin]) {
+    this.arrayUnitRow = arrayUnitRow;
   }
-  setWidthColumn(): [UnitMaxMin] {
-    return this.arrayUnitColumn;
+  set widthColumn(arrayUnitColumn: [UnitMaxMin]) {
+    this.arrayUnitColumn = arrayUnitColumn;
   }
-  setPositionGirdItem(girdItem: ElementRef, rowLine: {}, columnLine: {}) {}
+  setPositionGirdItem(
+    girdItem: ElementRef,
+    rowLine: positionLine,
+    columnLine: positionLine
+  ) {
+    this.renderer?.setStyle(girdItem, '', '');
+    this.renderer?.setStyle(girdItem, '', '');
+  }
 }
 interface UnitMaxMin {
   min: number;
   max: number;
+}
+interface positionLine {
+  startLine: number;
+  endLine: number;
 }
