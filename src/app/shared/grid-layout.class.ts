@@ -10,7 +10,6 @@ interface positionLine {
   startLine: number;
   endLine: number;
 }
-
 export default class GridLayout {
   private numberOfRows: number;
   private numberOfColumns: number;
