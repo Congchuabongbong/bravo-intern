@@ -22,12 +22,12 @@ import GridLayout from 'src/app/shared/grid-layout.class';
 })
 export class ProductFormComponent implements OnInit, AfterViewInit {
   //**Declaration */
-  public tabLinks!: ElementRef[];
-  public tabContents!: ElementRef[];
-  public productForm!: FormGroup;
   @ViewChild('info__general') infoGeneral!: ElementRef;
   @ViewChild('info__attribute') infoAttribute!: ElementRef;
   @ViewChild('product_id') lb_productId!: ElementRef;
+  public tabLinks!: ElementRef[];
+  public tabContents!: ElementRef[];
+  public productForm!: FormGroup;
   public infoGeneralLayout = new GridLayout(8, 4, this.renderer); // init layout
   //**constructor */
   constructor(
@@ -90,11 +90,11 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
       { min: '5rem', max: '15%' },
     ];
     this.infoGeneralLayout.generateGridLayout(this.infoGeneral);
-    this.infoGeneralLayout.setPositionGirdItem(
-      this.lb_productId,
-      { startLine: 1, endLine: 2 },
-      { startLine: 4, endLine: 5 }
-    );
+    // this.infoGeneralLayout.setPositionGirdItem(
+    //   this.lb_productId,
+    //   { startLine: 1, endLine: 2 },
+    //   { startLine: 4, endLine: 5 }
+    // );
   }
   //**Getter Form */
   //**get information of product */
@@ -198,4 +198,3 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     }
   }
 }
-//**Class Grid layout */
