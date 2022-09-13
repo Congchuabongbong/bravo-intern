@@ -28,7 +28,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   public tabLinks!: ElementRef[];
   public tabContents!: ElementRef[];
   public productForm!: FormGroup;
-  public infoGeneralLayout = new GridLayout(8, 4, this.renderer); // init layout
+  public infoGeneralLayout = new GridLayout(8, 6, this.renderer); // init layout
   //**constructor */
   constructor(
     private dataService: DataService,
@@ -84,17 +84,19 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     this.infoGeneralLayout.widthColumn = [
       { min: '10rem', max: '15rem' },
       { min: '10rem', max: '20rem' },
-      { min: '10rem', max: '20rem' },
+      { min: '10rem' },
       { min: '10rem', max: '1fr' },
       { min: '10rem', max: '1fr' },
       { min: '5rem', max: '15%' },
     ];
     this.infoGeneralLayout.generateGridLayout(this.infoGeneral);
-    // this.infoGeneralLayout.setPositionGirdItem(
-    //   this.lb_productId,
-    //   { startLine: 1, endLine: 2 },
-    //   { startLine: 4, endLine: 5 }
-    // );
+    this.infoGeneralLayout.setPositionGirdItem(
+      this.lb_productId,
+      { startLine: 1, endLine: 2 },
+      { startLine: 1, endLine: 2 }
+    );
+    this.infoGeneralLayout.setRowGap(this.infoGeneral, '0.3rem');
+    this.infoGeneralLayout.setColumnGap(this.infoGeneral, '1rem');
   }
   //**Getter Form */
   //**get information of product */
