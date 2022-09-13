@@ -28,7 +28,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   public tabLinks!: ElementRef[];
   public tabContents!: ElementRef[];
   public productForm!: FormGroup;
-  public infoGeneralLayout = new GridLayout(8, 6, this.renderer); // init layout
+
   //**constructor */
   constructor(
     private dataService: DataService,
@@ -81,7 +81,13 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     this.tabContents = this.el.nativeElement.querySelectorAll('.tabContent');
     this.el.nativeElement.querySelector('#defaultOpen').click();
     //declare css for layout here:
-    this.infoGeneralLayout.widthColumn = [
+    const infoGeneralLayout = new GridLayout(
+      this.infoGeneral,
+      8,
+      6,
+      this.renderer
+    ); // init layout
+    infoGeneralLayout.widthColumn = [
       { min: '10rem', max: '15rem' },
       { min: '10rem', max: '20rem' },
       { min: '10rem' },
@@ -89,14 +95,13 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
       { min: '10rem', max: '1fr' },
       { min: '5rem', max: '15%' },
     ];
-    this.infoGeneralLayout.generateGridLayout(this.infoGeneral);
-    this.infoGeneralLayout.setPositionGirdItem(
+    infoGeneralLayout.generateGridLayout();
+    infoGeneralLayout.setPositionGirdItem(
       this.lb_productId,
       { startLine: 1, endLine: 2 },
       { startLine: 1, endLine: 2 }
     );
-    this.infoGeneralLayout.setRowGap(this.infoGeneral, '0.3rem');
-    this.infoGeneralLayout.setColumnGap(this.infoGeneral, '1rem');
+    infoGeneralLayout.setGap('0.3rem', '1rem');
   }
   //**Getter Form */
   //**get information of product */
