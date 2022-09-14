@@ -16,11 +16,33 @@ export interface PositionGridItem {
 }
 interface ControlLayoutGridForm {
   labels: Label[];
-  input: ControlFormType[];
+  fields: ControlFormType[];
 }
 type ControlFormType = Input | Select | Textarea;
 type CategoryTag = 'input' | 'select' | 'textarea';
-type InputType = 'text' | 'checkbox' | 'radio';
+type InputType =
+  | 'text'
+  | 'checkbox'
+  | 'radio'
+  | 'button'
+  | 'color'
+  | 'date'
+  | 'datetime-local'
+  | 'email'
+  | 'file'
+  | 'hidden'
+  | 'image'
+  | 'month'
+  | 'number'
+  | 'password'
+  | 'range'
+  | 'reset'
+  | 'search'
+  | 'submit'
+  | 'tel'
+  | 'time'
+  | 'url'
+  | 'week';
 interface Input {
   categoryTag: CategoryTag;
   type: InputType;
@@ -29,21 +51,22 @@ interface Input {
 interface Select {
   categoryTag: CategoryTag;
   title: string;
-  option: {
-    title: string;
-    value: any;
-  };
+  options: [
+    {
+      title: string;
+      value: any;
+    }
+  ];
+  attribute: Attribute;
 }
 interface Textarea {
   categoryTag: CategoryTag;
   attribute: Attribute;
 }
-interface Label {
+interface Label extends Pick<Attribute, 'class' | 'position'> {
   title: string;
   id?: string;
-  class?: string;
   for: string;
-  position: PositionGridItem;
 }
 
 interface Attribute {
@@ -68,7 +91,7 @@ function doSomething() {
         },
       },
     ],
-    input: [
+    fields: [
       {
         categoryTag: 'input',
         type: 'text',
