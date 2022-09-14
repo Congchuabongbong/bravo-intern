@@ -83,7 +83,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     //declare css for layout here:
     const infoGeneralLayout = new GridLayout(
       this.infoGeneral,
-      8,
+      9,
       6,
       this.renderer
     ); // init layout
@@ -96,11 +96,10 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
       { min: '5rem', max: '15%' },
     ];
     infoGeneralLayout.generateGridLayout();
-    infoGeneralLayout.setPositionGirdItem(
-      this.lb_productId,
-      { startLine: 1, endLine: 2 },
-      { startLine: 1, endLine: 2 }
-    );
+    infoGeneralLayout.setPositionGirdItem(this.lb_productId, {
+      rowLine: { startLine: 1, endLine: 2 },
+      columnLine: { startLine: 1, endLine: 2 },
+    });
     infoGeneralLayout.setGap('0.3rem', '1rem');
   }
   //**Getter Form */

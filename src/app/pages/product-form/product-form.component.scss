@@ -64,15 +64,18 @@ label {
 
 //**main content
 .main-content {
-    min-height: calc(100vh - 5rem) !important;
+    height: calc(100vh - 5rem) !important;
     width: 100%;
     background-color: #F5F5F5;
+    overflow: hidden;
 }
 
 //** product  form
 .product_form {
+    display: block;
     overflow-x: scroll;
     padding: 0.5rem 1.2rem 0 1.2rem;
+    // height: 100%;
 }
 
 //** tab links
@@ -108,6 +111,7 @@ label {
 //** info general
 
 #info__general {
+    // height: 100%;
     // display: grid;
     // grid-template-columns: minmax(10rem, 15rem) minmax(10rem, 20rem) min(10rem) repeat(2, minmax(10rem, 1fr)) minmax(5rem, 15%);
     // grid-template-rows: repeat(8, 1fr);

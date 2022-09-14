@@ -3,15 +3,16 @@ import { ElementRef, Renderer2 } from '@angular/core';
 import {
   MinMax,
   PositionLine,
-  unitOfMeasure,
+  UnitOfMeasure,
+  PositionGridItem,
 } from '../data-type/grid-layout-data-type.type';
 
 export default class GridLayout {
   private gridContainer!: ElementRef;
   private numberOfRows: number;
   private numberOfColumns: number;
-  private arrayUnitRow!: unitOfMeasure[];
-  private arrayUnitColumn!: unitOfMeasure[];
+  private arrayUnitRow!: UnitOfMeasure[];
+  private arrayUnitColumn!: UnitOfMeasure[];
   private renderer!: Renderer2;
 
   constructor(
@@ -25,10 +26,10 @@ export default class GridLayout {
     this.numberOfColumns = _numberOfColumns;
     this.renderer = _renderer;
   }
-  set heightRow(arrayUnitRow: unitOfMeasure[]) {
+  set heightRow(arrayUnitRow: UnitOfMeasure[]) {
     this.arrayUnitRow = arrayUnitRow;
   }
-  set widthColumn(arrayUnitColumn: unitOfMeasure[]) {
+  set widthColumn(arrayUnitColumn: UnitOfMeasure[]) {
     this.arrayUnitColumn = arrayUnitColumn;
   }
   public generateGridLayout(): void {
@@ -71,7 +72,7 @@ export default class GridLayout {
         );
       }
       let preParedStatement: string = '';
-      this.arrayUnitColumn.forEach((unitColumn: unitOfMeasure) => {
+      this.arrayUnitColumn.forEach((unitColumn: UnitOfMeasure) => {
         if (typeof unitColumn !== 'string' && this.isMinMax(unitColumn)) {
           preParedStatement += `minmax(${unitColumn.min}, ${unitColumn.max}) `;
         } else if (typeof unitColumn !== 'string' && this.isMin(unitColumn)) {
@@ -121,28 +122,27 @@ export default class GridLayout {
   //**set position grid item */
   public setPositionGirdItem(
     gridItem: ElementRef,
-    rowLinePosition: PositionLine,
-    columnLinePosition: PositionLine
+    position: PositionGridItem
   ): void {
     this.renderer.setStyle(
       gridItem.nativeElement,
       'grid-row-start',
-      `${rowLinePosition.startLine}`
+      `${position.rowLine.startLine}`
     );
     this.renderer.setStyle(
       gridItem.nativeElement,
       'grid-row-end',
-      `${rowLinePosition.endLine}`
+      `${position.rowLine.endLine}`
     );
     this.renderer.setStyle(
       gridItem.nativeElement,
       'grid-column-start',
-      `${columnLinePosition.startLine}`
+      `${position.columnLine.startLine}`
     );
     this.renderer.setStyle(
       gridItem.nativeElement,
       'grid-column-end',
-      `${columnLinePosition.endLine}`
+      `${position.columnLine.endLine}`
     );
   }
 
