@@ -1,0 +1,18 @@
+<ng-container [ngSwitch]="filed.categoryTag">
+    <!-- ** case: Input -->
+    <ng-container *ngSwitchCase="'input'">
+        <input type="{{filed.type}}" id="{{filed.attribute.id}}"
+            class="{{filed.attribute.class ? filed.attribute.class :''}}">
+    </ng-container>
+    <!-- ** case: select -->
+    <ng-container *ngSwitchCase="'select'">
+        <select id="{{filed.attribute.id}}" class="{{filed.attribute.class ? filed.attribute.class :''}}">
+            <option *ngFor="let option of filed.options" value="{{option.value}}">
+                {{option.title}}</option>
+        </select>
+    </ng-container>
+    <!-- ** case: textarea -->
+    <ng-container *ngSwitchCase="'textarea'">
+        <textarea id="{{filed.attribute.id}}" class="{{filed.attribute.class ? filed.attribute.class :''}}"></textarea>
+    </ng-container>
+</ng-container>

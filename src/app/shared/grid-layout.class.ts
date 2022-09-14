@@ -1,18 +1,19 @@
 import { ElementRef, Renderer2 } from '@angular/core';
 //**data type */
 import {
-  MinMax,
-  PositionLine,
-  UnitOfMeasure,
-  PositionGridItem,
+  IMinMax,
+  IUnitOfMeasure,
+  IPositionGridItem,
+  IMin,
+  IMax,
 } from '../data-type/grid-layout-data-type.type';
 
 export default class GridLayout {
   private gridContainer!: ElementRef;
   private numberOfRows: number;
   private numberOfColumns: number;
-  private arrayUnitRow!: UnitOfMeasure[];
-  private arrayUnitColumn!: UnitOfMeasure[];
+  private arrayUnitRow!: IUnitOfMeasure[];
+  private arrayUnitColumn!: IUnitOfMeasure[];
   private renderer!: Renderer2;
 
   constructor(
@@ -26,10 +27,10 @@ export default class GridLayout {
     this.numberOfColumns = _numberOfColumns;
     this.renderer = _renderer;
   }
-  set heightRow(arrayUnitRow: UnitOfMeasure[]) {
+  set heightRow(arrayUnitRow: IUnitOfMeasure[]) {
     this.arrayUnitRow = arrayUnitRow;
   }
-  set widthColumn(arrayUnitColumn: UnitOfMeasure[]) {
+  set widthColumn(arrayUnitColumn: IUnitOfMeasure[]) {
     this.arrayUnitColumn = arrayUnitColumn;
   }
   public generateGridLayout(): void {
@@ -72,7 +73,7 @@ export default class GridLayout {
         );
       }
       let preParedStatement: string = '';
-      this.arrayUnitColumn.forEach((unitColumn: UnitOfMeasure) => {
+      this.arrayUnitColumn.forEach((unitColumn: IUnitOfMeasure) => {
         if (typeof unitColumn !== 'string' && this.isMinMax(unitColumn)) {
           preParedStatement += `minmax(${unitColumn.min}, ${unitColumn.max}) `;
         } else if (typeof unitColumn !== 'string' && this.isMin(unitColumn)) {
@@ -122,7 +123,7 @@ export default class GridLayout {
   //**set position grid item */
   public setPositionGirdItem(
     gridItem: ElementRef,
-    position: PositionGridItem
+    position: IPositionGridItem
   ): void {
     this.renderer.setStyle(
       gridItem.nativeElement,
@@ -147,13 +148,13 @@ export default class GridLayout {
   }
 
   //** Check if obj is type of minMax type*/
-  private isMinMax(obj: any): obj is MinMax {
+  private isMinMax(obj: any): obj is IMinMax {
     return 'min' in obj && 'max' in obj;
   }
-  private isMin(obj: any): obj is Pick<MinMax, 'min'> {
+  private isMin(obj: any): obj is IMin {
     return 'min' in obj;
   }
-  private isMax(obj: any): obj is Pick<MinMax, 'max'> {
+  private isMax(obj: any): obj is IMax {
     return 'max' in obj;
   }
 }

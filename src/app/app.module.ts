@@ -11,6 +11,7 @@ import { MenuItemSidebarComponent } from './components/menu-item-sidebar/menu-it
 import { MenuErrorsSidebarComponent } from './components/menu-errors-sidebar/menu-errors-sidebar.component';
 import { ProductFormComponent } from './pages/product-form/product-form.component';
 import { ControlLayoutComponent } from './components/control-layout/control-layout.component';
+import { ControlFormFiledPanelComponent } from './components/control-form-filed-panel/control-form-filed-panel.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { ControlLayoutComponent } from './components/control-layout/control-layo
     MenuErrorsSidebarComponent,
     ProductFormComponent,
     ControlLayoutComponent,
+    ControlFormFiledPanelComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
   providers: [],
