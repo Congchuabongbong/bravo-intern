@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ControlFormFiledPanelComponent } from './control-form-filed-panel.component';
+import { ControlFormFieldPanelComponent } from './control-form-field-panel.component';
 
 describe('ControlFormFiledPanelComponent', () => {
-  let component: ControlFormFiledPanelComponent;
-  let fixture: ComponentFixture<ControlFormFiledPanelComponent>;
+  let component: ControlFormFieldPanelComponent;
+  let fixture: ComponentFixture<ControlFormFieldPanelComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ControlFormFiledPanelComponent ]
+      declarations: [ControlFormFieldPanelComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(ControlFormFiledPanelComponent);
+    fixture = TestBed.createComponent(ControlFormFieldPanelComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

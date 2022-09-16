@@ -5,130 +5,42 @@
         <button class="tab__link" #btn_attribute (click)="openTab(btn_attribute ,'info__attribute')">Thuộc
             tính</button>
     </div>
-
     <form [formGroup]="productForm" class="product_form" novalidate>
         <!-- **Thông tin chung** -->
-        <div class='tabContent' id="info__general" formGroupName="info" #info__general>
-            <!-- **Mã vật tư -->
-            <label for="product_id" class="form__title" #product_id><span>1.</span>Mã Vật Tư</label>
-            <input type="text" id="product_id" name="idProduct" formControlName="idProduct">
-            <!-- **tên vật tư -->
-
-            <label for="product_name" class="form__title"><span>2.</span>Tên Vật Tư</label>
-            <input type="text" id="product_name" name="nameProduct" formControlName="nameProduct">
-            <!-- **tên thứ 2 -->
-
-            <label for="product_name--second" class="form__title"><span>3.</span>Tên Thứ 2</label>
-            <input type="text" id="product_name--second" name="secondNameProduct" formControlName="secondNameProduct">
-            <!-- **Đơn vị tính -->
-
-            <label for="product_unit" class="form__title"><span>4.</span>Đơn Vị Tính</label>
-            <input type="text" id="product_unit" name="unitProduct" formControlName="unitProduct">
-            <!-- **Loại vật tư -->
-
-            <label for="product_type" class="form__title"><span>5.</span>Loại Vật Tư</label>
-            <select id="product_type" name="typeProduct" formControlName="typeProduct">
-                <option [ngValue]="null" disabled>Chọn loại vật tư</option>
-                <option value="1">Type 1</option>
-                <option value="2">Type 2</option>
-                <option value="3">Type 3</option>
-            </select>
-            <!-- **Nhóm hàng -->
-
-            <label for="product_group" class="form__title"><span>6.</span>Nhóm Hàng</label>
-            <select id="product_group" name="groupProduct" formControlName="groupProduct">
-                <option [ngValue]="null" disabled>Chọn nhóm hàng</option>
-                <option value="1">Nhóm 1</option>
-                <option value="2">Nhóm 2</option>
-                <option value="3">Nhóm 3</option>
-            </select>
-            <!-- **tự tạo mã và mã sản phẩm -->
-
-            <label for="item_id--auto" class="form__title"><span>7.</span>Tự Tạo Mã SP</label>
-            <div class="row78-col23">
-                <input type="checkbox" id="item_id--auto" name="isAutoItemCodeProduct"
-                    formControlName="isAutoItemCodeProduct" (change)="onChangeAutoItemCodeProduct($event)">
-                <label for="item_id--create" class="form__title">Mã sản phẩm</label>
-            </div>
-            <input type="text" id="item_id--create" name="itemCodeProduct" formControlName="itemCodeProduct">
-            <!-- **Ghi chú -->
-
-            <label for="product_note" class="form__title"><span>8.</span>Ghi Chú</label>
-            <input type="text" id="product_note" name="noteProduct" formControlName="noteProduct">
-            <!-- **Ảnh** -->
-
-            <label for="product_image" class="form__title">Ảnh đại diện</label>
-            <textarea name="product_image" id="product_image" name="thumbnailProduct"
-                formControlName="thumbnailProduct"></textarea>
-
-        </div>
-        <!-- **Thuộc tính** -->
-        <div class="tabContent" id="info__attribute" formGroupName="attribute">
-            <!-- **Dài -->
-            <label for="product_length" class="form__title"><span>1.</span>Dài</label>
-            <div class="input-box"><input type="number" id="product_length" name="lengthProduct"
-                    formControlName="lengthProduct"></div>
-            <!-- **Rộng -->
-
-            <label for="product_width" class="form__title"><span>2.</span>Rộng</label>
-            <div class="input-box"><input type="number" id="product_width" name="widthProduct"
-                    formControlName="widthProduct"></div>
-            <!-- **Cao -->
-
-            <label for="product_height" class="form__title"><span>3.</span>Cao</label>
-            <div class="input-box"><input type="number" id="product_height" name="heightProduct"
-                    formControlName="heightProduct"></div>
-            <!-- **Trọng lượng -->
-
-            <label for="product_weight" class="form__title"><span>4.</span>Trọng lượng</label>
-            <div class="input-box"><input type="number" id="product_weight" name="weightProduct"
-                    formControlName="weightProduct"></div>
-            <!-- **Nhóm tiêu chuẩn -->
-
-            <label for="product_standard" class="form__title"><span>5.</span>Nhóm Tiêu chuẩn QC</label>
-            <div class="input-box">
-                <select id="product_standard" name="standardGroupQc" formControlName="standardGroupQc">
-                    <option [ngValue]="null" disabled>Chọn nhóm Tiêu chuẩn QC</option>
-                    <option value="1">Quy chuẩn 1</option>
-                    <option value="2">Quy chuẩn 2</option>
-                    <option value="3">Quy chuẩn 3</option>
-                    <option value="4">Quy chuẩn 4</option>
-                </select>
-            </div>
-            <!-- **Loại duyệt giá mua-->
-
-            <label for="product_type-of-purchase" class="form__title"><span>6.</span>Loại duyệt giá mua</label>
-            <div class="input-box">
-                <select id="product_type-of-purchase" name="typeOfPurchase" formControlName="typeOfPurchase">
-                    <option [ngValue]="null" disabled>Chọn loại duyệt giá mua</option>
-                    <option value="1">1: Không cần lập đơn hàng</option>
-                    <option value="2">2: Lập đơn hàng</option>
-                </select>
-            </div>
-
-            <!-- **Mã ngắn -->
-
-            <label for="product_short-code" class="form__title"><span>7.</span>Mã ngắn</label>
-            <div class="input-box"><input type="number" id="product_short-code" name="shortCode"
-                    formControlName="shortCode"></div>
-
-            <!-- **Group checkbox -->
-            <div class="group-checkbox">
-                <label for="item_serial" class="form__title"><span>8.</span>Mặt hàng theo dõi số serial</label>
-                <input type="checkbox" id="item_serial" name="isSerial" formControlName="isSerial">
-                <label for="item_inventory" class="form__title">Theo dõi tồn kho theo vị trí</label>
-                <input type="checkbox" id="item_inventory" name="isInventoryByLocation"
-                    formControlName="isInventoryByLocation">
-                <label for="uniform_ironing" class="form__title">Là Đồng phục</label>
-                <input type="checkbox" id="uniform_ironing" name="isIroningUniform" formControlName="isIroningUniform">
-                <label for="stamp_scale" class="form__title"><span>9.</span>Có tem in từ cân điện tử</label>
-                <input type="checkbox" id="stamp_scale" name="isStampScale" formControlName="isStampScale">
-                <label for="item_using" class="form__title">Sử dụng lô hàng</label>
-                <input type="checkbox" id="item_using" name="isUsingItem" formControlName="isUsingItem">
-                <label for="due-date" class="form__title">Hạn dùng/bảo hành</label>
-                <input type="number" id="due-date" name="dueDateProduct" formControlName="dueDateProduct">
-                <span class="form__title--month">tháng</span>
-            </div>
-        </div>
+        <app-control-grid-layout-panel formGroupName="info" class="tabContent" id="info__general"
+            [column]="formInfo.column.columnOfNumber" [row]="formInfo.row.rowOfNumber"
+            [arrayUnitColumn]="formInfo.column.arrayUnitColumn" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
+            <app-control-form-label-panel *ngFor="let label of formInfo.gridItemForm.labels;let index = index"
+                [label]="label">
+            </app-control-form-label-panel>
+            <app-control-form-field-panel *ngFor="let field of formInfo.gridItemForm.fields" [field]="field"
+                formControlName="{{field.attribute.formControlName}}">
+            </app-control-form-field-panel>
+        </app-control-grid-layout-panel>
+        <!--** Thuộc tính **-->
+        <app-control-grid-layout-panel class="tabContent" id="info__attribute" formGroupName="attribute"
+            [column]="formAttributeInfo.column.columnOfNumber" [row]="formAttributeInfo.row.rowOfNumber"
+            [arrayUnitColumn]="formAttributeInfo.column.arrayUnitColumn" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
+            <app-control-form-label-panel *ngFor="let label of formAttributeInfo.gridItemForm.labels;" [label]="label">
+            </app-control-form-label-panel>
+            <app-control-form-field-panel *ngFor="let field of formAttributeInfo.gridItemForm.fields" [field]="field"
+                formControlName="{{field.attribute.formControlName}}">
+            </app-control-form-field-panel>
+            <!-- **Nested layout** -->
+            <app-control-grid-layout-panel
+                [column]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.column.columnOfNumber"
+                [row]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.row.rowOfNumber"
+                [arrayUnitColumn]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.column.arrayUnitColumn"
+                [positionLine]="formAttributeInfo.gridItemForm.subControlGridLayoutForm?.position">
+                <app-control-form-label-panel
+                    *ngFor="let label of formAttributeInfo.gridItemForm.subControlGridLayoutForm?.subGridItemForm?.gridItemForm?.labels;"
+                    [label]="label">
+                </app-control-form-label-panel>
+                <app-control-form-field-panel
+                    *ngFor="let field of formAttributeInfo.gridItemForm.subControlGridLayoutForm?.subGridItemForm?.gridItemForm?.fields"
+                    [field]="field" formControlName="{{field.attribute.formControlName}}">
+                </app-control-form-field-panel>
+            </app-control-grid-layout-panel>
+        </app-control-grid-layout-panel>
     </form>
 </div>

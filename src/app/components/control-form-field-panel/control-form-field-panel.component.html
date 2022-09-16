@@ -1,0 +1,32 @@
+<ng-container [ngSwitch]="field.attribute.categoryTag">
+    <!-- ** case: Input -->
+    <ng-container *ngSwitchCase="'input'">
+        <ng-container *ngIf="isInput(field)">
+            <input type="{{field.type}}" id="{{field.attribute.id}}"
+                class="{{field.attribute.class ? field.attribute.class :''}}"
+                placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
+                [(ngModel)]="valueFiled" (ngModelChange)="handleValueChange($event)"
+                [ngClass]="classList ? classList : ''">
+        </ng-container>
+    </ng-container>
+    <!-- ** case: select -->
+    <ng-container *ngSwitchCase="'select'">
+        <ng-container *ngIf="isSelect(field)">
+            <select id="{{field.attribute.id}}" class="{{field.attribute.class ? field.attribute.class :''}}"
+                [(ngModel)]="valueFiled" (ngModelChange)="handleValueChange($event)"
+                [ngClass]="classList ? classList : ''">
+                <option *ngFor="let option of field.options" [ngValue]="option.value">
+                    {{option.title}}</option>
+            </select>
+        </ng-container>
+    </ng-container>
+    <!-- ** case: textarea -->
+    <ng-container *ngSwitchCase="'textarea'">
+        <ng-container *ngIf="isTextarea(field)">
+            <textarea id="{{field.attribute.id}}" class="{{field.attribute.class ? field.attribute.class :''}}"
+                placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
+                [(ngModel)]="valueFiled" (ngModelChange)="handleValueChange($event)"
+                [ngClass]="classList ? classList : ''"></textarea>
+        </ng-container>
+    </ng-container>
+</ng-container>

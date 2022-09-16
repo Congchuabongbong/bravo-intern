@@ -1,19 +1,19 @@
 import { ElementRef, Renderer2 } from '@angular/core';
+import { GridLayoutData } from '../data-type';
 //**data type */
 import {
   IMinMax,
-  IUnitOfMeasure,
-  IPositionGridItem,
+  UnitOfMeasure,
   IMin,
   IMax,
-} from '../data-type/grid-layout-data-type.type';
+} from '../data-type/grid-layout-data.type';
 
 export default class GridLayout {
   private gridContainer!: ElementRef;
   private numberOfRows: number;
   private numberOfColumns: number;
-  private arrayUnitRow!: IUnitOfMeasure[];
-  private arrayUnitColumn!: IUnitOfMeasure[];
+  private arrayUnitRow!: UnitOfMeasure[];
+  private arrayUnitColumn!: UnitOfMeasure[];
   private renderer!: Renderer2;
 
   constructor(
@@ -27,10 +27,10 @@ export default class GridLayout {
     this.numberOfColumns = _numberOfColumns;
     this.renderer = _renderer;
   }
-  set heightRow(arrayUnitRow: IUnitOfMeasure[]) {
+  set heightRow(arrayUnitRow: UnitOfMeasure[]) {
     this.arrayUnitRow = arrayUnitRow;
   }
-  set widthColumn(arrayUnitColumn: IUnitOfMeasure[]) {
+  set widthColumn(arrayUnitColumn: UnitOfMeasure[]) {
     this.arrayUnitColumn = arrayUnitColumn;
   }
   public generateGridLayout(): void {
@@ -53,7 +53,7 @@ export default class GridLayout {
           preParedStatement += `${unitRow} `;
         }
       });
-      console.log(`row statement:${preParedStatement}`);
+      // console.log(`row statement:${preParedStatement}`);
       this.renderer.setStyle(
         this.gridContainer.nativeElement,
         'grid-template-rows',
@@ -73,7 +73,7 @@ export default class GridLayout {
         );
       }
       let preParedStatement: string = '';
-      this.arrayUnitColumn.forEach((unitColumn: IUnitOfMeasure) => {
+      this.arrayUnitColumn.forEach((unitColumn: UnitOfMeasure) => {
         if (typeof unitColumn !== 'string' && this.isMinMax(unitColumn)) {
           preParedStatement += `minmax(${unitColumn.min}, ${unitColumn.max}) `;
         } else if (typeof unitColumn !== 'string' && this.isMin(unitColumn)) {
@@ -84,7 +84,7 @@ export default class GridLayout {
           preParedStatement += `${unitColumn} `;
         }
       });
-      console.log(`column statement:${preParedStatement}`);
+      // console.log(`column statement:${preParedStatement}`);
       this.renderer.setStyle(
         this.gridContainer.nativeElement,
         'grid-template-columns',
@@ -120,32 +120,13 @@ export default class GridLayout {
       `${rowGapUnit} ${columnGapUnit}`
     );
   }
+
   //**set position grid item */
-  public setPositionGirdItem(
-    gridItem: ElementRef,
-    position: IPositionGridItem
-  ): void {
-    this.renderer.setStyle(
-      gridItem.nativeElement,
-      'grid-row-start',
-      `${position.rowLine.startLine}`
-    );
-    this.renderer.setStyle(
-      gridItem.nativeElement,
-      'grid-row-end',
-      `${position.rowLine.endLine}`
-    );
-    this.renderer.setStyle(
-      gridItem.nativeElement,
-      'grid-column-start',
-      `${position.columnLine.startLine}`
-    );
-    this.renderer.setStyle(
-      gridItem.nativeElement,
-      'grid-column-end',
-      `${position.columnLine.endLine}`
-    );
+  public setPositionGirdItem(elRef: ElementRef, position: GridLayoutData.IPositionGridItem) {
+    this.renderer.setStyle(elRef.nativeElement, 'grid-row', `${position.rowLine.startLine} / ${position.rowLine.endLine}`)
+    this.renderer.setStyle(elRef.nativeElement, 'grid-column', `${position.columnLine.startLine} / ${position.columnLine.endLine}`)
   }
+
 
   //** Check if obj is type of minMax type*/
   private isMinMax(obj: any): obj is IMinMax {
