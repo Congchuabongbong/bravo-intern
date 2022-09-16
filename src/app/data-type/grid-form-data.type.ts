@@ -13,7 +13,3 @@ export interface IGridItemForm {
         position: GridLayoutData.IPositionGridItem
     };
 }
-
-function doSomething() {
-
-}

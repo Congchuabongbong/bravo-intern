@@ -6,8 +6,6 @@ import {
   ElementRef,
   AfterViewInit,
   Renderer2,
-  ViewChild,
-  ViewEncapsulation,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 //**Import from library */
