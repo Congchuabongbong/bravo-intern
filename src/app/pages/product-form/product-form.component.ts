@@ -535,7 +535,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 type: 'checkbox',
                 attribute: {
                   categoryTag: 'input',
-                  id: 'item_inventory',
+                  id: 'item_serial',
                   position: {
                     rowLine: { startLine: 1, endLine: 2 },
                     columnLine: { startLine: 2, endLine: 3 },
@@ -547,7 +547,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 type: 'checkbox',
                 attribute: {
                   categoryTag: 'input',
-                  id: 'item_serial',
+                  id: 'item_inventory',
                   position: {
                     rowLine: { startLine: 1, endLine: 2 },
                     columnLine: { startLine: 4, endLine: 5 },
@@ -686,13 +686,13 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     this.renderer.setStyle(currentTab, 'display', 'grid');
   }
   //**isAutoItemCodeProduct changed
-  public onChangeAutoItemCodeProduct(event: any): void {
-    if (event.target.checked) {
-      this.itemCodeProduct?.disable();
-      this.itemCodeProduct?.setValue(uuidV4());
-    } else {
-      this.itemCodeProduct?.enable();
-      this.itemCodeProduct?.setValue('');
-    }
-  }
+  // public onChangeAutoItemCodeProduct(event: any): void {
+  //   if (event.target.checked) {
+  //     this.itemCodeProduct?.disable();
+  //     this.itemCodeProduct?.setValue(uuidV4());
+  //   } else {
+  //     this.itemCodeProduct?.enable();
+  //     this.itemCodeProduct?.setValue('');
+  //   }
+  // }
 }

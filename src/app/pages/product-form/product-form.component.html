@@ -31,7 +31,8 @@
                 [column]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.column.columnOfNumber"
                 [row]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.row.rowOfNumber"
                 [arrayUnitColumn]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.column.arrayUnitColumn"
-                [positionLine]="formAttributeInfo.gridItemForm.subControlGridLayoutForm?.position">
+                [positionLine]="formAttributeInfo.gridItemForm.subControlGridLayoutForm?.position"
+                [columnGap]="'0.5rem'">
                 <app-control-form-label-panel
                     *ngFor="let label of formAttributeInfo.gridItemForm.subControlGridLayoutForm?.subGridItemForm?.gridItemForm?.labels;"
                     [label]="label">

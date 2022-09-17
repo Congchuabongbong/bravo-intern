@@ -7,7 +7,7 @@ import {
   forwardRef,
   Renderer2,
 } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { FormFieldData } from 'src/app/data-type';
 import { GridLayoutService } from 'src/app/services/grid-layout.service';
 
