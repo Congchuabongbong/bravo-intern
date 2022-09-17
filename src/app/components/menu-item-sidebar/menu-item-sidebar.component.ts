@@ -6,7 +6,7 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { HandleStringService } from 'src/app/services/handle-string.service';
-import { MenuItem } from '../../data-type';
+
 
 @Component({
   selector: 'app-menu-item-sidebar',
@@ -14,14 +14,17 @@ import { MenuItem } from '../../data-type';
   styleUrls: ['./menu-item-sidebar.component.scss'],
 })
 export class MenuItemSidebarComponent implements OnInit, AfterViewInit {
-  @Input() menuList!: [MenuItem];
+  @Input() menuList!: {
+    title: string;
+    submenu: string[];
+  }[];
   public btnSubMenu!: ElementRef[];
   constructor(
     private handleStringService: HandleStringService,
     private el: ElementRef
-  ) {}
+  ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
   ngAfterViewInit(): void {
     this.btnSubMenu = this.el.nativeElement.querySelectorAll(
       '.sideNav__sub-menu--item'
