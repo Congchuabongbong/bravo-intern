@@ -1,6 +1,4 @@
-
 import { FormFieldData, GridLayoutData } from '.';
-
 //**Form Grid layout*/
 export interface IControlGridLayoutForm extends GridLayoutData.IGridLayout {
     gridItemForm: IGridItemForm,
