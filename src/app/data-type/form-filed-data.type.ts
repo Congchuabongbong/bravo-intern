@@ -46,7 +46,8 @@ export interface ILabel extends Pick<IAttribute, 'class' | 'position'> {
     title: string;
     id?: string;
     for: string;
-    order?: number | string
+    order?: number | string,
+    formControlName?: string;
 }
 
 export interface IAttribute {

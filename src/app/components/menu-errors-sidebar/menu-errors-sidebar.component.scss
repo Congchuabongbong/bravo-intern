@@ -24,6 +24,7 @@
     }
 
     &__error {
+        display: block;
         width: 100%;
         min-height: 5rem;
         border-bottom: 1px solid #A0A0A0;

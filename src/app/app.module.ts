@@ -15,6 +15,7 @@ import { ProductFormComponent } from './pages/product-form/product-form.componen
 import { ControlFormFieldPanelComponent } from './components/control-form-field-panel/control-form-field-panel.component';
 import { ControlGridLayoutPanelComponent } from './components/control-grid-layout-panel/control-grid-layout-panel.component';
 import { ControlFormLabelPanelComponent } from './components/control-form-label-panel/control-form-label-panel.component';
+import { ErrorMessageComponent } from './components/error-message/error-message.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { ControlFormLabelPanelComponent } from './components/control-form-label-
     ControlFormFieldPanelComponent,
     ControlGridLayoutPanelComponent,
     ControlFormLabelPanelComponent,
+    ErrorMessageComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule],
   providers: [],

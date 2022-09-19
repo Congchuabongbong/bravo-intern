@@ -7,92 +7,28 @@
 
     <ng-container *ngIf="productForm">
         <!-- **Info product** -->
-        <!-- Mã Vật tư  -->
-        <div class="sideNav__error" *ngIf="idProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Mã vật tư</p>
-            <span class="sideNav__error--title" [hidden]="idProduct?.errors?.['required']">Không được bỏ trắng
-                giá trị.</span>
-        </div>
-        <!-- Tên Vật Tư  -->
-        <div class="sideNav__error" *ngIf="nameProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Tên vật tư</p>
-            <span class="sideNav__error--title" [hidden]="nameProduct?.errors?.['required']">Không được bỏ
-                trắng giá trị.</span>
-        </div>
-        <!-- Đơn vị tính  -->
-        <div class="sideNav__error" *ngIf="unitProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Đơn vị tính</p>
-            <span class="sideNav__error--title" [hidden]="unitProduct?.errors?.['required']">Không được bỏ
-                trắng giá trị.</span>
-        </div>
-        <!-- Loại vật tư  -->
-        <div class="sideNav__error" *ngIf="typeProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Loại vật tư</p>
-            <span class="sideNav__error--title" [hidden]="typeProduct?.errors?.['required']">Không được bỏ
-                trắng giá trị.</span>
-        </div>
-        <!-- Nhóm vật tư -->
-        <div class="sideNav__error" *ngIf="groupProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Nhóm hàng</p>
-            <span class="sideNav__error--title" [hidden]="groupProduct?.errors?.['required']">Không được bỏ
-                trắng giá trị.</span>
-        </div>
-        <!-- Mã sản phẩm -->
-        <div class="sideNav__error" *ngIf="itemCodeProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Mã sản phẩm</p>
-            <span class="sideNav__error--title" [hidden]="itemCodeProduct?.errors?.['required']">Không được bỏ
-                trắng giá trị.</span>
-        </div>
+        <ng-container *ngFor="let label of formInfo.gridItemForm.labels">
+            <ng-container *ngIf="label.formControlName">
+                <app-error-message class="sideNav__error" *ngIf="infoF[label.formControlName]?.invalid"
+                    [control]="infoF[label.formControlName]" [titleError]="label.title">
+                </app-error-message>
+            </ng-container>
+        </ng-container>
         <!-- **attribute product** -->
-        <!-- Chiều dài -->
-        <div class="sideNav__error" *ngIf="lengthProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Chiều dài</p>
-            <span class="sideNav__error--title" [hidden]="lengthProduct?.errors?.['required']">Không được bỏ trắng giá
-                trị.</span>
-        </div>
-        <!-- Chiều rộng -->
-        <div class="sideNav__error" *ngIf="widthProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Chiều rộng</p>
-            <span class="sideNav__error--title" [hidden]="widthProduct?.errors?.['required']">Không được bỏ trắng giá
-                trị.</span>
-        </div>
-        <!-- Chiều cao -->
-        <div class="sideNav__error" *ngIf="heightProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Chiều cao</p>
-            <span class="sideNav__error--title" [hidden]="heightProduct?.errors?.['required']">Không được bỏ trắng giá
-                trị.</span>
-        </div>
-        <!-- Trọng lượng -->
-        <div class="sideNav__error" *ngIf="weightProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Trọng lượng</p>
-            <span class="sideNav__error--title" [hidden]="weightProduct?.errors?.['required']">Không được bỏ trắng giá
-                trị.</span>
-        </div>
-        <!-- Nhóm tiêu chuẩn -->
-        <div class="sideNav__error" *ngIf="standardGroupQc?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Nhóm Tiêu chuẩn QC</p>
-            <span class="sideNav__error--title" [hidden]="standardGroupQc?.errors?.['required']">Không được bỏ trắng giá
-                trị.</span>
-        </div>
-        <!-- Loại duyệt giá mua -->
-        <div class="sideNav__error" *ngIf="typeOfPurchase?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Loại duyệt giá mua</p>
-            <span class="sideNav__error--title" [hidden]="typeOfPurchase?.errors?.['required']">Không được bỏ trắng giá
-                trị.</span>
-        </div>
-        <!-- Mã ngắn -->
-        <div class="sideNav__error" *ngIf="shortCode?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Mã ngắn</p>
-            <span class="sideNav__error--title" [hidden]="shortCode?.errors?.['required']">Không được bỏ trắng giá
-                trị.</span>
-        </div>
-        <!-- Hạn dùng bảo hành -->
-        <div class="sideNav__error" *ngIf="dueDateProduct?.invalid">
-            <p class="sideNav__error--header"><i class="fa-solid fa-circle-exclamation"></i>Hạn dùng/bảo hành</p>
-            <span class="sideNav__error--title" *ngIf="dueDateProduct?.errors?.['required']">Không được bỏ trắng giá
-                trị.</span>
-            <span class="sideNav__error--title"
-                *ngIf="dueDateProduct?.errors?.['maxMonth']">{{dueDateProduct?.errors?.['requiredValue']}}</span>
-        </div>
+        <ng-container *ngFor="let label of formAttributeInfo.gridItemForm.labels">
+            <ng-container *ngIf="label.formControlName">
+                <app-error-message class="sideNav__error" *ngIf="attributeF[label.formControlName]?.invalid"
+                    [control]="attributeF[label.formControlName]" [titleError]="label.title">
+                </app-error-message>
+            </ng-container>
+        </ng-container>
+        <ng-container
+            *ngFor="let label of formAttributeInfo.gridItemForm.subControlGridLayoutForm?.subGridItemForm?.gridItemForm?.labels">
+            <ng-container *ngIf="label.formControlName">
+                <app-error-message class="sideNav__error" *ngIf="attributeF[label.formControlName]?.invalid"
+                    [control]="attributeF[label.formControlName]" [titleError]="label.title">
+                </app-error-message>
+            </ng-container>
+        </ng-container>
     </ng-container>
 </li>

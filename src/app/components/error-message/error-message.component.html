@@ -1,0 +1,5 @@
+<p class="error__title error__title"><i class="fa-solid fa-circle-exclamation"></i>{{titleError}}
+</p>
+<span class="error__message" *ngIf="control.errors?.['required']">Không được bỏ trắng
+    giá trị.</span>
+<span class="error__message" *ngIf="control.errors?.['maxMonth']">{{control.errors?.['requiredValue']}}</span>

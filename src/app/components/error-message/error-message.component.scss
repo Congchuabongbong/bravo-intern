@@ -1,0 +1,21 @@
+.error {
+    &__title {
+        font-weight: 500;
+        margin-bottom: 0.7rem;
+        padding-top: 1rem;
+
+        i {
+            color: red;
+            margin-right: 0.8rem;
+        }
+    }
+
+    &__message {
+        display: inline-block;
+        font-weight: normal;
+        color: #747474;
+        font-size: 1.2rem;
+        padding-bottom: 1rem;
+    }
+
+}

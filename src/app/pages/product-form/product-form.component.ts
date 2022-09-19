@@ -52,7 +52,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 1, endLine: 2 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 1
+          order: 1,
+          formControlName: 'idProduct'
         },
         {
           title: 'Tên Vật Tư',
@@ -62,7 +63,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 2, endLine: 3 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 2
+          order: 2,
+          formControlName: 'nameProduct',
         },
         {
           title: 'Tên Thứ 2',
@@ -72,7 +74,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 3, endLine: 4 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 3
+          order: 3,
+          formControlName: 'secondNameProduct',
         },
         {
           title: 'Đơn Vị Tính',
@@ -82,7 +85,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 4, endLine: 5 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 4
+          order: 4,
+          formControlName: 'unitProduct',
         },
         {
           title: 'Loại Vật Tư',
@@ -92,7 +96,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 5, endLine: 6 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 5
+          order: 5,
+          formControlName: 'typeProduct',
         },
         {
           title: 'Nhóm Hàng',
@@ -102,7 +107,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 6, endLine: 7 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 6
+          order: 6,
+          formControlName: 'groupProduct',
         },
         {
           title: 'Tự Tạo Mã SP',
@@ -112,7 +118,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 7, endLine: 8 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 7
+          order: 7, formControlName: 'isAutoItemCodeProduct',
         },
         {
           title: 'Mã sản phẩm',
@@ -122,6 +128,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 7, endLine: 8 },
             columnLine: { startLine: 3, endLine: 4 },
           },
+          formControlName: 'itemCodeProduct',
         },
         {
           title: 'Ghi chú',
@@ -131,7 +138,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 8, endLine: 9 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 8
+          order: 8,
+          formControlName: 'noteProduct',
         },
         {
           title: 'Ảnh đại diện',
@@ -141,6 +149,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 2, endLine: 3 },
             columnLine: { startLine: 8, endLine: 9 },
           },
+          formControlName: 'thumbnailProduct',
         },
       ],
       fields: [
@@ -296,7 +305,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 1, endLine: 2 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 1
+          order: 1,
+          formControlName: 'lengthProduct',
         },
         {
           title: 'Rộng',
@@ -306,7 +316,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 2, endLine: 3 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 2
+          order: 2,
+          formControlName: 'widthProduct',
         },
         {
           title: 'Cao',
@@ -316,7 +327,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 3, endLine: 4 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 3
+          order: 3,
+          formControlName: 'heightProduct',
         },
         {
           title: 'Trọng lượng',
@@ -326,7 +338,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 4, endLine: 5 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 4
+          order: 4,
+          formControlName: 'weightProduct',
         },
         {
           title: 'Nhóm tiêu chuẩn QC',
@@ -336,7 +349,9 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 5, endLine: 6 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 5
+          order: 5,
+          formControlName: 'standardGroupQc',
+
         },
         {
           title: 'Loại duyệt giá mua',
@@ -346,7 +361,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 6, endLine: 7 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 6
+          order: 6,
+          formControlName: 'typeOfPurchase',
         },
         {
           title: 'Mã ngắn',
@@ -356,7 +372,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 7, endLine: 8 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 7
+          order: 7,
+          formControlName: 'shortCode',
         },
       ],
       fields: [
@@ -471,7 +488,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 rowLine: { startLine: 1, endLine: 2 },
                 columnLine: { startLine: 1, endLine: 2 },
               },
-              order: 8
+              order: 8,
+              formControlName: 'isSerial',
             },
             {
               title: 'Theo dõi tồn kho theo vị trí',
@@ -481,6 +499,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 rowLine: { startLine: 1, endLine: 2 },
                 columnLine: { startLine: 3, endLine: 4 },
               },
+              formControlName: 'isInventoryByLocation',
 
             },
             {
@@ -491,7 +510,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 rowLine: { startLine: 1, endLine: 2 },
                 columnLine: { startLine: 5, endLine: 6 },
               },
-
+              formControlName: 'isIroningUniform',
             },
             {
               title: 'Có tem in từ cân điện tử',
@@ -501,7 +520,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 rowLine: { startLine: 2, endLine: 3 },
                 columnLine: { startLine: 1, endLine: 2 },
               },
-              order: 9
+              order: 9,
+              formControlName: 'isStampScale'
             },
             {
               title: 'Sử dụng lô hàng',
@@ -511,6 +531,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 rowLine: { startLine: 2, endLine: 3 },
                 columnLine: { startLine: 3, endLine: 4 },
               },
+              formControlName: 'isUsingItem',
             },
             {
               title: 'Hạn dùng/bảo hành',
@@ -520,6 +541,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 rowLine: { startLine: 2, endLine: 3 },
                 columnLine: { startLine: 5, endLine: 6 },
               },
+              formControlName: 'dueDateProduct',
             },
             {
               title: 'tháng',
@@ -529,6 +551,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                 rowLine: { startLine: 2, endLine: 3 },
                 columnLine: { startLine: 7, endLine: 8 },
               },
+
             }],
             fields: [
               {
@@ -576,7 +599,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
                     rowLine: { startLine: 2, endLine: 3 },
                     columnLine: { startLine: 2, endLine: 3 },
                   },
-                  formControlName: 'isIroningUniform',
+                  formControlName: 'isStampScale',
                 },
               },
               {
@@ -653,6 +676,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     });
     setTimeout(() => {
       this.dataService.sendData(this.productForm);
+      this.dataService.sendDataByEvent({ formInfo: this.formInfo, formAttributeInfo: this.formAttributeInfo });
     });
 
   }
