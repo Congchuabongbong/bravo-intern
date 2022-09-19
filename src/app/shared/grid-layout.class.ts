@@ -126,8 +126,27 @@ export default class GridLayout {
     this.renderer.setStyle(elRef.nativeElement, 'grid-row', `${position.rowLine.startLine} / ${position.rowLine.endLine}`)
     this.renderer.setStyle(elRef.nativeElement, 'grid-column', `${position.columnLine.startLine} / ${position.columnLine.endLine}`)
   }
-
-
+  //**set width and height grid container */
+  public setWidthGridContainer(width: string): void {
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'width', width)
+  }
+  public setHeightGridContainer(height: string): void {
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'height', height)
+  }
+  //**set min width and height  grid container
+  public setMinWidthGridContainer(minWidth: string): void {
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'min-width', minWidth)
+  }
+  public setMinHeightGridContainer(minHeight: string): void {
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'min-height', minHeight)
+  }
+  //**set max height and width  grid container
+  public setMaxWidthGridContainer(maxWidth: string): void {
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'max-width', maxWidth)
+  }
+  public setMaxHeightGridContainer(maxHeight: string): void {
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'max-height', maxHeight)
+  }
   //** Check if obj is type of minMax type*/
   private isMinMax(obj: any): obj is IMinMax {
     return 'min' in obj && 'max' in obj;

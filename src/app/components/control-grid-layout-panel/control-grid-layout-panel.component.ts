@@ -25,6 +25,12 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input() arrayUnitRow?: UnitOfMeasure[];
   @Input() arrayUnitColumn?: UnitOfMeasure[];
   @Input() positionLine?: GridLayoutData.IPositionGridItem;
+  @Input() width!: string;
+  @Input() height!: string;
+  @Input() minWidth!: string;
+  @Input() minHeight!: string;
+  @Input() maxWidth!: string;
+  @Input() maxHeight!: string;
   @Output() currentTab = new EventEmitter<ElementRef>();
   public gridLayout!: GridLayout;
   constructor(private _element: ElementRef, private _renderer: Renderer2) { }
@@ -55,6 +61,12 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
       }
       if (this.positionLine) {
         this.gridLayout.setPositionGirdItem(this._element, this.positionLine);
+      }
+      if (this.width) {
+        this.gridLayout.setWidthGridContainer(this.width);
+      }
+      if (this.height) {
+        this.gridLayout.setHeightGridContainer(this.height);
       }
     }
   }

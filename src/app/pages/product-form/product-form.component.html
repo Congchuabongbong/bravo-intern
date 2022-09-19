@@ -6,7 +6,7 @@
             tính</button>
     </div>
     <form [formGroup]="productForm" class="product_form" novalidate>
-        <!-- **Thông tin chung** -->
+        <!-- **Information** -->
         <app-control-grid-layout-panel formGroupName="info" class="tabContent" id="info__general"
             [column]="formInfo.column.columnOfNumber" [row]="formInfo.row.rowOfNumber"
             [arrayUnitColumn]="formInfo.column.arrayUnitColumn" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
@@ -17,7 +17,7 @@
                 formControlName="{{field.attribute.formControlName}}">
             </app-control-form-field-panel>
         </app-control-grid-layout-panel>
-        <!--** Thuộc tính **-->
+        <!--** Attribute **-->
         <app-control-grid-layout-panel class="tabContent" id="info__attribute" formGroupName="attribute"
             [column]="formAttributeInfo.column.columnOfNumber" [row]="formAttributeInfo.row.rowOfNumber"
             [arrayUnitColumn]="formAttributeInfo.column.arrayUnitColumn" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
