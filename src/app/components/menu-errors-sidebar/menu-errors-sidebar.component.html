@@ -14,7 +14,7 @@
                 </app-error-message>
             </ng-container>
         </ng-container>
-        <!-- **attribute product** -->
+        <!-- **attribute info** -->
         <ng-container *ngFor="let label of formAttributeInfo.gridItemForm.labels">
             <ng-container *ngIf="label.formControlName">
                 <app-error-message class="sideNav__error" *ngIf="attributeF[label.formControlName]?.invalid"

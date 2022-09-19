@@ -118,7 +118,8 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
             rowLine: { startLine: 7, endLine: 8 },
             columnLine: { startLine: 1, endLine: 2 },
           },
-          order: 7, formControlName: 'isAutoItemCodeProduct',
+          order: 7,
+          formControlName: 'isAutoItemCodeProduct',
         },
         {
           title: 'Mã sản phẩm',
@@ -644,7 +645,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.productForm = this.fb.group({
       info: this.fb.group({
-        idProduct: ['', [Validators.required]],
+        idProduct: ['', [Validators.required, Validators.maxLength(12)]],
         nameProduct: ['', [Validators.required]],
         secondNameProduct: [''],
         unitProduct: ['', [Validators.required]],

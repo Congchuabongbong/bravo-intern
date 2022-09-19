@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { GridLayoutForm } from 'src/app/data-type';
 import { DataService } from 'src/app/services/data.service';
@@ -13,6 +13,7 @@ export class MenuErrorsSidebarComponent
   implements OnInit, AfterViewInit, OnDestroy {
   public productForm!: FormGroup;
   public obs!: Subscription;
+  public obsDataEvent!: Subscription;
   public formAttributeInfo!: GridLayoutForm.IControlGridLayoutForm;
   public formInfo!: GridLayoutForm.IControlGridLayoutForm;
   public idInfo: string = 'idProduct'
@@ -22,7 +23,7 @@ export class MenuErrorsSidebarComponent
     this.obs = this.dataService.data$.subscribe((response) => {
       this.productForm = response;
     });
-    this.dataService.dataByEvent.subscribe((data) => {
+    this.obsDataEvent = this.dataService.dataByEvent.subscribe((data) => {
       this.formInfo = data.formInfo;
       this.formAttributeInfo = data.formAttributeInfo;
     })
@@ -30,6 +31,7 @@ export class MenuErrorsSidebarComponent
   ngAfterViewInit(): void { }
   ngOnDestroy(): void {
     this.obs.unsubscribe();
+    this.obsDataEvent.unsubscribe();
   }
   public get infoF(): { [key: string]: AbstractControl } {
     return this.info.controls;
@@ -41,7 +43,6 @@ export class MenuErrorsSidebarComponent
   get info() {
     return this.productForm.get('info') as FormGroup;
   }
-
   //**get information attribute of product */
   get attribute() {
     return this.productForm.get('attribute') as FormGroup;
