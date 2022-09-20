@@ -2,18 +2,39 @@
     <!-- ** case: Input -->
     <ng-container *ngSwitchCase="'input'">
         <ng-container *ngIf="isInput(field)">
-            <input type="{{field.type}}" id="{{field.attribute.id}}"
-                class="{{field.attribute.class ? field.attribute.class :''}}"
-                placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
-                [(ngModel)]="valueFiled" (ngModelChange)="handleValueChange($event)"
-                [ngClass]="classList ? classList : ''">
+            <ng-container [ngSwitch]="field.type">
+                <!-- **Handle case input type is textbox** -->
+                <ng-container *ngSwitchCase="'checkbox'">
+                    <input type="{{field.type}}" id="{{field.attribute.id}}"
+                        class="{{field.attribute.class ? field.attribute.class :''}}" name='{{field.attribute.name}}'
+                        placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
+                        [checked]="valueFiled" (change)="handleValueChange($event)"
+                        [ngClass]="classList ? classList : ''">
+                </ng-container>
+                <!-- **Handle case input type is radio** -->
+                <ng-container *ngSwitchCase="'radio'">
+                    <input type="{{field.type}}" id="{{field.attribute.id}}"
+                        class="{{field.attribute.class ? field.attribute.class :''}}" name='{{field.attribute.name}}'
+                        placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
+                        [checked]="valueFiled" (change)="handleValueChange($event)"
+                        [ngClass]="classList ? classList : ''">
+                </ng-container>
+                <!-- **Handle case input other type** -->
+                <ng-container *ngSwitchDefault>
+                    <input type="{{field.type}}" id="{{field.attribute.id}}"
+                        class="{{field.attribute.class ? field.attribute.class :''}}" name='{{field.attribute.name}}'
+                        placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
+                        [(ngModel)]="valueFiled" (ngModelChange)="handleValueChange($event)"
+                        [ngClass]="classList ? classList : ''">
+                </ng-container>
+            </ng-container>
         </ng-container>
     </ng-container>
     <!-- ** case: select -->
     <ng-container *ngSwitchCase="'select'">
         <ng-container *ngIf="isSelect(field)">
             <select id="{{field.attribute.id}}" class="{{field.attribute.class ? field.attribute.class :''}}"
-                [(ngModel)]="valueFiled" (ngModelChange)="handleValueChange($event)"
+                name='{{field.attribute.name}}' [(ngModel)]="valueFiled" (ngModelChange)="handleValueChange($event)"
                 [ngClass]="classList ? classList : ''">
                 <option *ngFor="let option of field.options" [ngValue]="option.value">
                     {{option.title}}</option>
@@ -24,6 +45,7 @@
     <ng-container *ngSwitchCase="'textarea'">
         <ng-container *ngIf="isTextarea(field)">
             <textarea id="{{field.attribute.id}}" class="{{field.attribute.class ? field.attribute.class :''}}"
+                name="{{field.attribute.name}}"
                 placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
                 [(ngModel)]="valueFiled" (ngModelChange)="handleValueChange($event)"
                 [ngClass]="classList ? classList : ''"></textarea>

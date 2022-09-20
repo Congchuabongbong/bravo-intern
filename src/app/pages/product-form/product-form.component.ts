@@ -144,7 +144,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
         },
         {
           title: 'Ảnh đại diện',
-          for: 'product_image',
+          for: 'thumbnailProduct',
           class: 'form__title',
           position: {
             rowLine: { startLine: 2, endLine: 3 },
@@ -649,11 +649,11 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
         nameProduct: ['', [Validators.required]],
         secondNameProduct: [''],
         unitProduct: ['', [Validators.required]],
-        typeProduct: [null, [Validators.required]],
-        groupProduct: [null, [Validators.required]],
+        typeProduct: ['', [Validators.required]],
+        groupProduct: ['', [Validators.required]],
         isAutoItemCodeProduct: [true],
         itemCodeProduct: [
-          { value: uuidV4(), disabled: true },
+          uuidV4(),
           [Validators.required],
         ],
         noteProduct: [''],
@@ -664,10 +664,10 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
         widthProduct: ['', [Validators.required]],
         heightProduct: ['', [Validators.required]],
         weightProduct: ['', [Validators.required]],
-        standardGroupQc: [null, [Validators.required]],
-        typeOfPurchase: [null, [Validators.required]],
+        standardGroupQc: ['', [Validators.required]],
+        typeOfPurchase: ['', [Validators.required]],
         shortCode: ['', [Validators.required]],
-        isSerial: [false],
+        isSerial: [''],
         isInventoryByLocation: [false],
         isIroningUniform: [false],
         isStampScale: [false],
@@ -710,14 +710,5 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     elRef.classList.add('active');
     this.renderer.setStyle(currentTab, 'display', 'grid');
   }
-  //**isAutoItemCodeProduct changed
-  // public onChangeAutoItemCodeProduct(event: any): void {
-  //   if (event.target.checked) {
-  //     this.itemCodeProduct?.disable();
-  //     this.itemCodeProduct?.setValue(uuidV4());
-  //   } else {
-  //     this.itemCodeProduct?.enable();
-  //     this.itemCodeProduct?.setValue('');
-  //   }
-  // }
+
 }

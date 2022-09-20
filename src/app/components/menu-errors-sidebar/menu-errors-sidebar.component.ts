@@ -16,8 +16,8 @@ export class MenuErrorsSidebarComponent
   public obsDataEvent!: Subscription;
   public formAttributeInfo!: GridLayoutForm.IControlGridLayoutForm;
   public formInfo!: GridLayoutForm.IControlGridLayoutForm;
-  public idInfo: string = 'idProduct'
   constructor(private dataService: DataService) { }
+
 
   ngOnInit(): void {
     this.obs = this.dataService.data$.subscribe((response) => {
