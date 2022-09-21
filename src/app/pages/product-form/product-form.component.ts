@@ -645,7 +645,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.productForm = this.fb.group({
       info: this.fb.group({
-        idProduct: ['', [Validators.required, Validators.maxLength(12)]],
+        idProduct: ['', [Validators.required]],
         nameProduct: ['', [Validators.required]],
         secondNameProduct: [''],
         unitProduct: ['', [Validators.required]],
@@ -687,6 +687,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     this.tabLinks = this.el.nativeElement.querySelectorAll('.tab__link');
     this.tabContents = this.el.nativeElement.querySelectorAll('.tabContent');
     this.el.nativeElement.querySelector('#defaultOpen').click();
+    this.productForm.valueChanges.subscribe(data => console.log(data))
   }
   //**Getter Form */
   //**get information of product */

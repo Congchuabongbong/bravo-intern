@@ -55,6 +55,8 @@ export interface IAttribute {
     id: string;
     class?: string;
     name?: string;
+    max?: number;
+    min?: number;
     placeholder?: string;
     position: GridLayoutData.IPositionGridItem;
     formControlName: string;
