@@ -18,6 +18,7 @@ import GridLayout from 'src/app/shared/grid-layout.class';
   styleUrls: ['./control-grid-layout-panel.component.scss'],
 })
 export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
+  //**Input and Out decorator here: */
   @Input('row') rowOfNumber!: number;
   @Input('column') columnOfNumber!: number;
   @Input() columnGap!: string;
@@ -32,9 +33,11 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input() maxWidth!: string;
   @Input() maxHeight!: string;
   @Output() currentTab = new EventEmitter<ElementRef>();
+  // **Declare property class here:
   public gridLayout!: GridLayout;
+  //** constructor */
   constructor(private _element: ElementRef, private _renderer: Renderer2) { }
-
+  //** Lifecycle here: */
   ngOnInit(): void {
     this.currentTab.emit(this._element.nativeElement);
   }

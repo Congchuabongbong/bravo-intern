@@ -16,14 +16,14 @@ export class MenuErrorsSidebarComponent
   public obsDataEvent!: Subscription;
   public formAttributeInfo!: GridLayoutForm.IControlGridLayoutForm;
   public formInfo!: GridLayoutForm.IControlGridLayoutForm;
-  constructor(private dataService: DataService) { }
+  constructor(private _dataService: DataService) { }
 
 
   ngOnInit(): void {
-    this.obs = this.dataService.data$.subscribe((response) => {
+    this.obs = this._dataService.data$.subscribe((response) => {
       this.productForm = response;
     });
-    this.obsDataEvent = this.dataService.dataByEvent.subscribe((data) => {
+    this.obsDataEvent = this._dataService.dataByEvent.subscribe((data) => {
       this.formInfo = data.formInfo;
       this.formAttributeInfo = data.formAttributeInfo;
     })

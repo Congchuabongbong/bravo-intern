@@ -1,2 +1,4 @@
-<label [for]="label.for" [id]="label.id ? label.id : ''" [class]="label.class ? label.class : ''"><span
-        *ngIf="label.order">{{label.order}}</span>{{label.title}}</label>
+<ng-container *ngIf="label">
+        <label [for]="label.for" [id]="label.id ? label.id : ''" [class]="label.class ? label.class : ''"><span
+                        *ngIf="label.order">{{label.order}}</span>{{label.title}}</label>
+</ng-container>

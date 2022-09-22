@@ -636,15 +636,15 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
 
   //**constructor */
   constructor(
-    private dataService: DataService,
-    private renderer: Renderer2,
-    private el: ElementRef,
-    private fb: FormBuilder
+    private _dataService: DataService,
+    private _renderer: Renderer2,
+    private _el: ElementRef,
+    private _fb: FormBuilder
   ) { }
   // **life cycle hooks
   ngOnInit(): void {
-    this.productForm = this.fb.group({
-      info: this.fb.group({
+    this.productForm = this._fb.group({
+      info: this._fb.group({
         idProduct: ['', [Validators.required]],
         nameProduct: ['', [Validators.required]],
         secondNameProduct: [''],
@@ -659,7 +659,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
         noteProduct: [''],
         thumbnailProduct: [''],
       }),
-      attribute: this.fb.group({
+      attribute: this._fb.group({
         lengthProduct: ['', [Validators.required]],
         widthProduct: ['', [Validators.required]],
         heightProduct: ['', [Validators.required]],
@@ -676,18 +676,17 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
       }),
     });
     setTimeout(() => {
-      this.dataService.sendData(this.productForm);
-      this.dataService.sendDataByEvent({ formInfo: this.formInfo, formAttributeInfo: this.formAttributeInfo });
+      this._dataService.sendData(this.productForm);
+      this._dataService.sendDataByEvent({ formInfo: this.formInfo, formAttributeInfo: this.formAttributeInfo });
     });
 
   }
 
   ngAfterViewInit(): void {
     //select element when after view init*/
-    this.tabLinks = this.el.nativeElement.querySelectorAll('.tab__link');
-    this.tabContents = this.el.nativeElement.querySelectorAll('.tabContent');
-    this.el.nativeElement.querySelector('#defaultOpen').click();
-    this.productForm.valueChanges.subscribe(data => console.log(data))
+    this.tabLinks = this._el.nativeElement.querySelectorAll('.tab__link');
+    this.tabContents = this._el.nativeElement.querySelectorAll('.tabContent');
+    this._el.nativeElement.querySelector('#defaultOpen').click();
   }
   //**Getter Form */
   //**get information of product */
@@ -701,15 +700,15 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
 
   //**open tab  */
   public openTab(elRef: any, tabName: string): void {
-    let currentTab = this.el.nativeElement.querySelector(`#${tabName}`);
+    let currentTab = this._el.nativeElement.querySelector(`#${tabName}`);
     this.tabContents.forEach((tabContent) => {
-      this.renderer.setStyle(tabContent, 'display', 'none');
+      this._renderer.setStyle(tabContent, 'display', 'none');
     });
     this.tabLinks.forEach((tabLink) => {
-      this.renderer.removeClass(tabLink, 'active');
+      this._renderer.removeClass(tabLink, 'active');
     });
     elRef.classList.add('active');
-    this.renderer.setStyle(currentTab, 'display', 'grid');
+    this._renderer.setStyle(currentTab, 'display', 'grid');
   }
 
 }

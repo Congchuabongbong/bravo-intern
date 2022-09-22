@@ -1,19 +1,12 @@
 import { ElementRef, Renderer2 } from '@angular/core';
 import { GridLayoutData } from '../data-type';
-//**data type */
-import {
-  IMinMax,
-  UnitOfMeasure,
-  IMin,
-  IMax,
-} from '../data-type/grid-layout-data.type';
 
 export default class GridLayout {
   private gridContainer!: ElementRef;
   private numberOfRows: number;
   private numberOfColumns: number;
-  private arrayUnitRow!: UnitOfMeasure[];
-  private arrayUnitColumn!: UnitOfMeasure[];
+  private arrayUnitRow!: GridLayoutData.UnitOfMeasure[];
+  private arrayUnitColumn!: GridLayoutData.UnitOfMeasure[];
   private renderer!: Renderer2;
 
   constructor(
@@ -27,10 +20,10 @@ export default class GridLayout {
     this.numberOfColumns = _numberOfColumns;
     this.renderer = _renderer;
   }
-  set heightRow(arrayUnitRow: UnitOfMeasure[]) {
+  set heightRow(arrayUnitRow: GridLayoutData.UnitOfMeasure[]) {
     this.arrayUnitRow = arrayUnitRow;
   }
-  set widthColumn(arrayUnitColumn: UnitOfMeasure[]) {
+  set widthColumn(arrayUnitColumn: GridLayoutData.UnitOfMeasure[]) {
     this.arrayUnitColumn = arrayUnitColumn;
   }
   public generateGridLayout(): void {
@@ -73,7 +66,7 @@ export default class GridLayout {
         );
       }
       let preParedStatement: string = '';
-      this.arrayUnitColumn.forEach((unitColumn: UnitOfMeasure) => {
+      this.arrayUnitColumn.forEach((unitColumn: GridLayoutData.UnitOfMeasure) => {
         if (typeof unitColumn !== 'string' && this.isMinMax(unitColumn)) {
           preParedStatement += `minmax(${unitColumn.min}, ${unitColumn.max}) `;
         } else if (typeof unitColumn !== 'string' && this.isMin(unitColumn)) {
@@ -148,13 +141,13 @@ export default class GridLayout {
     this.renderer.setStyle(this.gridContainer.nativeElement, 'max-height', maxHeight)
   }
   //** Check if obj is type of minMax type*/
-  private isMinMax(obj: any): obj is IMinMax {
+  private isMinMax(obj: any): obj is GridLayoutData.IMinMax {
     return 'min' in obj && 'max' in obj;
   }
-  private isMin(obj: any): obj is IMin {
+  private isMin(obj: any): obj is GridLayoutData.IMin {
     return 'min' in obj;
   }
-  private isMax(obj: any): obj is IMax {
+  private isMax(obj: any): obj is GridLayoutData.IMax {
     return 'max' in obj;
   }
 }

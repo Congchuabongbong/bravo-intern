@@ -1,5 +1,5 @@
 
-import { Component, ElementRef, Input, OnInit, AfterViewInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, AfterViewInit } from '@angular/core';
 import { FormFieldData } from 'src/app/data-type';
 import { GridLayoutService } from 'src/app/services/grid-layout.service';
 

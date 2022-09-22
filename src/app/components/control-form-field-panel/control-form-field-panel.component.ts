@@ -4,7 +4,6 @@ import {
   Input,
   OnInit,
   AfterViewInit,
-  forwardRef,
   Renderer2,
   OnDestroy,
   ChangeDetectorRef,
@@ -26,7 +25,7 @@ import { GridLayoutService } from 'src/app/services/grid-layout.service';
     {
       provide: NG_VALIDATORS,
       multi: true,
-      useExisting: forwardRef(() => ControlFormFieldPanelComponent)
+      useExisting: ControlFormFieldPanelComponent
     }
   ]
 })
@@ -39,7 +38,7 @@ export class ControlFormFieldPanelComponent implements OnInit, AfterViewInit, Co
   private disabled = false;
   public classList!: string;
   //** */
-  constructor(private _element: ElementRef, private _gridLayoutService: GridLayoutService, private _renderer: Renderer2, private cd: ChangeDetectorRef) { }
+  constructor(private _element: ElementRef, private _gridLayoutService: GridLayoutService, private cd: ChangeDetectorRef) { }
 
 
   //**Life cycle hooks */
