@@ -28,6 +28,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   public formInfo: GridLayoutForm.IControlGridLayoutForm = {
     row: {
       rowOfNumber: 8,
+
     },
     column: {
       columnOfNumber: 8,

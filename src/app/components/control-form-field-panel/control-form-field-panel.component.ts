@@ -8,7 +8,7 @@ import {
   OnDestroy,
   ChangeDetectorRef,
 } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { AbstractControl, ControlValueAccessor, FormRecord, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { FormFieldData } from 'src/app/data-type';
 import { GridLayoutService } from 'src/app/services/grid-layout.service';
 
@@ -49,6 +49,7 @@ export class ControlFormFieldPanelComponent implements OnInit, AfterViewInit, Co
   }
   ngAfterViewInit(): void {
     this.classList = this._element.nativeElement.classList;
+
     this.cd.detectChanges();
   }
   ngOnDestroy(): void {
