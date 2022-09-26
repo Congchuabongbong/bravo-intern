@@ -1,3 +1,4 @@
+import { FormGroup } from '@angular/forms';
 import {
   AfterViewInit,
   Component,
@@ -32,6 +33,7 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input() minHeight!: string;
   @Input() maxWidth!: string;
   @Input() maxHeight!: string;
+  @Input() form!: FormGroup;
   @Output() currentTab = new EventEmitter<ElementRef>();
   // **Declare property class here:
   public gridLayout!: GridLayout;

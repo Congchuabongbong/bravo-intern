@@ -46,7 +46,6 @@ export default class GridLayout {
           preParedStatement += `${unitRow} `;
         }
       });
-      // console.log(`row statement:${preParedStatement}`);
       this.renderer.setStyle(
         this.gridContainer.nativeElement,
         'grid-template-rows',

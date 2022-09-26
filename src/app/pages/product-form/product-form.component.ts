@@ -25,10 +25,9 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   public tabLinks!: ElementRef[];
   public tabContents!: ElementRef[];
   public productForm!: FormGroup;
-  public formInfo: GridLayoutForm.IControlGridLayoutForm = {
+  public formInfo: any = {
     row: {
       rowOfNumber: 8,
-
     },
     column: {
       columnOfNumber: 8,
@@ -285,7 +284,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
       ],
     },
   };
-  public formAttributeInfo: GridLayoutForm.IControlGridLayoutForm = {
+  public formAttributeInfo: any = {
     row: {
       rowOfNumber: 9,
     },
@@ -692,10 +691,10 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
   //**Getter Form */
   //**get information of product */
   get info() {
-    return this.productForm.get('info');
+    return this.productForm.get('info') as FormGroup;
   }
   get itemCodeProduct() {
-    return this.info?.get('itemCodeProduct');
+    return this.info?.get('itemCodeProduct') as FormGroup;
   }
   //**get information attribute of product */
 

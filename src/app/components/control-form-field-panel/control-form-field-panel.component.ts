@@ -8,7 +8,7 @@ import {
   OnDestroy,
   ChangeDetectorRef,
 } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, FormRecord, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { AbstractControl, ControlContainer, ControlValueAccessor, FormGroup, FormRecord, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { FormFieldData } from 'src/app/data-type';
 import { GridLayoutService } from 'src/app/services/grid-layout.service';
 
@@ -33,23 +33,25 @@ export class ControlFormFieldPanelComponent implements OnInit, AfterViewInit, Co
   @Input() field!: FormFieldData.ControlFormType;
   @Input() isIcon?: boolean;
 
+
   public valueFiled!: any;
   private touched = false;
   private disabled = false;
   public classList!: string;
   //** */
-  constructor(private _element: ElementRef, private _gridLayoutService: GridLayoutService, private cd: ChangeDetectorRef) { }
+  constructor(private _element: ElementRef, private _gridLayoutService: GridLayoutService, private cd: ChangeDetectorRef) {
 
+  }
 
   //**Life cycle hooks */
   ngOnInit(): void {
+
     if (this.field) {
       this._gridLayoutService.setPositionGirdItem(this._element, this.field.attribute.position)
     }
   }
   ngAfterViewInit(): void {
     this.classList = this._element.nativeElement.classList;
-
     this.cd.detectChanges();
   }
   ngOnDestroy(): void {

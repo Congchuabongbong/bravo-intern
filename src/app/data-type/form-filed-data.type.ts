@@ -33,7 +33,7 @@ export interface IInput {
 export interface ISelect {
     attribute: IAttribute;
     options: {
-        title: string;
+        title: string; //key
         value: any;
     }[];
 }
@@ -44,10 +44,10 @@ export interface ITextarea {
 
 export interface ILabel extends Pick<IAttribute, 'class' | 'position'> {
     title: string;
-    id?: string;
-    for: string;
+    id?: string; //remove
+    for: string; //remove
     order?: number | string,
-    formControlName?: string;
+    formControlName?: string; //remove
 }
 
 export interface IAttribute {
@@ -59,5 +59,22 @@ export interface IAttribute {
     min?: number;
     placeholder?: string;
     position: GridLayoutData.IPositionGridItem;
+    formControlName: string;
+}
+
+//**Edit here */
+export interface IField {
+    filed: ControlFormType;
+    label: ILabel;
+}
+export interface IAttribute2<P> {
+    categoryTag: CategoryTag;
+    id: string;
+    class?: string;
+    name?: string;
+    max?: number;
+    min?: number;
+    placeholder?: string;
+    position: P;
     formControlName: string;
 }

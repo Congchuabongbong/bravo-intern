@@ -5,7 +5,7 @@
         <button class="tab__link" #btn_attribute (click)="openTab(btn_attribute ,'info__attribute')">Thuộc
             tính</button>
     </div>
-    <form [formGroup]="productForm" class="product_form" novalidate>
+    <form [formGroup]="productForm" class="product_form" novalidate autocomplete="off">
         <!-- **Information** -->
         <app-control-grid-layout-panel formGroupName="info" class="tabContent" id="info__general"
             [column]="formInfo.column.columnOfNumber" [row]="formInfo.row.rowOfNumber"
