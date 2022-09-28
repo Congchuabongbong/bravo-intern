@@ -16,6 +16,7 @@ import { ControlFormFieldPanelComponent } from './components/control-form-field-
 import { ControlGridLayoutPanelComponent } from './components/control-grid-layout-panel/control-grid-layout-panel.component';
 import { ControlFormLabelPanelComponent } from './components/control-form-label-panel/control-form-label-panel.component';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
+import { CustomFormCheckboxComponent } from './components/custom-form-checkbox/custom-form-checkbox.component';
 
 
 
@@ -33,6 +34,7 @@ import { ErrorMessageComponent } from './components/error-message/error-message.
     ControlGridLayoutPanelComponent,
     ControlFormLabelPanelComponent,
     ErrorMessageComponent,
+    CustomFormCheckboxComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule],
   providers: [],

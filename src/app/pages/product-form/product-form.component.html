@@ -15,8 +15,7 @@
                     <ng-container *ngFor="let field of formInfo.FormField">
                         <app-control-form-label-panel [field]="field">
                         </app-control-form-label-panel>
-                        <app-control-form-field-panel [field]="field"
-                            [formControlName]="field.attribute.formControlName">
+                        <app-control-form-field-panel [field]="field">
                         </app-control-form-field-panel>
                     </ng-container>
                 </app-control-grid-layout-panel>
@@ -32,8 +31,7 @@
                     <ng-container *ngFor="let field of formAttributeInfo.FormField">
                         <app-control-form-label-panel [field]="field">
                         </app-control-form-label-panel>
-                        <app-control-form-field-panel [field]="field"
-                            [formControlName]="field.attribute.formControlName">
+                        <app-control-form-field-panel [field]="field">
                         </app-control-form-field-panel>
                     </ng-container>
                     <!-- **Nested** -->
@@ -47,8 +45,7 @@
                                 *ngFor="let field of formAttributeInfo.subControlGridLayoutForm!.subGridItemForm.FormField">
                                 <app-control-form-label-panel [field]="field">
                                 </app-control-form-label-panel>
-                                <app-control-form-field-panel [field]="field"
-                                    [formControlName]="field.attribute.formControlName">
+                                <app-control-form-field-panel [field]="field">
                                 </app-control-form-field-panel>
                             </ng-container>
                         </app-control-grid-layout-panel>

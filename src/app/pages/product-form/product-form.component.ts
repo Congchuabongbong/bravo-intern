@@ -82,14 +82,15 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
         this._dataService.sendDataByEvent({ formInfo: this.formInfo, formAttributeInfo: this.formAttributeInfo });
       }
     )
+    this.productForm.valueChanges.subscribe(data => {
+      console.log(data);
+    })
   }
-
   ngAfterViewInit(): void {
     //select element when after view init*/
     this.tabLinks = this._el.nativeElement.querySelectorAll('.tab__link');
     this.tabContents = this._el.nativeElement.querySelectorAll('.tabContent');
     this._el.nativeElement.querySelector('#defaultOpen').click();
-
   }
   //**Getter Form */
   get info() {
