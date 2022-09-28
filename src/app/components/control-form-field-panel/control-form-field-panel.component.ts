@@ -8,7 +8,7 @@ import {
   OnDestroy,
   ChangeDetectorRef,
 } from '@angular/core';
-import { AbstractControl, ControlContainer, ControlValueAccessor, FormGroup, FormRecord, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+import { AbstractControl, ControlContainer, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 import { FormFieldData } from 'src/app/data-type';
 import { GridLayoutService } from 'src/app/services/grid-layout.service';
 

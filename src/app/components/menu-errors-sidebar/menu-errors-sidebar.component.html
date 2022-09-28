@@ -7,28 +7,21 @@
 
     <ng-container *ngIf="productForm">
         <!-- **Info product** -->
-        <ng-container *ngFor="let label of formInfo.gridItemForm.labels">
-            <ng-container *ngIf="label.formControlName">
-                <app-error-message class="sideNav__error" *ngIf="infoF[label.formControlName]?.invalid"
-                    [control]="infoF[label.formControlName]" [titleError]="label.title">
-                </app-error-message>
-            </ng-container>
+        <ng-container *ngFor="let field of formInfo.FormField">
+            <app-error-message class="sideNav__error" *ngIf="infoF[field.attribute.formControlName].invalid"
+                [control]="infoF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
+            </app-error-message>
         </ng-container>
         <!-- **attribute info** -->
-        <ng-container *ngFor="let label of formAttributeInfo.gridItemForm.labels">
-            <ng-container *ngIf="label.formControlName">
-                <app-error-message class="sideNav__error" *ngIf="attributeF[label.formControlName]?.invalid"
-                    [control]="attributeF[label.formControlName]" [titleError]="label.title">
-                </app-error-message>
-            </ng-container>
+        <ng-container *ngFor="let field of formAttributeInfo.FormField">
+            <app-error-message class="sideNav__error" *ngIf="attributeF[field.attribute.formControlName].invalid"
+                [control]="attributeF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
+            </app-error-message>
         </ng-container>
-        <ng-container
-            *ngFor="let label of formAttributeInfo.gridItemForm.subControlGridLayoutForm?.subGridItemForm?.gridItemForm?.labels">
-            <ng-container *ngIf="label.formControlName">
-                <app-error-message class="sideNav__error" *ngIf="attributeF[label.formControlName]?.invalid"
-                    [control]="attributeF[label.formControlName]" [titleError]="label.title">
-                </app-error-message>
-            </ng-container>
+        <ng-container *ngFor="let field of formAttributeInfo.subControlGridLayoutForm?.subGridItemForm?.FormField">
+            <app-error-message class="sideNav__error" *ngIf="attributeF[field.attribute.formControlName]?.invalid"
+                [control]="attributeF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
+            </app-error-message>
         </ng-container>
     </ng-container>
 </li>

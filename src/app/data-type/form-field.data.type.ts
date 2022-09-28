@@ -1,3 +1,4 @@
+import { ValidatorFn } from "@angular/forms";
 import { GridLayoutData } from ".";
 export type ControlFormType = IInput | ISelect | ITextarea;
 export type CategoryTag = 'input' | 'select' | 'textarea' | 'label';
@@ -33,7 +34,7 @@ export interface IInput {
 export interface ISelect {
     attribute: IAttribute;
     options: {
-        title: string; //key
+        title: string;
         value: any;
     }[];
 }
@@ -44,37 +45,26 @@ export interface ITextarea {
 
 export interface ILabel extends Pick<IAttribute, 'class' | 'position'> {
     title: string;
-    id?: string; //remove
-    for: string; //remove
-    order?: number | string,
-    formControlName?: string; //remove
+    id?: string;
+    for: string;
 }
 
 export interface IAttribute {
     categoryTag: CategoryTag;
-    id: string;
-    class?: string;
-    name?: string;
-    max?: number;
-    min?: number;
-    placeholder?: string;
+    label: ILabel
     position: GridLayoutData.IPositionGridItem;
     formControlName: string;
-}
-
-//**Edit here */
-export interface IField {
-    filed: ControlFormType;
-    label: ILabel;
-}
-export interface IAttribute2<P> {
-    categoryTag: CategoryTag;
     id: string;
+    validators?: Array<ValidatorFn>;
+    disabled?: boolean;
+    required?: boolean;
+    value?: any | undefined,
     class?: string;
     name?: string;
     max?: number;
     min?: number;
+    order?: number | string,
     placeholder?: string;
-    position: P;
-    formControlName: string;
+
 }
+

@@ -7,41 +7,54 @@
     </div>
     <form [formGroup]="productForm" class="product_form" novalidate autocomplete="off">
         <!-- **Information** -->
-        <app-control-grid-layout-panel formGroupName="info" class="tabContent" id="info__general"
-            [column]="formInfo.column.columnOfNumber" [row]="formInfo.row.rowOfNumber"
-            [arrayUnitColumn]="formInfo.column.arrayUnitColumn" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
-            <app-control-form-label-panel *ngFor="let label of formInfo.gridItemForm.labels;let index = index"
-                [label]="label">
-            </app-control-form-label-panel>
-            <app-control-form-field-panel *ngFor="let field of formInfo.gridItemForm.fields" [field]="field"
-                formControlName="{{field.attribute.formControlName}}">
-            </app-control-form-field-panel>
-        </app-control-grid-layout-panel>
+        <div class="tabContent" id="info__general">
+            <ng-container *ngIf="formInfo">
+                <app-control-grid-layout-panel formGroupName="info" [column]="formInfo.column.columnOfNumber"
+                    [row]="formInfo.row.rowOfNumber" [arrayUnitColumn]="formInfo.column.arrayUnitColumn"
+                    [columnGap]="'1rem'" [rowGap]="'0.3rem'">
+                    <ng-container *ngFor="let field of formInfo.FormField">
+                        <app-control-form-label-panel [field]="field">
+                        </app-control-form-label-panel>
+                        <app-control-form-field-panel [field]="field"
+                            [formControlName]="field.attribute.formControlName">
+                        </app-control-form-field-panel>
+                    </ng-container>
+                </app-control-grid-layout-panel>
+            </ng-container>
+        </div>
         <!--** Attribute **-->
-        <app-control-grid-layout-panel class="tabContent" id="info__attribute" formGroupName="attribute"
-            [column]="formAttributeInfo.column.columnOfNumber" [row]="formAttributeInfo.row.rowOfNumber"
-            [arrayUnitColumn]="formAttributeInfo.column.arrayUnitColumn" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
-            <app-control-form-label-panel *ngFor="let label of formAttributeInfo.gridItemForm.labels;" [label]="label">
-            </app-control-form-label-panel>
-            <app-control-form-field-panel *ngFor="let field of formAttributeInfo.gridItemForm.fields" [field]="field"
-                formControlName="{{field.attribute.formControlName}}">
-            </app-control-form-field-panel>
-            <!-- **Nested layout** -->
-            <app-control-grid-layout-panel
-                [column]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.column.columnOfNumber"
-                [row]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.row.rowOfNumber"
-                [arrayUnitColumn]="formAttributeInfo.gridItemForm.subControlGridLayoutForm!.subGridItemForm.column.arrayUnitColumn"
-                [positionLine]="formAttributeInfo.gridItemForm.subControlGridLayoutForm?.position"
-                [columnGap]="'0.5rem'">
-                <app-control-form-label-panel
-                    *ngFor="let label of formAttributeInfo.gridItemForm.subControlGridLayoutForm?.subGridItemForm?.gridItemForm?.labels;"
-                    [label]="label">
-                </app-control-form-label-panel>
-                <app-control-form-field-panel
-                    *ngFor="let field of formAttributeInfo.gridItemForm.subControlGridLayoutForm?.subGridItemForm?.gridItemForm?.fields"
-                    [field]="field" formControlName="{{field.attribute.formControlName}}">
-                </app-control-form-field-panel>
-            </app-control-grid-layout-panel>
-        </app-control-grid-layout-panel>
+        <div class="tabContent" id="info__attribute">
+            <ng-container *ngIf="formAttributeInfo">
+                <app-control-grid-layout-panel formGroupName="attribute"
+                    [column]="formAttributeInfo.column.columnOfNumber" [row]="formAttributeInfo.row.rowOfNumber"
+                    [arrayUnitColumn]="formAttributeInfo.column.arrayUnitColumn" [columnGap]="'1rem'"
+                    [rowGap]="'0.3rem'">
+                    <ng-container *ngFor="let field of formAttributeInfo.FormField">
+                        <app-control-form-label-panel [field]="field">
+                        </app-control-form-label-panel>
+                        <app-control-form-field-panel [field]="field"
+                            [formControlName]="field.attribute.formControlName">
+                        </app-control-form-field-panel>
+                    </ng-container>
+                    <!-- **Nested** -->
+                    <ng-container *ngIf="formAttributeInfo.subControlGridLayoutForm">
+                        <app-control-grid-layout-panel
+                            [column]="formAttributeInfo.subControlGridLayoutForm.subGridItemForm.column.columnOfNumber"
+                            [row]="formAttributeInfo.subControlGridLayoutForm.subGridItemForm.row.rowOfNumber"
+                            [arrayUnitColumn]="formAttributeInfo.subControlGridLayoutForm.subGridItemForm.column.arrayUnitColumn"
+                            [positionLine]="formAttributeInfo.subControlGridLayoutForm.position" [columnGap]="'0.5rem'">
+                            <ng-container
+                                *ngFor="let field of formAttributeInfo.subControlGridLayoutForm!.subGridItemForm.FormField">
+                                <app-control-form-label-panel [field]="field">
+                                </app-control-form-label-panel>
+                                <app-control-form-field-panel [field]="field"
+                                    [formControlName]="field.attribute.formControlName">
+                                </app-control-form-field-panel>
+                            </ng-container>
+                        </app-control-grid-layout-panel>
+                    </ng-container>
+                </app-control-grid-layout-panel>
+            </ng-container>
+        </div>
     </form>
 </div>

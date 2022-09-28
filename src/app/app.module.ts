@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-
+import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
@@ -16,6 +16,8 @@ import { ControlFormFieldPanelComponent } from './components/control-form-field-
 import { ControlGridLayoutPanelComponent } from './components/control-grid-layout-panel/control-grid-layout-panel.component';
 import { ControlFormLabelPanelComponent } from './components/control-form-label-panel/control-form-label-panel.component';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
+
+
 
 @NgModule({
   declarations: [
@@ -32,7 +34,7 @@ import { ErrorMessageComponent } from './components/error-message/error-message.
     ControlFormLabelPanelComponent,
     ErrorMessageComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent],
 })

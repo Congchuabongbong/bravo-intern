@@ -139,6 +139,22 @@ export default class GridLayout {
   public setMaxHeightGridContainer(maxHeight: string): void {
     this.renderer.setStyle(this.gridContainer.nativeElement, 'max-height', maxHeight)
   }
+  //** Set class */
+  public setClass(className: string): void {
+    this.renderer.addClass(this.gridContainer.nativeElement, className)
+  }
+  //** Set id */
+  public setId(idName: string): void {
+    this.renderer.setAttribute(this.gridContainer.nativeElement, 'id', idName)
+  }
+  //** Set attribute */
+  public setAttribute(name: string, value: string): void {
+    this.renderer.setAttribute(this.gridContainer.nativeElement, name, value)
+  }
+  //**set style */
+  public setStyle(name: string, value: string): void {
+    this.renderer.setStyle(this.gridContainer.nativeElement, name, value)
+  }
   //** Check if obj is type of minMax type*/
   private isMinMax(obj: any): obj is GridLayoutData.IMinMax {
     return 'min' in obj && 'max' in obj;

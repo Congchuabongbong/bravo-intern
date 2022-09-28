@@ -1,4 +1,4 @@
-import { FormGroup } from '@angular/forms';
+import { ControlContainer, FormGroup, FormGroupName } from '@angular/forms';
 import {
   AfterViewInit,
   Component,
@@ -10,7 +10,7 @@ import {
   Renderer2,
 } from '@angular/core';
 import { GridLayoutData } from 'src/app/data-type';
-import { UnitOfMeasure } from 'src/app/data-type/grid-layout-data.type';
+import { UnitOfMeasure } from 'src/app/data-type/grid-layout.data.type';
 import GridLayout from 'src/app/shared/grid-layout.class';
 
 @Component({
@@ -27,21 +27,24 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input() arrayUnitRow?: UnitOfMeasure[];
   @Input() arrayUnitColumn?: UnitOfMeasure[];
   @Input() positionLine?: GridLayoutData.IPositionGridItem;
-  @Input() width!: string;
-  @Input() height!: string;
-  @Input() minWidth!: string;
-  @Input() minHeight!: string;
-  @Input() maxWidth!: string;
-  @Input() maxHeight!: string;
-  @Input() form!: FormGroup;
+  @Input() width?: string;
+  @Input() height?: string;
+  @Input() minWidth?: string;
+  @Input() minHeight?: string;
+  @Input() maxWidth?: string;
+  @Input() maxHeight?: string;
+  @Input('idIp') id?: string;
+  @Input('classIp') class?: string;
+
+
   @Output() currentTab = new EventEmitter<ElementRef>();
   // **Declare property class here:
   public gridLayout!: GridLayout;
   //** constructor */
-  constructor(private _element: ElementRef, private _renderer: Renderer2) { }
+  constructor(private _element: ElementRef, private _renderer: Renderer2, private _parentContainer: ControlContainer) { }
   //** Lifecycle here: */
   ngOnInit(): void {
-    this.currentTab.emit(this._element.nativeElement);
+
   }
   ngAfterViewInit(): void {
     if (this.rowOfNumber && this.columnOfNumber) {
@@ -73,6 +76,13 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
       if (this.height) {
         this.gridLayout.setHeightGridContainer(this.height);
       }
+      if (this.class) {
+        this.gridLayout.setClass(this.class);
+      }
+      if (this.id) {
+        this.gridLayout.setId(this.id);
+      }
     }
   }
+
 }
