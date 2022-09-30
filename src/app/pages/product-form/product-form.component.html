@@ -9,7 +9,8 @@
         <!-- **Information** -->
         <div class="tabContent" id="info__general">
             <ng-container *ngIf="formInfo">
-                <app-control-grid-layout-panel formGroupName="info" [column]="formInfo.column.columnOfNumber"
+                <!-- **Case 1** -->
+                <!-- <app-control-grid-layout-panel formGroupName="info" [column]="formInfo.column.columnOfNumber"
                     [row]="formInfo.row.rowOfNumber" [arrayUnitColumn]="formInfo.column.arrayUnitColumn"
                     [columnGap]="'1rem'" [rowGap]="'0.3rem'">
                     <ng-container *ngFor="let field of formInfo.FormField">
@@ -18,13 +19,22 @@
                         <app-control-form-field-panel [field]="field">
                         </app-control-form-field-panel>
                     </ng-container>
+                </app-control-grid-layout-panel> -->
+                <!-- ** Case 2 ** -->
+                <app-control-grid-layout-panel [formFieldConfig]="formInfo" [columnGap]="'1rem'" [rowGap]="'0.3rem'"
+                    [groupNameForm]="'info'">
                 </app-control-grid-layout-panel>
             </ng-container>
         </div>
         <!--** Attribute **-->
         <div class="tabContent" id="info__attribute">
             <ng-container *ngIf="formAttributeInfo">
-                <app-control-grid-layout-panel formGroupName="attribute"
+                <!-- **Case 1 -->
+                <app-control-grid-layout-panel [formFieldConfig]="formAttributeInfo" [columnGap]="'1rem'"
+                    [rowGap]="'0.3rem'" [groupNameForm]="'attribute'">
+                </app-control-grid-layout-panel>
+                <!-- **Case 2 -->
+                <!-- <app-control-grid-layout-panel formGroupName="attribute"
                     [column]="formAttributeInfo.column.columnOfNumber" [row]="formAttributeInfo.row.rowOfNumber"
                     [arrayUnitColumn]="formAttributeInfo.column.arrayUnitColumn" [columnGap]="'1rem'"
                     [rowGap]="'0.3rem'">
@@ -34,7 +44,6 @@
                         <app-control-form-field-panel [field]="field">
                         </app-control-form-field-panel>
                     </ng-container>
-                    <!-- **Nested** -->
                     <ng-container *ngIf="formAttributeInfo.subControlGridLayoutForm">
                         <app-control-grid-layout-panel
                             [column]="formAttributeInfo.subControlGridLayoutForm.subGridItemForm.column.columnOfNumber"
@@ -50,7 +59,7 @@
                             </ng-container>
                         </app-control-grid-layout-panel>
                     </ng-container>
-                </app-control-grid-layout-panel>
+                </app-control-grid-layout-panel> -->
             </ng-container>
         </div>
     </form>

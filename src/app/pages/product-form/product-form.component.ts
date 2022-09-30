@@ -80,6 +80,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
         this._dataService.sendDataByEvent({ formInfo: this.formInfo, formAttributeInfo: this.formAttributeInfo });
       }
     )
+
   }
   ngAfterViewInit(): void {
     //select element when after view init*/

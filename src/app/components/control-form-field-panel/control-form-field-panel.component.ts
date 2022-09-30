@@ -21,13 +21,12 @@ export class ControlFormFieldPanelComponent implements OnInit, AfterViewInit, On
   public formGroup!: any;
 
   //** constructor*/
-  constructor(private _element: ElementRef, private _gridLayoutService: GridLayoutService, private cd: ChangeDetectorRef, private controlContainer: ControlContainer) {
-
+  constructor(private _element: ElementRef, private _gridLayoutService: GridLayoutService, private _controlContainer: ControlContainer) {
   }
 
   //**Life cycle hooks */
   ngOnInit(): void {
-    this.formGroup = this.controlContainer.control;
+    this.formGroup = this._controlContainer.control;
     if (this.field) {
       this._gridLayoutService.setPositionGirdItem(this._element, this.field.attribute.position)
     }

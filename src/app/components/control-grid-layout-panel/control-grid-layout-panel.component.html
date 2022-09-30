@@ -1,1 +1,19 @@
-<ng-content></ng-content>
+<!-- **Case Grid Layout Form** -->
+<ng-container *ngIf="formField && instanceForm && groupNameForm;else otherCase" [formGroup]="instanceForm">
+    <ng-container *ngFor="let field of formField.FormField" [formGroupName]="groupNameForm">
+        <app-control-form-label-panel [field]="field">
+        </app-control-form-label-panel>
+        <app-control-form-field-panel [field]="field">
+        </app-control-form-field-panel>
+    </ng-container>
+    <!-- **Nested** -->
+    <ng-container *ngIf="formField.subControlGridLayoutForm">
+        <app-control-grid-layout-panel [formFieldConfig]="formField.subControlGridLayoutForm.subGridItemForm"
+            [positionLine]="formField.subControlGridLayoutForm.position" [groupNameForm]="groupNameForm">
+        </app-control-grid-layout-panel>
+    </ng-container>
+</ng-container>
+<!-- ** Case Content Projection -->
+<ng-template #otherCase>
+    <ng-content></ng-content>
+</ng-template>

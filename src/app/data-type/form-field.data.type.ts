@@ -54,11 +54,11 @@ export interface IAttribute {
     label: ILabel
     position: GridLayoutData.IPositionGridItem;
     formControlName: string;
-    id: string;
     validators?: Array<ValidatorFn>;
     disabled?: boolean;
     required?: boolean;
     value?: any | undefined,
+    id: string;
     class?: string;
     name?: string;
     max?: number;
