@@ -1,7 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
-import { FormFieldData } from 'src/app/data-type';
-
 @Component({
   selector: 'app-custom-form-checkbox',
   templateUrl: './custom-form-checkbox.component.html',

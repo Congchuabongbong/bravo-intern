@@ -1,6 +1,6 @@
-<ng-container *ngIf="field">
-        <label [for]="field.attribute.label.for" [class]="field.attribute.label.class" [id]="field.attribute.label.id">
-                <span *ngIf="field.attribute.order">{{field.attribute.order}}</span>
-                {{field.attribute.label.title}}
+<ng-container *ngIf="_field">
+        <label [for]="label.for" [class]="label.class" [id]="label.id">
+                <span *ngIf="_field.attribute.order">{{_field.attribute.order}}</span>
+                {{label.title}}
         </label>
 </ng-container>

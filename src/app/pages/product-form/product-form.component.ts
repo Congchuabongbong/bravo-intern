@@ -1,4 +1,3 @@
-
 //*Import form core angular */
 import {
   Component,
@@ -25,7 +24,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./product-form.component.scss'],
 })
 export class ProductFormComponent implements OnInit, AfterViewInit {
-  @ViewChild('containerRef', { read: ViewContainerRef }) container!: ViewContainerRef;
+  @ViewChild('something', { read: ViewContainerRef }) container!: ViewContainerRef;
   //**Declaration */
   public tabLinks!: ElementRef[];
   public tabContents!: ElementRef[];
@@ -38,8 +37,7 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
     private _renderer: Renderer2,
     private _el: ElementRef,
     private _fb: FormBuilder,
-    private _http: HttpClient
-  ) { }
+    private _http: HttpClient) { }
   // **life cycle hooks
   ngOnInit(): void {
     this.productForm = this._fb.group({
@@ -82,22 +80,12 @@ export class ProductFormComponent implements OnInit, AfterViewInit {
         this._dataService.sendDataByEvent({ formInfo: this.formInfo, formAttributeInfo: this.formAttributeInfo });
       }
     )
-    this.productForm.valueChanges.subscribe(data => {
-      console.log(data);
-    })
   }
   ngAfterViewInit(): void {
     //select element when after view init*/
     this.tabLinks = this._el.nativeElement.querySelectorAll('.tab__link');
     this.tabContents = this._el.nativeElement.querySelectorAll('.tabContent');
     this._el.nativeElement.querySelector('#defaultOpen').click();
-  }
-  //**Getter Form */
-  get info() {
-    return this.productForm.get('info') as FormGroup;
-  }
-  get itemCodeProduct() {
-    return this.info?.get('itemCodeProduct') as FormGroup;
   }
   //**open tab  */
   public openTab(elRef: any, tabName: string): void {
