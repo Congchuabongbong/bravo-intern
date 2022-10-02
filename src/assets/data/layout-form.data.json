@@ -1,5 +1,5 @@
 {
-    "formInfo": {
+    "info": {
         "row": {
             "rowOfNumber": 8
         },
@@ -40,7 +40,7 @@
                 }
             ]
         },
-        "FormField": [
+        "formField": [
             {
                 "type": "text",
                 "attribute": {
@@ -72,7 +72,13 @@
                             "endLine": 5
                         }
                     },
-                    "formControlName": "productId"
+                    "formControlName": "productId",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -106,7 +112,13 @@
                             "endLine": 8
                         }
                     },
-                    "formControlName": "productName"
+                    "formControlName": "productName",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -140,7 +152,13 @@
                             "endLine": 8
                         }
                     },
-                    "formControlName": "productSecondName"
+                    "formControlName": "productSecondName",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -174,7 +192,13 @@
                             "endLine": 5
                         }
                     },
-                    "formControlName": "productUnit"
+                    "formControlName": "productUnit",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -221,7 +245,13 @@
                             "endLine": 6
                         }
                     },
-                    "formControlName": "productType"
+                    "formControlName": "productType",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -268,7 +298,13 @@
                             "endLine": 6
                         }
                     },
-                    "formControlName": "productGroup"
+                    "formControlName": "productGroup",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -335,7 +371,13 @@
                             "endLine": 8
                         }
                     },
-                    "formControlName": "productItemCode"
+                    "formControlName": "productItemCode",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -406,7 +448,7 @@
             }
         ]
     },
-    "formAttributeInfo": {
+    "attribute": {
         "row": {
             "rowOfNumber": 9
         },
@@ -421,7 +463,7 @@
                 "1fr"
             ]
         },
-        "FormField": [
+        "formField": [
             {
                 "type": "number",
                 "attribute": {
@@ -453,7 +495,13 @@
                             "endLine": 3
                         }
                     },
-                    "formControlName": "productLength"
+                    "formControlName": "productLength",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -487,7 +535,13 @@
                             "endLine": 3
                         }
                     },
-                    "formControlName": "productWidth"
+                    "formControlName": "productWidth",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -521,7 +575,13 @@
                             "endLine": 3
                         }
                     },
-                    "formControlName": "productHeight"
+                    "formControlName": "productHeight",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -555,7 +615,13 @@
                             "endLine": 3
                         }
                     },
-                    "formControlName": "productWeight"
+                    "formControlName": "productWeight",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -602,7 +668,13 @@
                             "endLine": 3
                         }
                     },
-                    "formControlName": "productStandardGroupQc"
+                    "formControlName": "productStandardGroupQc",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -645,7 +717,13 @@
                             "endLine": 3
                         }
                     },
-                    "formControlName": "typeOfPurchase"
+                    "formControlName": "typeOfPurchase",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             },
             {
@@ -679,7 +757,13 @@
                             "endLine": 3
                         }
                     },
-                    "formControlName": "shortCode"
+                    "formControlName": "shortCode",
+                    "validators": [
+                        {
+                            "key": "required",
+                            "messageError": "Không được bỏ trắng giá trị"
+                        }
+                    ]
                 }
             }
         ],
@@ -728,7 +812,7 @@
                         "1fr"
                     ]
                 },
-                "FormField": [
+                "formField": [
                     {
                         "type": "checkbox",
                         "attribute": {
@@ -926,7 +1010,13 @@
                                     "endLine": 7
                                 }
                             },
-                            "formControlName": "dueDateProduct"
+                            "formControlName": "dueDateProduct",
+                            "validators": [
+                                {
+                                    "key": "required",
+                                    "messageError": "Không được bỏ trắng giá trị"
+                                }
+                            ]
                         }
                     }
                 ]

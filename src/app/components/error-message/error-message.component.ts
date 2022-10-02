@@ -42,7 +42,7 @@ export class ErrorMessageComponent implements OnInit, OnDestroy {
             this.errorMessage = `Giá trị tối thiểu phải lớn hơn ${controlErrors['min'].min}.`;
             break;
           case 'max':
-            this.errorMessage = `Giá trị không được quá ${controlErrors['min'].max}.`;
+            this.errorMessage = `Giá trị không được quá ${controlErrors['max'].max}.`;
             break;
           case 'email':
             this.errorMessage = 'Email không hợp lệ.';

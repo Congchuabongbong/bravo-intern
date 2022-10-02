@@ -1,6 +1,6 @@
 <!-- **Case Grid Layout Form** -->
 <ng-container *ngIf="formField && instanceForm && groupNameForm;else otherCase" [formGroup]="instanceForm">
-    <ng-container *ngFor="let field of formField.FormField" [formGroupName]="groupNameForm">
+    <ng-container *ngFor="let field of formField.formField" [formGroupName]="groupNameForm">
         <app-control-form-label-panel [field]="field">
         </app-control-form-label-panel>
         <app-control-form-field-panel [field]="field">

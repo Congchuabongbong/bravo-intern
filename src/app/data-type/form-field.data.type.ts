@@ -48,13 +48,18 @@ export interface ILabel extends Pick<IAttribute, 'class' | 'position'> {
     id?: string;
     for: string;
 }
+export interface IValidator {
+    key: string,
+    value?: number | string;
+    message: string;
+}
 
 export interface IAttribute {
     categoryTag: CategoryTag;
     label: ILabel
     position: GridLayoutData.IPositionGridItem;
     formControlName: string;
-    validators?: Array<ValidatorFn>;
+    validators?: Array<IValidator>;
     disabled?: boolean;
     required?: boolean;
     value?: any | undefined,

@@ -7,18 +7,18 @@
 
     <ng-container *ngIf="productForm">
         <!-- **Info product** -->
-        <ng-container *ngFor="let field of formInfo.FormField">
+        <ng-container *ngFor="let field of formInfo.formField">
             <app-error-message class="sideNav__error" *ngIf="infoF[field.attribute.formControlName].invalid"
                 [control]="infoF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
             </app-error-message>
         </ng-container>
         <!-- **attribute info** -->
-        <ng-container *ngFor="let field of formAttributeInfo.FormField">
+        <ng-container *ngFor="let field of formAttributeInfo.formField">
             <app-error-message class="sideNav__error" *ngIf="attributeF[field.attribute.formControlName].invalid"
                 [control]="attributeF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
             </app-error-message>
         </ng-container>
-        <ng-container *ngFor="let field of formAttributeInfo.subControlGridLayoutForm?.subGridItemForm?.FormField">
+        <ng-container *ngFor="let field of formAttributeInfo.subControlGridLayoutForm?.subGridItemForm?.formField">
             <app-error-message class="sideNav__error" *ngIf="attributeF[field.attribute.formControlName]?.invalid"
                 [control]="attributeF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
             </app-error-message>

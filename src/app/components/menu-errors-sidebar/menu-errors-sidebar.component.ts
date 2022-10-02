@@ -16,6 +16,7 @@ export class MenuErrorsSidebarComponent
   public obsDataEvent!: Subscription;
   public formAttributeInfo!: GridLayoutForm.IControlGridLayoutForm;
   public formInfo!: GridLayoutForm.IControlGridLayoutForm;
+
   constructor(private _dataService: DataService) { }
 
 
