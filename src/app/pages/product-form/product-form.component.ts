@@ -24,7 +24,6 @@ import { Observable, Subscription } from 'rxjs';
   styleUrls: ['./product-form.component.scss'],
 })
 export class ProductFormComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
-  @ViewChild('something', { read: ViewContainerRef }) container!: ViewContainerRef;
   //**Declaration */
   public tabLinks!: ElementRef[];
   public tabContents!: ElementRef[];
