@@ -14,10 +14,10 @@
             <!-- **Handle case input other type** -->
             <ng-template #otherInput>
                 <input type="{{field.type}}" id="{{field.attribute.id}}"
-                    class="{{field.attribute.class ? field.attribute.class :''}}" name='{{field.attribute.name}}'
-                    min="{{field.attribute.min ? field.attribute.min : ''}}"
-                    max="{{field.attribute.max ? field.attribute.max : ''}}"
-                    placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
+                    [class]="field.attribute.class ? field.attribute.class :''" [name]='field.attribute.name'
+                    [min]="field.attribute.min ? field.attribute.min : ''"
+                    [max]="field.attribute.max ? field.attribute.max : ''"
+                    [placeholder]="field.attribute.placeholder ? field.attribute.placeholder : ''"
                     [formControlName]="field.attribute.formControlName">
             </ng-template>
         </ng-container>
@@ -25,8 +25,8 @@
     <!-- ** case: select -->
     <ng-container *ngSwitchCase="'select'">
         <ng-container *ngIf="isSelect(field)">
-            <select id="{{field.attribute.id}}" class="{{field.attribute.class ? field.attribute.class :''}}"
-                name='{{field.attribute.name}}' [formControlName]="field.attribute.formControlName">
+            <select [id]="field.attribute.id" [class]="field.attribute.class ? field.attribute.class :''"
+                [name]='field.attribute.name' [formControlName]="field.attribute.formControlName">
                 <option *ngFor="let option of field.options" [ngValue]="option.value">
                     {{option.title}}</option>
             </select>
@@ -35,9 +35,9 @@
     <!-- ** case: textarea -->
     <ng-container *ngSwitchCase="'textarea'">
         <ng-container *ngIf="isTextarea(field)">
-            <textarea id="{{field.attribute.id}}" class="{{field.attribute.class ? field.attribute.class :''}}"
-                name="{{field.attribute.name}}"
-                placeholder="{{field.attribute.placeholder ? field.attribute.placeholder : ''}}"
+            <textarea [id]="field.attribute.id" [class]="field.attribute.class ? field.attribute.class :''"
+                [name]="field.attribute.name"
+                [placeholder]="field.attribute.placeholder ? field.attribute.placeholder : ''"
                 [formControlName]="field.attribute.formControlName"></textarea>
         </ng-container>
     </ng-container>

@@ -9,6 +9,7 @@ import { GridLayoutService } from 'src/app/services/grid-layout.service';
   styleUrls: ['./control-form-label-panel.component.scss'],
 })
 export class ControlFormLabelPanelComponent implements OnInit, AfterViewInit {
+  // ** Declaration
   public _field!: FormFieldData.ControlFormType;
   public label!: FormFieldData.ILabel;
   @Input() public set field(field: FormFieldData.ControlFormType) {
@@ -18,9 +19,9 @@ export class ControlFormLabelPanelComponent implements OnInit, AfterViewInit {
   public get field() {
     return this._field;
   };
-
+  // **constructor
   constructor(private _element: ElementRef, private _gridLayoutService: GridLayoutService) { }
-
+  //** Lifecycle hooks*/
   ngOnInit(): void {
   }
   ngAfterViewInit(): void {
@@ -28,5 +29,4 @@ export class ControlFormLabelPanelComponent implements OnInit, AfterViewInit {
       this._gridLayoutService.setPositionGirdItem(this._element, this.label.position)
     }
   }
-
 }

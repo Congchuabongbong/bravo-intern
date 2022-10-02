@@ -78,12 +78,12 @@ export class ProductFormComponent implements OnInit, AfterViewInit, AfterViewChe
         this.formAttributeInfo = response.attribute;
         this.formInfo = response.info;
         //!!getLayoutForm
-        const initialForm: Record<string, any> = {}
+        const formPrepareObject: Record<string, any> = {}
         Object.keys(response).forEach(key => {
-          initialForm[key] = this.generateFormGroup(response[key]);
+          formPrepareObject[key] = this.generateFormGroup(response[key]);
         });
         this.isProductForm = true;
-        this.productForm = this._fb.group(initialForm);
+        this.productForm = this._fb.group(formPrepareObject);
         this._dataService.sendData(this.productForm);
         this._dataService.sendDataByEvent({ formInfo: this.formInfo, formAttributeInfo: this.formAttributeInfo });
       }

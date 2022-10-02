@@ -5,7 +5,6 @@ import {
   OnInit,
   AfterViewInit,
   OnDestroy,
-  ChangeDetectorRef,
 } from '@angular/core';
 import { ControlContainer } from '@angular/forms';
 import { FormFieldData } from 'src/app/data-type';
