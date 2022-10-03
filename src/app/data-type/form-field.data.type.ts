@@ -51,7 +51,7 @@ export interface ILabel extends Pick<IAttribute, 'class' | 'position'> {
 export interface IValidator {
     key: string,
     value?: number | string;
-    message: string;
+    messageError: string;
 }
 
 export interface IAttribute {

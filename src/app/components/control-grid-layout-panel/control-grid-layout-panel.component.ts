@@ -1,4 +1,4 @@
-import { ControlContainer, FormGroup, FormGroupName } from '@angular/forms';
+import { ControlContainer, FormGroup } from '@angular/forms';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -39,9 +39,8 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input() maxHeight?: string;
   @Input('idIp') id?: string;
   @Input('classIp') class?: string;
-  @Input('formFieldConfig') formField?: GridLayoutForm.IControlGridLayoutForm;
+  @Input('formFieldConfig') formFieldConfig?: GridLayoutForm.IControlGridLayoutForm;
   @Input() groupNameForm?: string;
-  @Output() currentTab = new EventEmitter<ElementRef>();
   // **Declare property class here:
   public gridLayout!: GridLayout;
   public instanceForm!: any;
@@ -51,11 +50,13 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
   }
   ngAfterViewInit(): void {
-    if (this.formField) {
+    if (this.formFieldConfig) {
+      //** this approach using component for grid layout form
       this.generateGridLayoutFormPanel();
       this.instanceForm = this._controlContainer.control as FormGroup;
       this._cd.detectChanges();
     } else {
+      //** this approach using content projection for every thing elements is grid item 
       if (this.rowOfNumber && this.columnOfNumber) {
         this.gridLayout = new GridLayout(
           this._element,
@@ -95,20 +96,20 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
       this.gridLayout.setPositionGirdItem(this._element, this.positionLine);
     }
   }
-
+  //** generate grid layout form for approach component for grid layout form
   private generateGridLayoutFormPanel(): void {
-    if (this.formField) {
+    if (this.formFieldConfig) {
       this.gridLayout = new GridLayout(
         this._element,
-        this.formField.row.rowOfNumber,
-        this.formField.column.columnOfNumber,
+        this.formFieldConfig.row.rowOfNumber,
+        this.formFieldConfig.column.columnOfNumber,
         this._renderer
       );
-      if (this.formField.column.arrayUnitColumn) {
-        this.gridLayout.widthColumn = this.formField.column.arrayUnitColumn;
+      if (this.formFieldConfig.column.arrayUnitColumn) {
+        this.gridLayout.widthColumn = this.formFieldConfig.column.arrayUnitColumn;
       }
-      if (this.formField.row.arrayUnitRow !== undefined) {
-        this.gridLayout.heightRow = this.formField.row.arrayUnitRow
+      if (this.formFieldConfig.row.arrayUnitRow !== undefined) {
+        this.gridLayout.heightRow = this.formFieldConfig.row.arrayUnitRow
       }
       this.gridLayout.generateGridLayout();
     }

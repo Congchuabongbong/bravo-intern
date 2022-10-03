@@ -11,7 +11,7 @@ export class DataService {
   public sendData(data: any) {
     this.dataSource.next(data);
   }
-  public sendDataByEvent(data: any) {
+  public sendDataByEventEmitter(data: any) {
     this.dataByEvent.emit(data);
   }
 }

@@ -1,5 +1,5 @@
 <ng-container *ngIf="control">
-    <p class="error__title error__title"><i class="fa-solid fa-circle-exclamation"></i>{{titleError}}
+    <p class="error__title error__title"><i class="fa-solid fa-circle-exclamation"></i>{{field.attribute.label.title}}
     </p>
-    <span class="error__message" *ngIf="control.invalid">{{errorMessage}}</span>
+    <span class="error__message">{{errorMessage}}</span>
 </ng-container>

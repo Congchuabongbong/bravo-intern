@@ -1,6 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, ValidationErrors } from '@angular/forms';
-import { debounceTime, map, Subscription } from 'rxjs';
+import { FormControl, ValidationErrors } from '@angular/forms';
+import { debounceTime, Subscription, tap } from 'rxjs';
+import { FormFieldData } from 'src/app/data-type';
+import { DynamicFormService } from 'src/app/services/dynamic-form.service';
 @Component({
   selector: 'app-error-message',
   templateUrl: './error-message.component.html',
@@ -8,63 +10,37 @@ import { debounceTime, map, Subscription } from 'rxjs';
 })
 
 export class ErrorMessageComponent implements OnInit, OnDestroy {
-  @Input() control!: AbstractControl;
-  @Input() titleError!: string;
+  //**Declaration */
+  @Input() control!: FormControl;
+  @Input() field!: FormFieldData.ControlFormType;
   public errorMessage: string = ''
   public errorMessage$!: Subscription;
-  constructor() {
+  constructor(private _dynamicFormService: DynamicFormService,) {
   }
-
+  //** Lifecycle hooks */
   ngOnInit(): void {
     if (this.control && this.control.invalid) {
-      this.getErrorMessage();
+      this.getErrorMessage()
     }
-    this.errorMessage$ = this.control.valueChanges.pipe(debounceTime(200), map(() => {
-      const { invalid } = this.control;
-      return invalid ? this.getErrorMessage() : '';
-    })).subscribe();
+    if (this.control) {
+      this.errorMessage$ = this.control.valueChanges.pipe(debounceTime(200), tap(() => {
+        const { invalid } = this.control as FormControl;
+        invalid ? this.getErrorMessage() : '';
+      })).subscribe();
+    }
   }
   ngOnDestroy(): void {
     if (this.errorMessage$) {
       this.errorMessage$.unsubscribe();
     }
   }
-
+  //**get Error Message */
   getErrorMessage() {
-    const controlErrors: ValidationErrors | null = this.control.errors;
+    const controlErrors: ValidationErrors | null = (this.control as FormControl).errors;
     if (controlErrors != null) {
       Object.keys(controlErrors).forEach(keyError => {
-        switch (keyError) {
-          case 'required':
-            this.errorMessage = 'Không được bỏ trắng giá trị.';
-            break;
-          case 'min':
-            this.errorMessage = `Giá trị tối thiểu phải lớn hơn ${controlErrors['min'].min}.`;
-            break;
-          case 'max':
-            this.errorMessage = `Giá trị không được quá ${controlErrors['max'].max}.`;
-            break;
-          case 'email':
-            this.errorMessage = 'Email không hợp lệ.';
-            break;
-          case 'pattern':
-            this.errorMessage = `Dữ liệu không đúng định dạng yêu cầu.`;
-            break;
-          case 'requiredValue':
-            this.errorMessage = `${controlErrors['requiredValue']}.`;
-            break;
-          case 'minlength':
-            this.errorMessage = `Dữ liệu phải dài tối thiểu ${controlErrors['minlength'].requiredLength} ký tự.`;
-            break;
-          case 'maxlength':
-            this.errorMessage = `Dữ liệu không vượt quá ${controlErrors['maxlength'].requiredLength} ký tự.`;
-            break;
-          default:
-            this.errorMessage = 'Giá trị không hợp lệ.';
-            break;
-        }
+        this.errorMessage = this._dynamicFormService.getValidatorsMessageErrorFiled(keyError, this.field.attribute.validators as FormFieldData.IValidator[]);
       });
     }
   }
-
 }

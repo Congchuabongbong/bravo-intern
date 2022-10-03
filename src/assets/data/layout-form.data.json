@@ -78,7 +78,8 @@
                             "key": "required",
                             "messageError": "Không được bỏ trắng giá trị"
                         }
-                    ]
+                    ],
+                    "value": "Hello World"
                 }
             },
             {
@@ -500,6 +501,11 @@
                         {
                             "key": "required",
                             "messageError": "Không được bỏ trắng giá trị"
+                        },
+                        {
+                            "key": "min",
+                            "value": 24,
+                            "messageError": "Đơn vị độ dài không được nhỏ hơn 24 đơn vị đo."
                         }
                     ]
                 }
@@ -540,6 +546,11 @@
                         {
                             "key": "required",
                             "messageError": "Không được bỏ trắng giá trị"
+                        },
+                        {
+                            "key": "max",
+                            "value": 48,
+                            "messageError": "Đơn vị chiều rộng không được nhỏ hơn 48 đơn vị đo."
                         }
                     ]
                 }

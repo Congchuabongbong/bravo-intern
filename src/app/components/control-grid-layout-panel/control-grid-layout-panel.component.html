@@ -1,15 +1,15 @@
 <!-- **Case Grid Layout Form** -->
-<ng-container *ngIf="formField && instanceForm && groupNameForm;else otherCase" [formGroup]="instanceForm">
-    <ng-container *ngFor="let field of formField.formField" [formGroupName]="groupNameForm">
+<ng-container *ngIf="formFieldConfig && instanceForm && groupNameForm;else otherCase" [formGroup]="instanceForm">
+    <ng-container *ngFor="let field of formFieldConfig.formField" [formGroupName]="groupNameForm">
         <app-control-form-label-panel [field]="field">
         </app-control-form-label-panel>
         <app-control-form-field-panel [field]="field">
         </app-control-form-field-panel>
     </ng-container>
     <!-- **Nested** -->
-    <ng-container *ngIf="formField.subControlGridLayoutForm">
-        <app-control-grid-layout-panel [formFieldConfig]="formField.subControlGridLayoutForm.subGridItemForm"
-            [positionLine]="formField.subControlGridLayoutForm.position" [groupNameForm]="groupNameForm">
+    <ng-container *ngIf="formFieldConfig.subControlGridLayoutForm">
+        <app-control-grid-layout-panel [formFieldConfig]="formFieldConfig.subControlGridLayoutForm.subGridItemForm"
+            [positionLine]="formFieldConfig.subControlGridLayoutForm.position" [groupNameForm]="groupNameForm">
         </app-control-grid-layout-panel>
     </ng-container>
 </ng-container>

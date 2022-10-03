@@ -4,24 +4,23 @@
             <span class="sideNav__btn--index">2</span>. Lỗi nhập liệu
         </span>
     </button>
-
-    <ng-container *ngIf="productForm">
-        <!-- **Info product** -->
-        <ng-container *ngFor="let field of formInfo.formField">
-            <app-error-message class="sideNav__error" *ngIf="infoF[field.attribute.formControlName].invalid"
-                [control]="infoF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
-            </app-error-message>
-        </ng-container>
-        <!-- **attribute info** -->
-        <ng-container *ngFor="let field of formAttributeInfo.formField">
-            <app-error-message class="sideNav__error" *ngIf="attributeF[field.attribute.formControlName].invalid"
-                [control]="attributeF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
-            </app-error-message>
-        </ng-container>
-        <ng-container *ngFor="let field of formAttributeInfo.subControlGridLayoutForm?.subGridItemForm?.formField">
-            <app-error-message class="sideNav__error" *ngIf="attributeF[field.attribute.formControlName]?.invalid"
-                [control]="attributeF[field.attribute.formControlName]" [titleError]="field.attribute.label.title">
-            </app-error-message>
+    <ng-container *ngIf="productForm && formTabs">
+        <ng-container *ngFor="let tab of formTabs">
+            <ng-container *ngFor="let field of tab.formTab.formField">
+                <app-error-message class="sideNav__error"
+                    *ngIf="getFormControl(tab.nameTab,field.attribute.formControlName)?.invalid" [field]="field"
+                    [control]="getFormControl(tab.nameTab,field.attribute.formControlName)">
+                </app-error-message>
+            </ng-container>
+            <!-- ** Nested grid form -->
+            <ng-container *ngIf="tab.formTab.subControlGridLayoutForm">
+                <ng-container *ngFor="let field of tab.formTab.subControlGridLayoutForm.subGridItemForm.formField">
+                    <app-error-message class="sideNav__error"
+                        *ngIf="getFormControl(tab.nameTab,field.attribute.formControlName)?.invalid" [field]="field"
+                        [control]="getFormControl(tab.nameTab,field.attribute.formControlName)">
+                    </app-error-message>
+                </ng-container>
+            </ng-container>
         </ng-container>
     </ng-container>
 </li>

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
 @Component({
   selector: 'app-custom-form-checkbox',
@@ -17,7 +17,7 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
     }
   ]
 })
-export class CustomFormCheckboxComponent implements OnInit, ControlValueAccessor, Validator, OnDestroy {
+export class CustomFormCheckboxComponent implements ControlValueAccessor, Validator {
   @Input('classIp') class!: string;
   @Input('idIp') id!: string;
   @Input('nameIp') name!: string;
@@ -28,13 +28,6 @@ export class CustomFormCheckboxComponent implements OnInit, ControlValueAccessor
   private disabled = false;
   constructor() { }
 
-  // **Lifecycle hook
-  ngOnInit(): void {
-  }
-
-  ngOnDestroy(): void {
-
-  }
   //**event binding 
   public onChange = (value: any) => { return value };
   public onTouched = () => { };

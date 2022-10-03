@@ -1,69 +1,13 @@
-<div class="main-content">
+<div class="main-content" *ngIf="formTabs$ | async as formTabs">
     <div class="tab__box">
-        <button class="tab__link" id="defaultOpen" #btn_general (click)="openTab(btn_general,'info__general')">Thông tin
-            chung</button>
-        <button class="tab__link" #btn_attribute (click)="openTab(btn_attribute ,'info__attribute')">Thuộc
-            tính</button>
+        <button class="tab__link" [ngClass]="tab === activeTab ? 'active' : ''" *ngFor="let tab of formTabs"
+            (click)="onchangeFormTab(tab)">{{tab.nameTab}}</button>
     </div>
-    <ng-container *ngIf="productForm">
-        <form [formGroup]="productForm" class="product_form" novalidate autocomplete="off">
-            <!-- **Information** -->
-            <div class="tabContent" id="info__general">
-                <ng-container *ngIf="formInfo">
-                    <!-- **Case 1 projection content** -->
-                    <!-- <app-control-grid-layout-panel formGroupName="info" [column]="formInfo.column.columnOfNumber"
-                        [row]="formInfo.row.rowOfNumber" [arrayUnitColumn]="formInfo.column.arrayUnitColumn"
-                        [columnGap]="'1rem'" [rowGap]="'0.3rem'">
-                        <ng-container *ngFor="let field of formInfo.FormField">
-                            <app-control-form-label-panel [field]="field">
-                            </app-control-form-label-panel>
-                            <app-control-form-field-panel [field]="field">
-                            </app-control-form-field-panel>
-                        </ng-container>
-                    </app-control-grid-layout-panel> -->
-                    <!-- ** Case 2 ** -->
-                    <app-control-grid-layout-panel [formFieldConfig]="formInfo" [columnGap]="'1rem'" [rowGap]="'0.3rem'"
-                        [groupNameForm]="'info'">
-                    </app-control-grid-layout-panel>
-                </ng-container>
-            </div>
-            <!--** Attribute **-->
-            <div class="tabContent" id="info__attribute">
-                <ng-container *ngIf="formAttributeInfo">
-                    <!-- **Case 1 projection content -->
-                    <!-- <app-control-grid-layout-panel formGroupName="attribute"
-                        [column]="formAttributeInfo.column.columnOfNumber" [row]="formAttributeInfo.row.rowOfNumber"
-                        [arrayUnitColumn]="formAttributeInfo.column.arrayUnitColumn" [columnGap]="'1rem'"
-                        [rowGap]="'0.3rem'">
-                        <ng-container *ngFor="let field of formAttributeInfo.FormField">
-                            <app-control-form-label-panel [field]="field">
-                            </app-control-form-label-panel>
-                            <app-control-form-field-panel [field]="field">
-                            </app-control-form-field-panel>
-                        </ng-container>
-                        <ng-container *ngIf="formAttributeInfo.subControlGridLayoutForm">
-                            <app-control-grid-layout-panel
-                                [column]="formAttributeInfo.subControlGridLayoutForm.subGridItemForm.column.columnOfNumber"
-                                [row]="formAttributeInfo.subControlGridLayoutForm.subGridItemForm.row.rowOfNumber"
-                                [arrayUnitColumn]="formAttributeInfo.subControlGridLayoutForm.subGridItemForm.column.arrayUnitColumn"
-                                [positionLine]="formAttributeInfo.subControlGridLayoutForm.position" [columnGap]="'0.5rem'">
-                                <ng-container
-                                    *ngFor="let field of formAttributeInfo.subControlGridLayoutForm!.subGridItemForm.FormField">
-                                    <app-control-form-label-panel [field]="field">
-                                    </app-control-form-label-panel>
-                                    <app-control-form-field-panel [field]="field">
-                                    </app-control-form-field-panel>
-                                </ng-container>
-                            </app-control-grid-layout-panel>
-                        </ng-container>
-                    </app-control-grid-layout-panel> -->
-                    <!-- **Case 2 -->
-                    <app-control-grid-layout-panel [formFieldConfig]="formAttributeInfo" [columnGap]="'1rem'"
-                        [rowGap]="'0.3rem'" [groupNameForm]="'attribute'">
-                    </app-control-grid-layout-panel>
-
-                </ng-container>
-            </div>
-        </form>
-    </ng-container>
+    <form *ngIf="productForm" [formGroup]="productForm" class="product_form" novalidate autocomplete="off">
+        <ng-container *ngFor="let tab of formTabs">
+            <app-control-grid-layout-panel *ngIf="tab === activeTab" [formFieldConfig]="tab.formTab"
+                [groupNameForm]="tab.nameTab" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
+            </app-control-grid-layout-panel>
+        </ng-container>
+    </form>
 </div>
