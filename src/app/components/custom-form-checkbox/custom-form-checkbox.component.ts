@@ -31,7 +31,7 @@ export class CustomFormCheckboxComponent implements ControlValueAccessor, Valida
   //**event binding 
   public onChange = (value: any) => { return value };
   public onTouched = () => { };
-  public handleValueChange(value: any) {
+  public onChangeChecked(value: any) {
     this.markAsTouched();
     this.onChange(value.target.checked);
     return;
