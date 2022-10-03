@@ -1,5 +1,5 @@
 {
-    "info": {
+    "General": {
         "row": {
             "rowOfNumber": 8
         },
@@ -79,7 +79,7 @@
                             "messageError": "Không được bỏ trắng giá trị"
                         }
                     ],
-                    "value": "Hello World"
+                    "value": "3465457"
                 }
             },
             {
@@ -339,7 +339,8 @@
                             "endLine": 3
                         }
                     },
-                    "formControlName": "isAutoItemCodeProduct"
+                    "formControlName": "isAutoItemCodeProduct",
+                    "value": true
                 }
             },
             {
@@ -378,7 +379,8 @@
                             "key": "required",
                             "messageError": "Không được bỏ trắng giá trị"
                         }
-                    ]
+                    ],
+                    "value": "10412904"
                 }
             },
             {
@@ -449,7 +451,7 @@
             }
         ]
     },
-    "attribute": {
+    "Attribute": {
         "row": {
             "rowOfNumber": 9
         },
