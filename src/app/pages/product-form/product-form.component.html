@@ -5,7 +5,7 @@
     </div>
     <form *ngIf="productForm" [formGroup]="productForm" class="product_form" novalidate autocomplete="off">
         <ng-container *ngFor="let tab of formTabs">
-            <app-control-grid-layout-panel *ngIf="tab === activeTab" [formFieldConfig]="tab.formTab"
+            <app-control-grid-layout-panel class="tabContent" *ngIf="tab === activeTab" [formFieldConfig]="tab.formTab"
                 [groupNameForm]="tab.nameTab" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
             </app-control-grid-layout-panel>
         </ng-container>
