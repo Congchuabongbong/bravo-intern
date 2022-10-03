@@ -7,7 +7,7 @@ export interface IControlGridLayoutFormData extends GridLayoutData.IGridLayout {
         position: GridLayoutData.IPositionGridItem
     };
 }
-export interface IFormTabItem {
-    nameTab: string;
+export interface IFormTab {
+    key: string, name: string,
     formTab: IControlGridLayoutFormData;
 }

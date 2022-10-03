@@ -20,12 +20,12 @@ export class DynamicFormService {
   private generateFormGroup(controlGridLayoutFormData: GridLayoutFormData.IControlGridLayoutFormData): FormGroup {
     const formGroupPrepareObject: Record<string, any> = {};
     controlGridLayoutFormData.formField.forEach(field => {
-      formGroupPrepareObject[field.attribute.formControlName] = [field.attribute.value || '', field.attribute.validators ? this.generateValidators(field.attribute.validators) : null];
+      formGroupPrepareObject[field.attribute.formControlName] = [field.attribute.value || null, field.attribute.validators ? this.generateValidators(field.attribute.validators) : null];
     })
     //**Nested grid layout */
     if (controlGridLayoutFormData.subControlGridLayoutFormData) {
       controlGridLayoutFormData.subControlGridLayoutFormData.subGridItemForm.formField.forEach(field => {
-        formGroupPrepareObject[field.attribute.formControlName] = [field.attribute.value || '', field.attribute.validators ? this.generateValidators(field.attribute.validators) : null];
+        formGroupPrepareObject[field.attribute.formControlName] = [field.attribute.value || null, field.attribute.validators ? this.generateValidators(field.attribute.validators) : null];
       })
     }
     return this._fb.group(formGroupPrepareObject);

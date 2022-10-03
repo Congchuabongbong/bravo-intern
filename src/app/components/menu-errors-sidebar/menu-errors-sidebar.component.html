@@ -8,16 +8,16 @@
         <ng-container *ngFor="let tab of formTabs">
             <ng-container *ngFor="let field of tab.formTab.formField">
                 <app-error-message class="sideNav__error"
-                    *ngIf="getFormControl(tab.nameTab,field.attribute.formControlName)?.invalid" [field]="field"
-                    [control]="getFormControl(tab.nameTab,field.attribute.formControlName)">
+                    *ngIf="getFormControl(tab.key,field.attribute.formControlName)?.invalid" [field]="field"
+                    [control]="getFormControl(tab.key,field.attribute.formControlName)">
                 </app-error-message>
             </ng-container>
             <!-- ** Nested grid form -->
             <ng-container *ngIf="tab.formTab.subControlGridLayoutFormData">
                 <ng-container *ngFor="let field of tab.formTab.subControlGridLayoutFormData.subGridItemForm.formField">
                     <app-error-message class="sideNav__error"
-                        *ngIf="getFormControl(tab.nameTab,field.attribute.formControlName)?.invalid" [field]="field"
-                        [control]="getFormControl(tab.nameTab,field.attribute.formControlName)">
+                        *ngIf="getFormControl(tab.key,field.attribute.formControlName)?.invalid" [field]="field"
+                        [control]="getFormControl(tab.key,field.attribute.formControlName)">
                     </app-error-message>
                 </ng-container>
             </ng-container>

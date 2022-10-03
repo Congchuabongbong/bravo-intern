@@ -1,5 +1,5 @@
 {
-    "General": {
+    "general": {
         "row": {
             "rowOfNumber": 8
         },
@@ -449,9 +449,10 @@
                     "formControlName": "productThumbnail"
                 }
             }
-        ]
+        ],
+        "nameTab": "Thông tin chung"
     },
-    "Attribute": {
+    "attribute": {
         "row": {
             "rowOfNumber": 9
         },
@@ -857,7 +858,8 @@
                                     "endLine": 3
                                 }
                             },
-                            "formControlName": "isSerial"
+                            "formControlName": "isSerial",
+                            "value": true
                         }
                     },
                     {
@@ -890,7 +892,8 @@
                                     "endLine": 5
                                 }
                             },
-                            "formControlName": "isInventoryByLocation"
+                            "formControlName": "isInventoryByLocation",
+                            "value": false
                         }
                     },
                     {
@@ -923,7 +926,8 @@
                                     "endLine": 7
                                 }
                             },
-                            "formControlName": "isIroningUniform"
+                            "formControlName": "isIroningUniform",
+                            "value": true
                         }
                     },
                     {
@@ -957,7 +961,8 @@
                                     "endLine": 3
                                 }
                             },
-                            "formControlName": "isStampScale"
+                            "formControlName": "isStampScale",
+                            "value": false
                         }
                     },
                     {
@@ -990,7 +995,8 @@
                                     "endLine": 5
                                 }
                             },
-                            "formControlName": "isUsingItem"
+                            "formControlName": "isUsingItem",
+                            "value": true
                         }
                     },
                     {
@@ -1029,11 +1035,13 @@
                                     "key": "required",
                                     "messageError": "Không được bỏ trắng giá trị"
                                 }
-                            ]
+                            ],
+                            "value": 12
                         }
                     }
                 ]
             }
-        }
+        },
+        "nameTab": "Thuộc tính"
     }
 }
