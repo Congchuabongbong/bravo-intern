@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { GridLayoutForm } from 'src/app/data-type';
+import { GridLayoutFormData } from 'src/app/data-type';
 import { DataService } from 'src/app/services/data.service';
 @Component({
   selector: 'app-menu-errors-sidebar',
@@ -12,7 +12,7 @@ export class MenuErrorsSidebarComponent
   implements OnInit, OnDestroy {
   public productForm!: FormGroup;
   public productForm$!: Subscription;
-  public formTabs!: GridLayoutForm.IFormTabItem[];
+  public formTabs!: GridLayoutFormData.IFormTabItem[];
   public formTabs$!: Subscription;
 
   constructor(private _dataService: DataService) { }
@@ -20,7 +20,7 @@ export class MenuErrorsSidebarComponent
     this.productForm$ = this._dataService.data$.subscribe((form: FormGroup) => {
       this.productForm = form;
     });
-    this.formTabs$ = this._dataService.dataByEvent.subscribe((formTabItem: GridLayoutForm.IFormTabItem[]) => {
+    this.formTabs$ = this._dataService.dataByEvent.subscribe((formTabItem: GridLayoutFormData.IFormTabItem[]) => {
       this.formTabs = formTabItem
     });
   }

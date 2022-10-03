@@ -2,18 +2,19 @@
 import {
   Component,
   OnInit,
-  ElementRef
+  ViewChild,
+  ViewContainerRef,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 //**import from source */
 import { DataService } from 'src/app/services/data.service';
-import { GridLayoutForm } from 'src/app/data-type';
+import { GridLayoutFormData } from 'src/app/data-type';
 import { map, Observable, tap } from 'rxjs';
 import { DynamicFormService } from 'src/app/services/dynamic-form.service';
 interface formTabItem {
   nameTab: string;
-  formTab: GridLayoutForm.IControlGridLayoutForm;
+  formTab: GridLayoutFormData.IControlGridLayoutFormData;
 }
 @Component({
   selector: 'app-product-form',
@@ -21,30 +22,28 @@ interface formTabItem {
   styleUrls: ['./product-form.component.scss'],
 })
 export class ProductFormComponent implements OnInit {
-  //**Declaration */
-  public tabLinks!: ElementRef[];
-  public tabContents!: ElementRef[];
+  @ViewChild("tabForm", { read: ViewContainerRef, static: false }) tabForm!: ViewContainerRef;
+  //**Declaration *
   public productForm!: FormGroup;
   public activeTab!: formTabItem;
   public formTabs$!: Observable<formTabItem[]>;
+
   //**constructor */
   constructor(
     private _dataService: DataService,
-    private _fb: FormBuilder,
     private _dynamicFormService: DynamicFormService,
     private _http: HttpClient,
   ) { }
+
   // **life cycle hooks
   ngOnInit(): void {
     this.formTabs$ = this.getLayoutForm()
       .pipe(
-        tap(gridLayoutForm => {
-          const entries = Object.keys(gridLayoutForm).map(key => [key, this._dynamicFormService.generateFormGroup(gridLayoutForm[key])]);
-          const initFormModel = Object.fromEntries(entries);
-          this.productForm = this._fb.group(initFormModel);
+        tap(GridLayoutFormData => {
+          this.productForm = this._dynamicFormService.generateForm(GridLayoutFormData);
           this._dataService.sendData(this.productForm);
         }),
-        map(gridLayoutForm => Object.keys(gridLayoutForm).map(key => ({ nameTab: key, formTab: gridLayoutForm[key] }))),
+        map(GridLayoutFormData => Object.keys(GridLayoutFormData).map(key => ({ nameTab: key, formTab: GridLayoutFormData[key] }))),
         tap(formTabs => {
           this.activeTab = formTabs[0]
           this._dataService.sendDataByEventEmitter(formTabs);
@@ -52,7 +51,7 @@ export class ProductFormComponent implements OnInit {
       )
   }
   //**Event binding */
-  public onchangeFormTab(formTab: formTabItem): void {
+  public onChangeFormTab(formTab: formTabItem): void {
     this.activeTab = formTab;
   }
   //** get layout 

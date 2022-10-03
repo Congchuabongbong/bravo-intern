@@ -13,8 +13,8 @@
                 </app-error-message>
             </ng-container>
             <!-- ** Nested grid form -->
-            <ng-container *ngIf="tab.formTab.subControlGridLayoutForm">
-                <ng-container *ngFor="let field of tab.formTab.subControlGridLayoutForm.subGridItemForm.formField">
+            <ng-container *ngIf="tab.formTab.subControlGridLayoutFormData">
+                <ng-container *ngFor="let field of tab.formTab.subControlGridLayoutFormData.subGridItemForm.formField">
                     <app-error-message class="sideNav__error"
                         *ngIf="getFormControl(tab.nameTab,field.attribute.formControlName)?.invalid" [field]="field"
                         [control]="getFormControl(tab.nameTab,field.attribute.formControlName)">

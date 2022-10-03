@@ -29,15 +29,6 @@ export class MenuItemSidebarComponent implements OnInit, AfterViewInit {
     this.btnSubMenu = this.el.nativeElement.querySelectorAll(
       '.sideNav__sub-menu--item'
     );
-
-    // this.btnSubMenu.forEach((btn: any) => {
-    //   if (btn.classList.includes('active')) {
-    //     btn.classList.remove('active');
-    //   }
-    //   btn.addEventListener('click', () => {
-    //     btn.classList.toggle('active');
-    //   });
-    // });
   }
   public convertStringToRoute(value: string): string {
     return this.handleStringService.handleSpecialCharacter(value);

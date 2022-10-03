@@ -1,4 +1,3 @@
-import { ValidatorFn } from "@angular/forms";
 import { GridLayoutData } from ".";
 export type ControlFormType = IInput | ISelect | ITextarea;
 export type CategoryTag = 'input' | 'select' | 'textarea' | 'label';

@@ -11,7 +11,7 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import { GridLayoutData, GridLayoutForm } from 'src/app/data-type';
+import { GridLayoutData, GridLayoutFormData } from 'src/app/data-type';
 import { UnitOfMeasure } from 'src/app/data-type/grid-layout.data.type';
 import GridLayout from 'src/app/shared/grid-layout.class';
 import { GridLayoutService } from 'src/app/services/grid-layout.service';
@@ -22,7 +22,7 @@ import { GridLayoutService } from 'src/app/services/grid-layout.service';
   styleUrls: ['./control-grid-layout-panel.component.scss'],
 })
 export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
-  @ViewChild('') subControlGridLayoutForm !: ElementRef;
+  @ViewChild('') subControlGridLayoutFormData !: ElementRef;
   //**Input and Out decorator here: */
   @Input('row') rowOfNumber: number = 1;
   @Input('column') columnOfNumber: number = 1;
@@ -39,7 +39,7 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input() maxHeight?: string;
   @Input('idIp') id?: string;
   @Input('classIp') class?: string;
-  @Input('formFieldConfig') formFieldConfig?: GridLayoutForm.IControlGridLayoutForm;
+  @Input('formFieldConfig') formFieldConfig?: GridLayoutFormData.IControlGridLayoutFormData;
   @Input() groupNameForm?: string;
   // **Declare property class here:
   public gridLayout!: GridLayout;
@@ -52,7 +52,7 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     if (this.formFieldConfig) {
       //** this approach using component for grid layout form
-      this.generateGridLayoutFormPanel();
+      this.generateGridLayoutFormDataPanel();
       this.instanceForm = this._controlContainer.control as FormGroup;
       this._cd.detectChanges();
     } else {
@@ -97,7 +97,7 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
     }
   }
   //** generate grid layout form for approach component for grid layout form
-  private generateGridLayoutFormPanel(): void {
+  private generateGridLayoutFormDataPanel(): void {
     if (this.formFieldConfig) {
       this.gridLayout = new GridLayout(
         this._element,

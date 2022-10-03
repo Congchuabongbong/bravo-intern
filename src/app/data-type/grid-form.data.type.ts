@@ -1,13 +1,13 @@
 import { FormFieldData, GridLayoutData } from '.';
 //**Form Grid layout*/
-export interface IControlGridLayoutForm extends GridLayoutData.IGridLayout {
+export interface IControlGridLayoutFormData extends GridLayoutData.IGridLayout {
     formField: FormFieldData.ControlFormType[];
-    subControlGridLayoutForm?: {
-        subGridItemForm: IControlGridLayoutForm
+    subControlGridLayoutFormData?: {
+        subGridItemForm: IControlGridLayoutFormData
         position: GridLayoutData.IPositionGridItem
     };
 }
 export interface IFormTabItem {
     nameTab: string;
-    formTab: IControlGridLayoutForm;
+    formTab: IControlGridLayoutFormData;
 }

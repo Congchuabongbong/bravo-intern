@@ -48,4 +48,4 @@ export class TemplatePageTitleStrategy extends TitleStrategy {
   exports: [RouterModule],
   providers: [{ provide: TitleStrategy, useClass: TemplatePageTitleStrategy }],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

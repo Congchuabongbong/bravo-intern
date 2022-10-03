@@ -1,30 +1,36 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { FormFieldData, GridLayoutForm } from '../data-type';
+import { FormFieldData, GridLayoutFormData } from '../data-type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DynamicFormService {
-
+  //** Constructor */
   constructor(private _fb: FormBuilder) { }
 
-  //// ** generate form control:
+  //** generate form group
+  public generateForm(GridLayoutFormData: any): FormGroup {
+    const entries = Object.keys(GridLayoutFormData).map(key => [key, this.generateFormGroup(GridLayoutFormData[key])]);
+    const initFormModel = Object.fromEntries(entries);
+    return this._fb.group(initFormModel);
+  }
 
   // ** generate form group
-  public generateFormGroup(controlGridLayoutForm: GridLayoutForm.IControlGridLayoutForm): FormGroup {
+  private generateFormGroup(controlGridLayoutFormData: GridLayoutFormData.IControlGridLayoutFormData): FormGroup {
     const formGroupPrepareObject: Record<string, any> = {};
-    controlGridLayoutForm.formField.forEach(field => {
+    controlGridLayoutFormData.formField.forEach(field => {
       formGroupPrepareObject[field.attribute.formControlName] = [field.attribute.value || '', field.attribute.validators ? this.generateValidators(field.attribute.validators) : null];
     })
     //**Nested grid layout */
-    if (controlGridLayoutForm.subControlGridLayoutForm) {
-      controlGridLayoutForm.subControlGridLayoutForm.subGridItemForm.formField.forEach(field => {
+    if (controlGridLayoutFormData.subControlGridLayoutFormData) {
+      controlGridLayoutFormData.subControlGridLayoutFormData.subGridItemForm.formField.forEach(field => {
         formGroupPrepareObject[field.attribute.formControlName] = [field.attribute.value || '', field.attribute.validators ? this.generateValidators(field.attribute.validators) : null];
       })
     }
     return this._fb.group(formGroupPrepareObject);
   }
+
   //*get validators message errorFiled
   public getValidatorsMessageErrorFiled(keyError: string, validators: FormFieldData.IValidator[]): string {
     let messageError: string = '';

@@ -7,9 +7,9 @@
         </app-control-form-field-panel>
     </ng-container>
     <!-- **Nested** -->
-    <ng-container *ngIf="formFieldConfig.subControlGridLayoutForm">
-        <app-control-grid-layout-panel [formFieldConfig]="formFieldConfig.subControlGridLayoutForm.subGridItemForm"
-            [positionLine]="formFieldConfig.subControlGridLayoutForm.position" [groupNameForm]="groupNameForm">
+    <ng-container *ngIf="formFieldConfig.subControlGridLayoutFormData">
+        <app-control-grid-layout-panel [formFieldConfig]="formFieldConfig.subControlGridLayoutFormData.subGridItemForm"
+            [positionLine]="formFieldConfig.subControlGridLayoutFormData.position" [groupNameForm]="groupNameForm">
         </app-control-grid-layout-panel>
     </ng-container>
 </ng-container>
