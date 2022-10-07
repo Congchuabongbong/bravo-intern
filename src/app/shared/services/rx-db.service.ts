@@ -21,7 +21,7 @@ async function createDb(): Promise<RxDb> {
   console.log('DatabaseService: creating database..');
   let storage: RxStorage<any, any> = getRxStorageDexie();
   if (isDevMode()) {
-    // we use the schema-validation only in dev-mode
+    // use the schema-validation only in dev-mode
     // this validates each document if it is matching the jsonschema
     storage = wrappedValidateAjvStorage({ storage });
   }
@@ -32,9 +32,10 @@ async function createDb(): Promise<RxDb> {
     password: PASSWORD,
     ignoreDuplicate: true
   });
-  // create collections
+  // **create collections
   console.log('DatabaseService: create collections');
   await db.addCollections(collectionSettings);
+  // **Add hooks
   console.log('DatabaseService: add hooks');
   db.collections.gridLayoutForm.preInsert(function (docObj: RxGridLayoutFormDocType) {
     const name = docObj.name;
