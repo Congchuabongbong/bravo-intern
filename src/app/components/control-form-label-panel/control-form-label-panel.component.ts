@@ -1,7 +1,7 @@
 
 import { Component, ElementRef, Input, OnInit, AfterViewInit } from '@angular/core';
-import { FormFieldData } from 'src/app/data-type';
-import { GridLayoutService } from 'src/app/services/grid-layout.service';
+import { FormFieldData } from 'src/app/shared/data-type';
+import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 
 @Component({
   selector: 'app-control-form-label-panel',

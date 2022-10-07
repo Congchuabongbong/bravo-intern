@@ -5,7 +5,7 @@ import {
   ElementRef,
   AfterViewInit,
 } from '@angular/core';
-import { HandleStringService } from 'src/app/services/handle-string.service';
+import { HandleStringService } from 'src/app/shared/services/handle-string.service';
 
 
 @Component({

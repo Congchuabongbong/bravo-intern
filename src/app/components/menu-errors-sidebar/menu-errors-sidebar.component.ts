@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { GridLayoutFormData } from 'src/app/data-type';
-import { DataService } from 'src/app/services/data.service';
+import { GridLayoutFormData } from 'src/app/shared/data-type';
+import { DataService } from 'src/app/shared/services/data.service';
 @Component({
   selector: 'app-menu-errors-sidebar',
   templateUrl: './menu-errors-sidebar.component.html',

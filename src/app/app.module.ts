@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +17,7 @@ import { ControlGridLayoutPanelComponent } from './components/control-grid-layou
 import { ControlFormLabelPanelComponent } from './components/control-form-label-panel/control-form-label-panel.component';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
 import { CustomFormCheckboxComponent } from './components/custom-form-checkbox/custom-form-checkbox.component';
-
+import { initDatabase, RxDbService } from './shared/services/rx-db.service';
 
 
 @NgModule({
@@ -37,7 +37,14 @@ import { CustomFormCheckboxComponent } from './components/custom-form-checkbox/c
     CustomFormCheckboxComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule],
-  providers: [],
+  providers: [RxDbService, {
+    provide: APP_INITIALIZER,
+    useFactory: () => initDatabase,
+    multi: true,
+    deps: [
+      /* your dependencies */
+    ],
+  },],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

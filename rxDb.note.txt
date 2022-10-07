@@ -1,0 +1,19 @@
+**--------------------------------------------------------------------RxDb**--------------------------------------------------------------------**
+->Realtime applications made easy (realtime applications trở nên dễ dàng).
+Results của một truy vấn, đến một single field của một document, với RxDb có thể overve mọi thứ. Điều này cho phép xây dựng realtime applications nhanh và đáng tin cậy. Bất cứ khi nào dữ liệu thay đổi, Ui sẽ được cập nhật.
+->RxDB hỗ trợ nhân bản(sao chép) với CouchDB server hoặc bất kỳ GraphQL endpoint custom một cách mượt mà với infrastructure hiện có. Ngoài ra, có thể sử dụng plugin để tạo bản sao tùy chỉnh qua bất kỳ giao thức nào như REST, Websocket hoặc p2p.
+->Online là optional: RxDb follows mô hình Offline First => Application phải work tốt khi mà nó offline cũng như online. Vì dữ liệu luôn duy trì phía client và nhân bản nó trong background
+->RxDb có thể hoạt động độc lập với client side mà không cần đến backend. 
+->App có thể hoạt động offline
+->Tăng hiệu xuất trải nghiệm 
+->Easier và faster implementation
+->Không phụ thuộc nhiều vào backend và dễ dàng mở rộng hơn
+**What is RxDB?
+-RxDB (viết tắt của Reactive Databse) là một mô hình offline-first
+-Là dạng NoSql-database dành cho js như: app web, hybrid Apps, Electron-Apps, Progressive Web Apps and Node.js
+-Reactive có nghĩa là mình không chỉ có thể truy vấn state hiện tại,nhưng subscribe tất cả các thay đổi state như kết quả của một truy vấn hoặc thậm chí một field duy nhất của document
+-Điều này rất tốt cho các ứng dụng thời gian thực dựa trên giao diện người dùng theo cách giúp nó dễ dàng phát triển và cũng có lợi ích về hiệu suất tốt nhưng cũng có thể được sử dụng để tạo ra phía backend nhanh trong Node.js.
+-RxDB provides an easy to implement protocol for realtime replication with your existing infrastructure or any compliant CouchDB endpoint.
+RxDB is based on a storage interface that enables you to swap out the underlaying storage engine. This increases code reuse because you can use the same database code for different JavaScript environments by just switching out the storage settings.
+
+

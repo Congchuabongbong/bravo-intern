@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, ValidationErrors } from '@angular/forms';
 import { debounceTime, Subscription, tap } from 'rxjs';
-import { FormFieldData } from 'src/app/data-type';
-import { DynamicFormService } from 'src/app/services/dynamic-form.service';
+import { FormFieldData } from 'src/app/shared/data-type';
+import { DynamicFormService } from 'src/app/shared/services/dynamic-form.service';
 @Component({
   selector: 'app-error-message',
   templateUrl: './error-message.component.html',

@@ -11,10 +11,10 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import { GridLayoutData, GridLayoutFormData } from 'src/app/data-type';
-import { UnitOfMeasure } from 'src/app/data-type/grid-layout.data.type';
-import GridLayout from 'src/app/shared/grid-layout.class';
-import { GridLayoutService } from 'src/app/services/grid-layout.service';
+import { GridLayoutData, GridLayoutFormData } from 'src/app/shared/data-type';
+import { UnitOfMeasure } from 'src/app/shared/data-type/grid-layout.data.type';
+import GridLayout from 'src/app/shared/utils/grid-layout.class';
+import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 
 @Component({
   selector: 'app-control-grid-layout-panel',
