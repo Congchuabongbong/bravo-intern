@@ -16,7 +16,6 @@ let collectionSettings = {
 }
 
 //**Create Db 
-
 async function createDb(): Promise<RxDb> {
   console.log('DatabaseService: creating database..');
   let storage: RxStorage<any, any> = getRxStorageDexie();
@@ -67,7 +66,6 @@ export async function initDatabase() {
   console.log('initDatabase()');
   DB_INSTANCE = await createDb();
 }
-
 @Injectable({
   providedIn: 'root'
 })

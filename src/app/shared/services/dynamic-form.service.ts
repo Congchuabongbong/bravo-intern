@@ -9,7 +9,7 @@ export class DynamicFormService {
   //** Constructor */
   constructor(private _fb: FormBuilder) { }
 
-  //** generate form group
+  //** generate form
   public generateForm(GridLayoutFormData: any): FormGroup {
     const entries = Object.keys(GridLayoutFormData).map(key => [key, this.generateFormGroup(GridLayoutFormData[key])]);
     const initFormModel = Object.fromEntries(entries);

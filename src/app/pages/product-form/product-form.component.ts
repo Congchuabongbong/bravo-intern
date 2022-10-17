@@ -37,12 +37,12 @@ export class ProductFormComponent implements OnInit {
 
   // **life cycle hooks
   ngOnInit(): void {
-    this.formTabs$ = this.getLayoutForm()
+    this.formTabs$ = this._http.get<any>('assets/data/layout-form.data.json')
       .pipe(
         tap(async GridLayoutFormData => {
           this.productForm = this._dynamicFormService.generateForm(GridLayoutFormData);
           this._dataService.sendData(this.productForm);
-          this._rxDb.db.gridLayoutForm.insert({ name: "product formm", layoutConfig: JSON.stringify(GridLayoutFormData) });
+          this._rxDb.db.gridLayoutForm.insert({ name: "product form", layoutConfig: JSON.stringify(GridLayoutFormData) });
         }),
         map(GridLayoutFormData => Object.keys(GridLayoutFormData).map(key => ({ key, name: GridLayoutFormData[key].nameTab, formTab: GridLayoutFormData[key] }))),
         tap(formTabs => {
@@ -54,10 +54,6 @@ export class ProductFormComponent implements OnInit {
   //**Event binding */
   public onChangeFormTab(formTab: GridLayoutFormData.IFormTab): void {
     this.activeTab = formTab;
-  }
-  //** get layout 
-  private getLayoutForm(): Observable<any> {
-    return this._http.get('assets/data/layout-form.data.json');
   }
 
 }
