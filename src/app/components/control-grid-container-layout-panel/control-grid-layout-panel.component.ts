@@ -4,87 +4,101 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
+  Injector,
   Input,
   OnInit,
-  Output,
   Renderer2,
-  ViewChild,
 } from '@angular/core';
 import { GridLayoutData, GridLayoutFormData } from 'src/app/shared/data-type';
-import { UnitOfMeasure } from 'src/app/shared/data-type/grid-layout.data.type';
 import GridLayout from 'src/app/shared/utils/grid-layout.class';
 import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 
 @Component({
-  selector: 'app-control-grid-layout-panel',
+  selector: 'app-control-grid-container-layout-panel',
   templateUrl: './control-grid-layout-panel.component.html',
   styleUrls: ['./control-grid-layout-panel.component.scss'],
 })
 export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
-  @ViewChild('') subControlGridLayoutFormData !: ElementRef;
+  // @ViewChild('') subControlGridLayoutFormData !: ElementRef;
   //**Input and Out decorator here: */
-  @Input('row') rowOfNumber: number = 1;
-  @Input('column') columnOfNumber: number = 1;
-  @Input() columnGap?: string;
-  @Input() rowGap?: string;
-  @Input() arrayUnitRow?: UnitOfMeasure[];
-  @Input() arrayUnitColumn?: UnitOfMeasure[];
-  @Input() positionLine?: GridLayoutData.IPositionGridItem;
-  @Input() width?: string;
-  @Input() height?: string;
-  @Input() minWidth?: string;
-  @Input() minHeight?: string;
-  @Input() maxWidth?: string;
-  @Input() maxHeight?: string;
-  @Input('idIp') id?: string;
-  @Input('classIp') class?: string;
-  @Input('formFieldConfig') formFieldConfig?: GridLayoutFormData.IControlGridLayoutFormData;
-  @Input() groupNameForm?: string;
+  @Input() layoutConfig!: any;
+  @Input('formFieldConfig') formFieldConfig!: GridLayoutFormData.IControlGridLayoutFormData;
+  @Input() columnGap!: string;
+  @Input() rowGap!: string;
+  @Input() positionLine!: GridLayoutData.IPositionGridItem;
+  @Input() width!: string;
+  @Input() height!: string;
+  @Input() minWidth!: string;
+  @Input() minHeight!: string;
+  @Input() maxWidth!: string;
+  @Input() maxHeight!: string;
+  @Input('idIp') id!: string;
+  @Input('classIp') class!: string;
+  @Input() groupNameForm!: string;
+  @Input() displayName: string = 'grid'
   // **Declare property class here:
   public gridLayout!: GridLayout;
   public instanceForm!: any;
+  public _controlContainer !: ControlContainer;
   //** constructor */
-  constructor(private _element: ElementRef, private _renderer: Renderer2, private _controlContainer: ControlContainer, private _cd: ChangeDetectorRef, private _gridLayoutService: GridLayoutService) { }
+  constructor(private _element: ElementRef, private _renderer: Renderer2, private _cd: ChangeDetectorRef, private _gridLayoutService: GridLayoutService, private injector: Injector) {
+  }
   //** Lifecycle here: */
   ngOnInit(): void {
   }
   ngAfterViewInit(): void {
+
     if (this.formFieldConfig) {
+      this._controlContainer = this.injector.get<ControlContainer>(ControlContainer); //dynamic add dependency injection service */
       //** this approach using component for grid layout form
       this.generateGridLayoutFormDataPanel();
       this.instanceForm = this._controlContainer.control as FormGroup;
       this._cd.detectChanges();
     } else {
-      //** this approach using content projection for every thing elements is grid item 
-      if (this.rowOfNumber && this.columnOfNumber) {
+      //** this approach using content projection for every thing elements is grid item
+      if (this.layoutConfig) {
         this.gridLayout = new GridLayout(
           this._element,
-          this.rowOfNumber,
-          this.columnOfNumber,
+          this.layoutConfig.row.rowOfNumber,
+          this.layoutConfig.column.columnOfNumber,
           this._renderer
         );
-        if (this.arrayUnitColumn) {
-          this.gridLayout.widthColumn = this.arrayUnitColumn;
+        if (this.layoutConfig.column.arrayUnitColumn) {
+          this.gridLayout.widthColumn = this.layoutConfig.column.arrayUnitColumn;
         }
-        if (this.arrayUnitRow) {
-          this.gridLayout.heightRow = this.arrayUnitRow;
+        if (this.layoutConfig.row.arrayUnitRow) {
+          this.gridLayout.heightRow = this.layoutConfig.row.arrayUnitRow;
         }
         this.gridLayout.generateGridLayout();
       }
     }
     //**general behavior grid layout pass type input decorator external component
+    this._gridLayoutService.setDisplay(this._element, this.displayName);
     if (this.rowGap) {
       this._gridLayoutService.setRowGap(this._element, this.rowGap);
     }
     if (this.columnGap) {
       this._gridLayoutService.setColumnGap(this._element, this.columnGap)
     }
+    //**width */
     if (this.width) {
-      this._gridLayoutService.setWidthGridContainer(this._element, this.width);
+      this._gridLayoutService.setWidth(this._element, this.width);
     }
+    if (this.minWidth) {
+      this._gridLayoutService.setMinWidth(this._element, this.minWidth);
+    }
+    if (this.maxWidth) {
+      this._gridLayoutService.setMaxWidth(this._element, this.maxWidth);
+    }
+    //**height */
     if (this.height) {
-      this._gridLayoutService.setHeightGridContainer(this._element, this.height);
+      this._gridLayoutService.setHeight(this._element, this.height);
+    }
+    if (this.minHeight) {
+      this._gridLayoutService.setMinHeight(this._element, this.minHeight);
+    }
+    if (this.maxHeight) {
+      this._gridLayoutService.setMaxHeight(this._element, this.maxHeight);
     }
     if (this.class) {
       this._gridLayoutService.setClass(this._element, this.class);

@@ -13,12 +13,16 @@ import { MenuItemSidebarComponent } from './components/menu-item-sidebar/menu-it
 import { MenuErrorsSidebarComponent } from './components/menu-errors-sidebar/menu-errors-sidebar.component';
 import { ProductFormComponent } from './pages/product-form/product-form.component';
 import { ControlFormFieldPanelComponent } from './components/control-form-field-panel/control-form-field-panel.component';
-import { ControlGridLayoutPanelComponent } from './components/control-grid-layout-panel/control-grid-layout-panel.component';
+import { ControlGridLayoutPanelComponent } from './components/control-grid-container-layout-panel/control-grid-layout-panel.component';
 import { ControlFormLabelPanelComponent } from './components/control-form-label-panel/control-form-label-panel.component';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
 import { CustomFormCheckboxComponent } from './components/custom-form-checkbox/custom-form-checkbox.component';
 import { initDatabase, RxDbService } from './shared/services/rx-db.service';
-
+import { ProductGridDataComponent } from './pages/product-grid-data/product-grid-data.component';
+import { WjGridModule } from '@grapecity/wijmo.angular2.grid';
+import { WjInputModule } from '@grapecity/wijmo.angular2.input';
+import { ControlGridItemLayoutPanelComponent } from './components/control-grid-item-layout-panel/control-grid-item-layout-panel.component';
+import { WjGridFilterModule } from '@grapecity/wijmo.angular2.grid.filter';
 
 @NgModule({
   declarations: [
@@ -35,8 +39,11 @@ import { initDatabase, RxDbService } from './shared/services/rx-db.service';
     ControlFormLabelPanelComponent,
     ErrorMessageComponent,
     CustomFormCheckboxComponent,
+    ProductGridDataComponent,
+    ControlGridItemLayoutPanelComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule, WjGridModule,
+    WjInputModule,WjGridFilterModule],
   providers: [RxDbService, {
     provide: APP_INITIALIZER,
     useFactory: () => initDatabase,

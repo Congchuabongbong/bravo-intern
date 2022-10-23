@@ -26,8 +26,10 @@ export default class GridLayout {
   set widthColumn(arrayUnitColumn: GridLayoutData.UnitOfMeasure[]) {
     this.arrayUnitColumn = arrayUnitColumn;
   }
+  //**Generate grid layout here */
   public generateGridLayout(): void {
     this.renderer.setStyle(this.gridContainer.nativeElement, 'display', 'grid');
+    //**Row
     if (this.arrayUnitRow !== undefined) {
       if (this.arrayUnitRow.length !== this.numberOfRows) {
         throw new Error(
@@ -58,6 +60,7 @@ export default class GridLayout {
         `repeat(${this.numberOfRows},1fr)`
       );
     }
+    //**Column */
     if (this.arrayUnitColumn !== undefined) {
       if (this.arrayUnitColumn.length != this.numberOfColumns) {
         throw new Error(
@@ -76,7 +79,6 @@ export default class GridLayout {
           preParedStatement += `${unitColumn} `;
         }
       });
-      // console.log(`column statement:${preParedStatement}`);
       this.renderer.setStyle(
         this.gridContainer.nativeElement,
         'grid-template-columns',

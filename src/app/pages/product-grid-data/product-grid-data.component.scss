@@ -1,0 +1,92 @@
+//**main content
+.main-content {
+  height: calc(100vh - 5rem) !important;
+  width: 100%;
+  background-color: #F5F5F5;
+}
+
+.flex-grid {
+  &__container {
+    display: flex;
+    flex-direction: column;
+    height:100%;
+  }
+  &__box-btn {
+    display:flex;
+    flex-direction:row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: stretch;
+    height:3rem;
+    flex-shrink: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  &__box-tab {
+    .btn {
+      border: 1px solid #AAAAAA;
+      margin-right: 0.1rem;        
+      flex-shrink: 0;
+    }
+    display:flex;
+    flex-direction:row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    overflow-x: auto ;  
+    overflow-y: hidden;
+    width: 90%;    
+  }
+  &__content {
+    flex-grow: 0;
+    height: calc(100% - 3rem);
+  }
+}
+
+
+/* gird wijmo */
+::ng-deep .wj-flexgrid {
+  height:inherit !important;
+  border-radius: unset;
+}
+::ng-deep .wj-cell.wj-header {
+  background: #dfe3e8 !important;
+  color: #333 !important;
+  font-weight: 500 !important;
+
+}
+
+::ng-deep.wj-cell {
+  padding: 8px;
+  background: #ffffff !important;
+}
+
+::ng-deep.wj-alt {
+  background: #ecf2ff !important;
+}
+
+::ng-deep.wj-cells .wj-cell.wj-state-selected {
+  background: #cce9ff !important;
+  color: #333 !important;
+}
+
+::ng-deep.wj-cells .wj-cell.wj-state-multi-selected {
+  background: #cce9ff !important;
+  color: #333 !important;
+}
+
+// ::ng-deep.wj-cell.wj-header.wj-header-selected {
+//   background-color: #FFD85E !important;
+// }
+
+/* style frozen cells */
+::ng-deep.wj-cell.wj-frozen,
+::ng-deep.wj-cell.wj-alt.wj-frozen {
+    background: rgb(255, 255, 125) !important;
+}
+
+::ng-deep.wj-cell.even {
+  background-color: red !important;
+}
+::ng-deep.wj-cell.odd {
+  background-color: green !important;
+}

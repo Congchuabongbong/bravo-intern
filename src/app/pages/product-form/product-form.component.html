@@ -1,13 +1,13 @@
 <div class="main-content" *ngIf="formTabs$ | async as formTabs">
-    <div class="tab__box">
-        <button class="tab__link" [ngClass]="tab === activeTab ? 'active' : ''" *ngFor="let tab of formTabs"
-            (click)="onChangeFormTab(tab)">{{tab.name}}</button>
-    </div>
-    <form *ngIf="productForm" [formGroup]="productForm" class="product_form" novalidate autocomplete="off">
-        <ng-container *ngFor="let tab of formTabs">
-            <app-control-grid-layout-panel class="tabContent" *ngIf="tab === activeTab" [formFieldConfig]="tab.formTab"
-                [groupNameForm]="tab.key" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
-            </app-control-grid-layout-panel>
-        </ng-container>
-    </form>
+  <div class="tab__box">
+    <button class="tab__link" [ngClass]="tab === activeTab ? 'active' : ''" *ngFor="let tab of formTabs"
+      (click)="onChangeFormTab(tab)">{{tab.name}}</button>
+  </div>
+  <form *ngIf="productForm" [formGroup]="productForm" class="product_form" novalidate autocomplete="off">
+    <ng-container *ngFor="let tab of formTabs">
+      <app-control-grid-container-layout-panel class="tabContent" *ngIf="tab === activeTab"
+        [formFieldConfig]="tab.formTab" [groupNameForm]="tab.key" [columnGap]="'1rem'" [rowGap]="'0.3rem'">
+      </app-control-grid-container-layout-panel>
+    </ng-container>
+  </form>
 </div>

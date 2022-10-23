@@ -1,0 +1,20 @@
+//**selectionChanged;
+flexGrid.selectionChanged.addHandler((s, e) => {
+    console.log(s.collectionView.currentItem);
+})
+//**resizedColumn
+flexGrid.resizedColumn.addHandler((s, e) => {
+    console.log("resizedColumn")
+})
+//** draggingColumn*/
+flexGrid.draggingColumn.addHandler((s, e) => {
+    console.log('draggingRow');
+})
+//** copying*/
+flexGrid.copying.addHandler((s, e) => {
+    console.log('copying');
+});
+//** autoSizedColumn*/
+flexGrid.autoSizedColumn.addHandler((s, e) => {
+    console.log('autoSizedColumn');
+})

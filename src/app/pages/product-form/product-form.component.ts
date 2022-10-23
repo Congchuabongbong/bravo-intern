@@ -5,7 +5,6 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { FormGroup } from '@angular/forms';
 //**import from source */
 import { DataService } from 'src/app/shared/services/data.service';
@@ -13,6 +12,7 @@ import { GridLayoutFormData } from 'src/app/shared/data-type';
 import { map, Observable, tap } from 'rxjs';
 import { DynamicFormService } from 'src/app/shared/services/dynamic-form.service';
 import { RxDbService } from 'src/app/shared/services/rx-db.service';
+import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 
 
 @Component({
@@ -31,18 +31,18 @@ export class ProductFormComponent implements OnInit {
   constructor(
     private _dataService: DataService,
     private _dynamicFormService: DynamicFormService,
-    private _http: HttpClient,
-    private _rxDb: RxDbService
+    private _rxDb: RxDbService,
+    private httpLayoutService: HttpLayoutService
   ) { }
 
   // **life cycle hooks
   ngOnInit(): void {
-    this.formTabs$ = this._http.get<any>('assets/data/layout-form.data.json')
+    this.formTabs$ = this.httpLayoutService.formTabs$
       .pipe(
-        tap(async GridLayoutFormData => {
+        tap(GridLayoutFormData => {
           this.productForm = this._dynamicFormService.generateForm(GridLayoutFormData);
           this._dataService.sendData(this.productForm);
-          this._rxDb.db.gridLayoutForm.insert({ name: "product form", layoutConfig: JSON.stringify(GridLayoutFormData) });
+          // this._rxDb.db.gridLayoutForm.insert({ name: "product form", layoutConfig: JSON.stringify(GridLayoutFormData) });
         }),
         map(GridLayoutFormData => Object.keys(GridLayoutFormData).map(key => ({ key, name: GridLayoutFormData[key].nameTab, formTab: GridLayoutFormData[key] }))),
         tap(formTabs => {

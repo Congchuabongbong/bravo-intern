@@ -14,25 +14,25 @@ export class GridLayoutService {
     this.renderer.setStyle(elRef.nativeElement, 'grid-row', `${position.rowLine.startLine} / ${position.rowLine.endLine}`)
     this.renderer.setStyle(elRef.nativeElement, 'grid-column', `${position.columnLine.startLine} / ${position.columnLine.endLine}`)
   }
-  //**set width and height grid container */
-  public setWidthGridContainer(elRef: ElementRef, width: string): void {
+  //**set width and height */
+  public setWidth(elRef: ElementRef, width: string): void {
     this.renderer.setStyle(elRef.nativeElement, 'width', width)
   }
-  public setHeightGridContainer(elRef: ElementRef, height: string): void {
+  public setHeight(elRef: ElementRef, height: string): void {
     this.renderer.setStyle(elRef.nativeElement, 'height', height)
   }
-  //**set min width and height  grid container
-  public setMinWidthGridContainer(elRef: ElementRef, minWidth: string): void {
+  //**set min width and height  g
+  public setMinWidth(elRef: ElementRef, minWidth: string): void {
     this.renderer.setStyle(elRef.nativeElement, 'min-width', minWidth)
   }
-  public setMinHeightGridContainer(elRef: ElementRef, minHeight: string): void {
+  public setMinHeight(elRef: ElementRef, minHeight: string): void {
     this.renderer.setStyle(elRef.nativeElement, 'min-height', minHeight)
   }
-  //**set max height and width  grid container
-  public setMaxWidthGridContainer(elRef: ElementRef, maxWidth: string): void {
+  //**set max height and width  g
+  public setMaxWidth(elRef: ElementRef, maxWidth: string): void {
     this.renderer.setStyle(elRef.nativeElement, 'max-width', maxWidth)
   }
-  public setMaxHeightGridContainer(elRef: ElementRef, maxHeight: string): void {
+  public setMaxHeight(elRef: ElementRef, maxHeight: string): void {
     this.renderer.setStyle(elRef.nativeElement, 'max-height', maxHeight)
   }
   //**Set gap column and row */
@@ -64,5 +64,11 @@ export class GridLayoutService {
   //** Set id */
   public setId(elRef: ElementRef, idName: string): void {
     this.renderer.setAttribute(elRef.nativeElement, 'id', idName)
+  }
+  public setDisplay(elRef: ElementRef, displayName: string): void {
+    this.renderer.setStyle(elRef.nativeElement, 'display', displayName)
+  }
+  public setOverflow(elRef: ElementRef, valueName: string) {
+    this.renderer.setStyle(elRef.nativeElement, 'overflow', valueName)
   }
 }

@@ -15,7 +15,7 @@ let collectionSettings = {
 
 }
 
-//**Create Db 
+//**Create Db
 async function createDb(): Promise<RxDb> {
   console.log('DatabaseService: creating database..');
   let storage: RxStorage<any, any> = getRxStorageDexie();
