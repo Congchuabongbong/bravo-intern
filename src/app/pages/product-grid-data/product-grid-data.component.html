@@ -1,61 +1,7 @@
 <div class="main-content" *ngIf="products$ | async as products">
-  <app-control-grid-container-layout-panel [height]="'100%'" [layoutConfig]="layoutConfig">
-    <!--** Flex grid data **-->
-    <app-control-grid-item-layout-panel [height]="'100%'" [position]="positionLineGridData" [overflow]="'scroll'">
-      <wj-flex-grid #flex [itemsSource]="products" (initialized)="flexInitialized(flex)">
-        <!--** Dynamic wj-flex-grid-column **-->
-        <ng-container></ng-container>
-        <!-- <wj-flex-grid-column binding="ItemTypeName" header="Tên Vật tư" [width]="350" [align]="'left'">
-        </wj-flex-grid-column>
-        <wj-flex-grid-column binding="Id" header="Mã" [width]="150" [align]="'left'">
-        </wj-flex-grid-column>
-        <wj-flex-grid-column binding="Unit" header="Đvt" [width]="130" [align]="'left'">
-        </wj-flex-grid-column>
-        <wj-flex-grid-column binding="ItemTypeName" header="Loại vật tư" [width]="150" [align]="'left'">
-        </wj-flex-grid-column>
-        <wj-flex-grid-column binding="ParentCode" header="Mã nhóm mẹ" [width]="150" [align]="'left'">
-        </wj-flex-grid-column>
-        <wj-flex-grid-column binding="ItemGroupCode" header="Nhóm hàng" [width]="150" [align]="'left'">
-        </wj-flex-grid-column>
-        <wj-flex-grid-column binding="Name" header="Sản Phẩm" [width]="350" [align]="'left'">
-        </wj-flex-grid-column> -->
-      </wj-flex-grid>
-    </app-control-grid-item-layout-panel>
-    <!--** Pagination **-->
-    <!--** Tab **-->
-    <app-control-grid-item-layout-panel [height]="'100%'" [position]="positionLineTabGridData">
-      <div class="flex-grid__container">
-        <div class="flex-grid__box-btn">
-          <div class="flex-grid__box-tab">
-            <button class="btn btn--tab">Đvt khác</button>
-            <button class="btn btn--tab">Tồn tức thời</button>
-            <button class="btn btn--tab">Phân loại</button>
-            <button class="btn btn--tab">Đơn hàng mua</button>
-            <button class="btn btn--tab">Đơn hàng nán</button>
-            <button class="btn btn--tab">Phát sinh nhập mua hàng</button>
-            <button class="btn btn--tab">Phát sinh hoá đơn bán hàng</button>
-            <button class="btn btn--tab">Sản phẩm hoàn thành</button>
-            <button class="btn btn--tab">Vật tư suất kho</button>
-            <button class="btn btn--tab">Kế hoạch</button>
-            <button class="btn btn--tab">Chi tiết lô</button>
-          </div>
-          <div class="flex-grid__box-control">
-            <button class="btn btn--switch-layout">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                class="bi bi-square-half" viewBox="0 0 16 16">
-                <path
-                  d="M8 15V1h6a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8zm6 1a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12z" />
-              </svg>
-            </button>
-            <button class="btn btn--hidden">
-              <i class="fa-solid fa-minus"></i>
-            </button>
-          </div>
-        </div>
-        <div class="flex-grid__content">
-          <wj-flex-grid></wj-flex-grid>
-        </div>
-      </div>
-    </app-control-grid-item-layout-panel>
-  </app-control-grid-container-layout-panel>
+  <ng-container *ngIf=" wijFlexLayout$ |async as wijFlexLayout">
+    <app-control-grid-data-layout-panel *ngIf="wijFlexColumnConfig$ | async as wijFlexColumnConfig"
+      [dataSource]="products" [wijFlexLayout]="wijFlexLayout" [wjFlexColumnConfig]="wijFlexColumnConfig">
+    </app-control-grid-data-layout-panel>
+  </ng-container>
 </div>

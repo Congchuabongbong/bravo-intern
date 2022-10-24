@@ -69,6 +69,5 @@ export interface IAttribute {
     min?: number;
     order?: number | string,
     placeholder?: string;
-
 }
 

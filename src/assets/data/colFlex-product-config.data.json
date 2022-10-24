@@ -1,0 +1,53 @@
+{
+    "flexColumns": [
+        {
+            "binding": "Name",
+            "header": "Tên vật tư",
+            "width": 300,
+            "dataType": 1,
+            "align": "left"
+        },
+        {
+            "binding": "Id",
+            "header": "Mã",
+            "width": 150,
+            "dataType": 2,
+            "align": "left"
+        },
+        {
+            "binding": "Unit",
+            "header": "Đvt",
+            "width": 100,
+            "dataType": 1,
+            "align": "left"
+        },
+        {
+            "binding": "ItemTypeName",
+            "header": "Loại Vật Tư",
+            "width": 200,
+            "dataType": 1,
+            "align": "left"
+        },
+        {
+            "binding": "ParentCode",
+            "header": "Mã nhóm mẹ",
+            "width": 130,
+            "dataType": 1,
+            "align": "left"
+        },
+        {
+            "binding": "ItemGroupCode",
+            "header": "Nhóm hàng",
+            "width": 150,
+            "dataType": 1,
+            "align": "left"
+        },
+        {
+            "binding": "ProductCostInfo",
+            "header": "Sản phẩm",
+            "width": 300,
+            "dataType": 1,
+            "align": "left"
+        }
+    ]
+}

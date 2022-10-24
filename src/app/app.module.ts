@@ -23,6 +23,8 @@ import { WjGridModule } from '@grapecity/wijmo.angular2.grid';
 import { WjInputModule } from '@grapecity/wijmo.angular2.input';
 import { ControlGridItemLayoutPanelComponent } from './components/control-grid-item-layout-panel/control-grid-item-layout-panel.component';
 import { WjGridFilterModule } from '@grapecity/wijmo.angular2.grid.filter';
+import { ControlGridDataLayoutPanelComponent } from './components/control-grid-data-layout-panel/control-grid-data-layout-panel.component';
+
 
 @NgModule({
   declarations: [
@@ -41,9 +43,10 @@ import { WjGridFilterModule } from '@grapecity/wijmo.angular2.grid.filter';
     CustomFormCheckboxComponent,
     ProductGridDataComponent,
     ControlGridItemLayoutPanelComponent,
+    ControlGridDataLayoutPanelComponent,
+
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule, WjGridModule,
-    WjInputModule,WjGridFilterModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule, WjGridModule, WjInputModule, WjGridFilterModule],
   providers: [RxDbService, {
     provide: APP_INITIALIZER,
     useFactory: () => initDatabase,

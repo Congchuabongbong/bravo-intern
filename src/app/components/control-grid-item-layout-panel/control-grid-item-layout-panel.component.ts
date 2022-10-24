@@ -8,7 +8,7 @@ import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
   styleUrls: ['./control-grid-item-layout-panel.component.scss']
 })
 export class ControlGridItemLayoutPanelComponent implements OnInit {
-  @Input() position!: GridLayoutData.IPositionGridItem;
+  @Input() position?: GridLayoutData.IPositionGridItem;
   @Input() width!: string;
   @Input() height!: string;
   @Input() minWidth!: string;

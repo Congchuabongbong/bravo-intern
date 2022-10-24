@@ -23,6 +23,9 @@ export interface IColumn {
   arrayUnitColumn?: UnitOfMeasure[];
 }
 export interface IGridLayout {
-  row: IRow
+  row: IRow;
   column: IColumn;
 }
+
+
+
