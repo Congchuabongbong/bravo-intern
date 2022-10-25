@@ -1,0 +1,34 @@
+{
+    "container": {
+        "row": {
+            "rowOfNumber": 2,
+            "arrayUnitRow": [
+                "60%",
+                "40%"
+            ]
+        },
+        "column": {
+            "columnOfNumber": 1
+        }
+    },
+    "mainGridData": {
+        "rowLine": {
+            "startLine": 1,
+            "endLine": 2
+        },
+        "columnLine": {
+            "startLine": 1,
+            "endLine": 2
+        }
+    },
+    "tabGridData": {
+        "rowLine": {
+            "startLine": 2,
+            "endLine": 3
+        },
+        "columnLine": {
+            "startLine": 1,
+            "endLine": 2
+        }
+    }
+}

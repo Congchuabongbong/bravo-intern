@@ -21,13 +21,13 @@ import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   // @ViewChild('') subControlGridLayoutFormData !: ElementRef;
   //**Input and Out decorator here: */
-  @Input() layoutConfig!: any;
+  @Input() layoutConfig!: GridLayoutData.IGridLayout;
   @Input('formFieldConfig') formFieldConfig!: GridLayoutFormData.IControlGridLayoutFormData;
   @Input() columnGap!: string;
   @Input() rowGap!: string;
   @Input() positionLine!: GridLayoutData.IPositionGridItem;
-  @Input() width!: string;
-  @Input() height!: string;
+  @Input() width: string = '100%';
+  @Input() height: string = '100%';
   @Input() minWidth!: string;
   @Input() minHeight!: string;
   @Input() maxWidth!: string;
@@ -36,6 +36,7 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input('classIp') class!: string;
   @Input() groupNameForm!: string;
   @Input() displayName: string = 'grid'
+  @Input() overflow: string = 'visible'
   // **Declare property class here:
   public gridLayout!: GridLayout;
   public instanceForm!: any;
@@ -74,6 +75,9 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
     }
     //**general behavior grid layout pass type input decorator external component
     this._gridLayoutService.setDisplay(this._element, this.displayName);
+    if (this.overflow) {
+      this._gridLayoutService.setOverflow(this._element, this.overflow);
+    }
     if (this.rowGap) {
       this._gridLayoutService.setRowGap(this._element, this.rowGap);
     }

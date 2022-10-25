@@ -11,22 +11,22 @@ import { DataService } from 'src/app/shared/services/data.service';
 export class MenuErrorsSidebarComponent
   implements OnInit, OnDestroy {
   public productForm!: FormGroup;
-  public productForm$!: Subscription;
+  public productFormSub!: Subscription;
   public formTabs!: GridLayoutFormData.IFormTab[];
-  public formTabs$!: Subscription;
+  public formTabsSub!: Subscription;
 
   constructor(private _dataService: DataService) { }
   ngOnInit(): void {
-    this.productForm$ = this._dataService.data$.subscribe((form: FormGroup) => {
+    this.productFormSub = this._dataService.data$.subscribe((form: FormGroup) => {
       this.productForm = form;
     });
-    this.formTabs$ = this._dataService.dataByEvent.subscribe((formTabItem: GridLayoutFormData.IFormTab[]) => {
+    this.formTabsSub = this._dataService.dataByEvent.subscribe((formTabItem: GridLayoutFormData.IFormTab[]) => {
       this.formTabs = formTabItem
     });
   }
   ngOnDestroy(): void {
-    this.productForm$.unsubscribe();
-    this.formTabs$.unsubscribe();
+    this.productFormSub.unsubscribe();
+    this.formTabsSub.unsubscribe();
   }
   public getFormControl(formGroupName: string, formControlName: string): FormControl {
     return this.productForm.get(formGroupName)?.get(formControlName) as FormControl;

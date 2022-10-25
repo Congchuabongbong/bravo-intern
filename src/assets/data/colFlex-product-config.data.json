@@ -5,7 +5,8 @@
             "header": "Tên vật tư",
             "width": 300,
             "dataType": 1,
-            "align": "left"
+            "align": "left",
+            "allowMerging": true
         },
         {
             "binding": "Id",
@@ -19,7 +20,8 @@
             "header": "Đvt",
             "width": 100,
             "dataType": 1,
-            "align": "left"
+            "align": "left",
+            "allowMerging": true
         },
         {
             "binding": "ItemTypeName",
@@ -40,7 +42,8 @@
             "header": "Nhóm hàng",
             "width": 150,
             "dataType": 1,
-            "align": "left"
+            "align": "left",
+            "allowMerging": true
         },
         {
             "binding": "ProductCostInfo",

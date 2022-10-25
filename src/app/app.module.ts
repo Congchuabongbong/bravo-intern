@@ -24,6 +24,7 @@ import { WjInputModule } from '@grapecity/wijmo.angular2.input';
 import { ControlGridItemLayoutPanelComponent } from './components/control-grid-item-layout-panel/control-grid-item-layout-panel.component';
 import { WjGridFilterModule } from '@grapecity/wijmo.angular2.grid.filter';
 import { ControlGridDataLayoutPanelComponent } from './components/control-grid-data-layout-panel/control-grid-data-layout-panel.component';
+import { ControlGridTabDataLayoutPanelComponent } from './components/control-grid-tab-data-layout-panel/control-grid-tab-data-layout-panel.component';
 
 
 @NgModule({
@@ -44,6 +45,7 @@ import { ControlGridDataLayoutPanelComponent } from './components/control-grid-d
     ProductGridDataComponent,
     ControlGridItemLayoutPanelComponent,
     ControlGridDataLayoutPanelComponent,
+    ControlGridTabDataLayoutPanelComponent,
 
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule, WjGridModule, WjInputModule, WjGridFilterModule],

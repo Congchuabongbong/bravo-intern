@@ -9,7 +9,7 @@ import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 })
 export class ControlGridItemLayoutPanelComponent implements OnInit {
   @Input() position?: GridLayoutData.IPositionGridItem;
-  @Input() width!: string;
+  @Input() width: string = '100%';
   @Input() height!: string;
   @Input() minWidth!: string;
   @Input() minHeight!: string;
