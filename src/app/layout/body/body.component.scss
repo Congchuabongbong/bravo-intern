@@ -1,30 +1,35 @@
 .main-content {
-    position: relative;
+  position: relative;
 }
 
 .app-main {
-    position: absolute;
-    left: 27rem;
-    min-height: calc(100vh - 5rem) !important;
-    width: calc(100vw - 27rem);
-    transition: all 0.25s ease-in-out;
+  position: absolute;
+  left: 27rem;
+  min-height: calc(100vh - 5rem) !important;
+  width: calc(100vw - 27rem);
+  transition: all 0.25s ease-in-out;
 }
 
 .app-main.active {
-    width: 100vw !important;
-    left: 0;
+  width: 100vw !important;
+  left: 0;
 }
 
 .app-sidebar {
-    position: fixed;
-    top: 5rem;
-    left: 0;
-    width: 27rem;
-    height: calc(100vh - 5rem);
-    transition: all 0.25s ease-in-out;
-
+  position: fixed;
+  top: 5rem;
+  left: 0;
+  width: 27rem;
+  height: calc(100vh - 5rem);
+  transition: all 0.25s ease-in-out;
 }
 
 .app-sidebar.active {
-    transform: translateX(-100%);
+  transform: translateX(-100%);
+}
+
+@media (max-width: 200px) {
+  .app-sidebar {
+    transform: translateX(-100%) !important;
+  }
 }

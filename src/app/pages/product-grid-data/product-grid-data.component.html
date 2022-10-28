@@ -1,9 +1,14 @@
 <div class="main-content" *ngIf="products$ | async as products">
   <ng-container *ngIf=" wijFlexLayout$ |async as wijFlexLayout">
-    <!-- <app-control-grid-tab-data-layout-panel></app-control-grid-tab-data-layout-panel> -->
     <app-control-grid-data-layout-panel *ngIf="wijFlexColumnConfig$ | async as wijFlexColumnConfig"
       [dataSource]="products" [wijFlexLayout]="wijFlexLayout" [wjFlexColumnConfig]="wijFlexColumnConfig"
-      (wijFlexMainInitialized)="flexMainInitialized($event)" (wijFlexTabInitialized)="flexTabInitialized($event)">
+      (wijFlexMainInitialized)="flexMainInitialized($event)" (wijFlexTabInitialized)="flexTabInitialized($event)"
+      [isColumPicker]="true" [isDrawIdOddAndEven]="true">
     </app-control-grid-data-layout-panel>
   </ng-container>
+  <!-- <wj-list-box #columnPicker class="column-picker" (initialized)="listBoxInitialized(columnPicker)">
+  </wj-list-box>
+  <ng-container *ngFor="let item of items">
+    {{item | json}}
+  </ng-container> -->
 </div>

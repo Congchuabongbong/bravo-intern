@@ -1,41 +1,49 @@
+::ng-deep app-control-grid-data-layout-panel {
+  display: block;
+  height: 100%;
+}
 /* gird wijmo */
 ::ng-deep .wj-flexgrid {
-  height: 100% !important;
+  height: 100%;
   border-radius: unset;
 }
 ::ng-deep .wj-cell.wj-header {
-  background: #dfe3e8 !important;
-  color: #333 !important;
-  font-weight: 500 !important;
+  background: #dfe3e8;
+  color: #333;
+  font-weight: 500;
 }
 
 ::ng-deep.wj-cell {
   padding: 8px;
-  background: #ffffff !important;
+  background: #ffffff;
 }
 
 ::ng-deep.wj-alt {
-  background: #ecf2ff !important;
+  background: #ecf2ff;
 }
 
 ::ng-deep.wj-cells .wj-cell.wj-state-selected {
-  background: #cce9ff !important;
-  color: #333 !important;
+  background: #cce9ff;
+  color: #333;
 }
 
 ::ng-deep.wj-cells .wj-cell.wj-state-multi-selected {
-  background: #cce9ff !important;
-  color: #333 !important;
+  background: #cce9ff;
+  color: #333;
 }
 
 ::ng-deep.wj-cell.wj-frozen,
 ::ng-deep.wj-cell.wj-alt.wj-frozen {
-  background: rgb(255, 255, 125) !important;
+  background: rgb(255, 255, 125);
 }
 
 ::ng-deep.wj-cell.even {
-  background-color: red !important;
+  background-color: blue;
 }
 ::ng-deep.wj-cell.odd {
-  background-color: green !important;
+  background-color: green;
+}
+
+::ng-deep.wj-flexgrid .cell-changed {
+  background-color: red;
 }

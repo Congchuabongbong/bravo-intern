@@ -1,4 +1,4 @@
-import { Component, OnInit, Renderer2, ElementRef, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import * as wjcGrid from '@grapecity/wijmo.grid';
 import { GridLayoutData } from 'src/app/shared/data-type';
 import { IWjFlexColumnConfig } from 'src/app/shared/data-type/wijmo-data.type';
