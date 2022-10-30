@@ -13,6 +13,8 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   @Input() layoutConfig!: GridLayoutData.IGridLayout;
   @Input() wjFlexColumnConfig!: IWjFlexColumnConfig;
   @Output() flexTabInitialized = new EventEmitter<wjcGrid.FlexGrid>();
+  @Output() actionDelete: EventEmitter<any> = new EventEmitter();
+  @Output() actionAdd: EventEmitter<any> = new EventEmitter();
   public configLayout = {
     row: {
       rowOfNumber: 2,
@@ -40,5 +42,11 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   }
   public onClickTab(): void {
     //**next signal here */
+  }
+  public onDeleteRowSelected() {
+    this.actionDelete.emit()
+  }
+  public onAddNewColumn() {
+    this.actionAdd.emit();
   }
 }

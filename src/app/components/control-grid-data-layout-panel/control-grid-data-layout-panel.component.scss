@@ -47,3 +47,8 @@
 ::ng-deep.wj-flexgrid .cell-changed {
   background-color: red;
 }
+
+::ng-deep.wj-flexgrid .wj-colheaders .wj-header.wj-state-multi-selected {
+  background-color: yellow;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}

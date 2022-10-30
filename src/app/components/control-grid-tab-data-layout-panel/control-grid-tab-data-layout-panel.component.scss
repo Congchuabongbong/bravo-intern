@@ -9,16 +9,15 @@
   flex-flow: row nowrap;
   justify-content: space-between;
   align-items: stretch;
-
+  height: 100%;
   &--tab {
     display: flex;
     justify-content: flex-start;
     align-items: stretch;
-    flex: 1 1 90%;
-    height: 3rem;
+    flex: 0 1 90%;
     overflow-x: auto;
     border-right: 1px solid #ccc;
-
+    height: 100%;
     &:has(.btn) .btn {
       white-space: nowrap;
       border: 1px solid #ccc;

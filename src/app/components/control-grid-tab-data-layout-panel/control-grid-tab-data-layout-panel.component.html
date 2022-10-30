@@ -3,17 +3,17 @@
     <app-control-grid-item-layout-panel [overflow]="'auto hidden'">
         <div class="box-btn">
             <div class="box-btn--tab">
-                <button class="btn btn--tab">Đvt khác</button>
-                <button class="btn btn--tab">Tồn tức thời</button>
+                <button class="btn btn--tab" (click)="onDeleteRowSelected()">Delete Row</button>
+                <button class="btn btn--tab" (click)="onAddNewColumn()">Add Column</button>
                 <button class="btn btn--tab">Phân loại</button>
                 <button class="btn btn--tab">Đơn hàng mua</button>
                 <button class="btn btn--tab">Đơn hàng bán</button>
                 <button class="btn btn--tab">Phát sinh nhập mua hàng</button>
-                <button class="btn btn--tab">Phát sinh hoá đơn bán hàng</button>
+                <!-- <button class="btn btn--tab">Phát sinh hoá đơn bán hàng</button>
                 <button class="btn btn--tab">Sản phẩm hoàn thành</button>
                 <button class="btn btn--tab">Vật tư suất kho</button>
                 <button class="btn btn--tab">Kế hoạch</button>
-                <button class="btn btn--tab">Chi tiết lô</button>
+                <button class="btn btn--tab">Chi tiết lô</button> -->
             </div>
             <div class="box-btn--control">
                 <button class="btn btn--control">

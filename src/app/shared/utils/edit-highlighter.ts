@@ -61,7 +61,7 @@ export class EditHighlighter {
 
     // store a change into the _originalValueMap map
     private _storeChange(item: any, binding: string, originalValue: any, newValue: any) {
-        debugger
+
         // get the item with the original values
         let editItem = this._originalValueMap.get(item);
         if (editItem == null) {
