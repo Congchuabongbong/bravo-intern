@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, Column } from '@grapecity/wijmo.grid';
-import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, toggleClass, Control, CollectionView, INotifyCollectionChanged, NotifyCollectionChangedEventArgs } from '@grapecity/wijmo';
+import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, Column, ICellTemplateContext } from '@grapecity/wijmo.grid';
+import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, toggleClass, Control, CollectionView } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter';
+import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 
-type UnitOfProduct = 'Dịch vụ' | 'Thành phẩm' | 'Vật tư hàng hoá';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -25,7 +25,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   @Output() wijFlexTabInitialized = new EventEmitter<FlexGrid>();
   //**Declare properties here **
   public flex!: FlexGrid;
-  public selectedItem!: any;
+  public selectedItems!: any[];
   //**constructor
   constructor(private _wijFlexGridService: WijFlexGridService, private _renderer: Renderer2, private _el: ElementRef) { }
 
@@ -90,9 +90,20 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     flexGrid.copied.addHandler(this.onHandleCopied);
     //onHandleCopying
     flexGrid.copying.addHandler(this.onHandleCopying);
-
-
-    this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
+    this.selectedItems = this.flex.selectedItems; //-> get selected item
+    flexGrid.deferUpdate(() => {
+      this.flex.columns.unshift(new Column({
+        header: "Delete Action",
+        width: 150,
+        align: "center",
+        cellTemplate: CellMaker.makeButton({
+          text: '<i class="fa-solid fa-trash"></i>', // override bound text
+          click: (e: MouseEvent, ctx: ICellTemplateContext) => {
+            this.onDeleteRowSelected();
+          }
+        })
+      }))
+    })
   }
 
   //**flex Tab Initialized*/
@@ -172,11 +183,11 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     // console.log(flex.collectionView.currentItem);
   }
   private onHandleCollectionViewCurrentChanged(): void {
-    this.selectedItem = this.flex.collectionView.currentItem;
+    this.selectedItems = this.flex.selectedItems;
   }
   public onDeleteRowSelected(): void {
     this.flex && this.flex.deferUpdate(() => {
-      this.flex.editableCollectionView.remove(this.selectedItem)
+      this.selectedItems.length && this.selectedItems.forEach(item => this.flex.editableCollectionView.remove(item))
     })
   }
 
@@ -291,12 +302,8 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   }
   //**Handle action here
   public onAddNewColumn(): void {
-    this.flex && this.flex.deferUpdate(() => {
-      this.flex.columns.unshift(new Column({
-        "header": "New Column",
-        "width": 100,
-        "align": "left"
-      }))
-    })
+
   }
 }
+
+

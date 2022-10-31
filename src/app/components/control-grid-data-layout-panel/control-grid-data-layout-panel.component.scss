@@ -34,14 +34,14 @@
 
 ::ng-deep.wj-cell.wj-frozen,
 ::ng-deep.wj-cell.wj-alt.wj-frozen {
-  background: rgb(255, 255, 125);
+  background: #b3ffae;
 }
 
 ::ng-deep.wj-cell.even {
-  background-color: blue;
+  background-color: #ffddd2;
 }
 ::ng-deep.wj-cell.odd {
-  background-color: green;
+  background-color: #82cd47;
 }
 
 ::ng-deep.wj-flexgrid .cell-changed {
@@ -51,4 +51,13 @@
 ::ng-deep.wj-flexgrid .wj-colheaders .wj-header.wj-state-multi-selected {
   background-color: yellow;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+::ng-deep button.wj-cell-maker {
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.5;
+  }
 }

@@ -11,6 +11,4 @@ export class HttpLayoutService {
   public wijFlexLayout$: Observable<IWjFlexLayoutConfig> = this._http.get<any>('assets/data/wjFlex-layout-3-config.data.json');
   public wijFlexColumnConfig$: Observable<IWjFlexColumnConfig> = this._http.get<any>('assets/data/colFlex-product-config.data.json');
   constructor(private _http: HttpClient) { };
-
-
 }

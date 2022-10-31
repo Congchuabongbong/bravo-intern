@@ -5,7 +5,8 @@
             "header": "Tên vật tư",
             "width": 300,
             "dataType": 1,
-            "align": "left"
+            "align": "left",
+            "cellTemplate": "<i class='fa-regular fa-file'></i> ${text}"
         },
         {
             "binding": "Id",
