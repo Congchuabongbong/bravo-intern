@@ -1,7 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import * as wjcGrid from '@grapecity/wijmo.grid';
+import { Observable } from 'rxjs';
 import { GridLayoutData } from 'src/app/shared/data-type';
 import { IWjFlexColumnConfig } from 'src/app/shared/data-type/wijmo-data.type';
+import { HttpProductService } from 'src/app/shared/services/http-product.service';
 
 @Component({
   selector: 'app-control-grid-tab-data-layout-panel',
@@ -15,6 +17,8 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   @Output() flexTabInitialized = new EventEmitter<wjcGrid.FlexGrid>();
   @Output() actionDelete: EventEmitter<any> = new EventEmitter();
   @Output() actionAdd: EventEmitter<any> = new EventEmitter();
+  //**Property declarations*/
+  public productSelected$: Observable<any> = this._httpProductService.productSelectedWithTab$;
   public configLayout = {
     row: {
       rowOfNumber: 2,
@@ -27,7 +31,7 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
       columnOfNumber: 1
     }
   }
-  constructor() { }
+  constructor(private _httpProductService: HttpProductService) { }
 
 
   ngOnInit(): void {

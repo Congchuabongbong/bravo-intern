@@ -1,34 +1,106 @@
 {
-    "container": {
-        "row": {
-            "rowOfNumber": 2,
-            "arrayUnitRow": [
-                "40%",
-                "60%"
-            ]
+    "layouts": [
+        {
+            "container": {
+                "row": {
+                    "rowOfNumber": 2,
+                    "arrayUnitRow": [
+                        "40%",
+                        "60%"
+                    ]
+                },
+                "column": {
+                    "columnOfNumber": 1
+                }
+            },
+            "mainGridData": {
+                "rowLine": {
+                    "startLine": 2,
+                    "endLine": 3
+                },
+                "columnLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                }
+            },
+            "tabGridData": {
+                "rowLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                },
+                "columnLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                }
+            }
         },
-        "column": {
-            "columnOfNumber": 1
-        }
-    },
-    "mainGridData": {
-        "rowLine": {
-            "startLine": 2,
-            "endLine": 3
+        {
+            "container": {
+                "row": {
+                    "rowOfNumber": 1
+                },
+                "column": {
+                    "columnOfNumber": 2,
+                    "arrayUnitColumn": [
+                        "40%",
+                        "60%"
+                    ]
+                }
+            },
+            "mainGridData": {
+                "rowLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                },
+                "columnLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                }
+            },
+            "tabGridData": {
+                "rowLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                },
+                "columnLine": {
+                    "startLine": 2,
+                    "endLine": 3
+                }
+            }
         },
-        "columnLine": {
-            "startLine": 1,
-            "endLine": 2
+        {
+            "container": {
+                "row": {
+                    "rowOfNumber": 2,
+                    "arrayUnitRow": [
+                        "60%",
+                        "40%"
+                    ]
+                },
+                "column": {
+                    "columnOfNumber": 1
+                }
+            },
+            "mainGridData": {
+                "rowLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                },
+                "columnLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                }
+            },
+            "tabGridData": {
+                "rowLine": {
+                    "startLine": 2,
+                    "endLine": 3
+                },
+                "columnLine": {
+                    "startLine": 1,
+                    "endLine": 2
+                }
+            }
         }
-    },
-    "tabGridData": {
-        "rowLine": {
-            "startLine": 1,
-            "endLine": 2
-        },
-        "columnLine": {
-            "startLine": 1,
-            "endLine": 2
-        }
-    }
+    ]
 }

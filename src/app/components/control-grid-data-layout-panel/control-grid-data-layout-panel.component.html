@@ -1,4 +1,5 @@
-<app-control-grid-container-layout-panel [layoutConfig]="wijFlexLayout.container" overflow="'hidden'">
+<app-control-grid-container-layout-panel *ngIf="wijFlexLayout$ | async as wijFlexLayout"
+    [layoutConfig]="wijFlexLayout.container" overflow="'hidden'">
     <!--** main grid data **-->
     <app-control-grid-item-layout-panel [position]="wijFlexLayout.mainGridData" [overflow]="'auto hidden'">
         <wj-flex-grid #wjFlexMain [itemsSource]="dataSource" (initialized)="flexMainInitialized(wjFlexMain)"

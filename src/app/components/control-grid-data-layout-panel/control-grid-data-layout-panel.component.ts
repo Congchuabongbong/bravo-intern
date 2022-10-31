@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, Column, ICellTemplateContext } from '@grapecity/wijmo.grid';
 import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, toggleClass, Control, CollectionView } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
@@ -6,6 +6,9 @@ import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-ty
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
+import { HttpProductService } from 'src/app/shared/services/http-product.service';
+import { Observable } from 'rxjs';
+import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 
 @Component({
   selector: 'app-control-grid-data-layout-panel',
@@ -18,16 +21,21 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   @Input() dataSource!: any[];
   @Input() dataTabSource!: any[];
   @Input() wjFlexColumnConfig!: IWjFlexColumnConfig;
-  @Input() wijFlexLayout!: IWjFlexLayoutConfig;
   @Input() isDrawIdOddAndEven: boolean = false;
   @Input() isColumPicker: boolean = false;
   @Output() wijFlexMainInitialized = new EventEmitter<FlexGrid>();
   @Output() wijFlexTabInitialized = new EventEmitter<FlexGrid>();
+
   //**Declare properties here **
   public flex!: FlexGrid;
   public selectedItems!: any[];
+  public selectedItem!: any;
+  public wijFlexLayout$: Observable<IWjFlexLayoutConfig> = this._httpLayoutService.wijFlexLayout$;
   //**constructor
-  constructor(private _wijFlexGridService: WijFlexGridService, private _renderer: Renderer2, private _el: ElementRef) { }
+  constructor(private _wijFlexGridService: WijFlexGridService, private _renderer: Renderer2, private _el: ElementRef, private _httpProductService: HttpProductService, private _httpLayoutService: HttpLayoutService) {
+    this.wijFlexLayout$.subscribe(data => console.log(JSON.stringify(data)));
+
+  }
 
   //**lifecycle hooks
   ngOnInit(): void {
@@ -90,20 +98,28 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     flexGrid.copied.addHandler(this.onHandleCopied);
     //onHandleCopying
     flexGrid.copying.addHandler(this.onHandleCopying);
-    this.selectedItems = this.flex.selectedItems; //-> get selected item
-    flexGrid.deferUpdate(() => {
-      this.flex.columns.unshift(new Column({
-        header: "Delete Action",
-        width: 150,
-        align: "center",
-        cellTemplate: CellMaker.makeButton({
-          text: '<i class="fa-solid fa-trash"></i>', // override bound text
-          click: (e: MouseEvent, ctx: ICellTemplateContext) => {
-            this.onDeleteRowSelected();
-          }
-        })
-      }))
-    })
+    this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
+    /*add delete column*/
+    // flexGrid.deferUpdate(() => {
+    //   this.flex.columns.unshift(new Column({
+    //     header: "Delete Action",
+    //     width: 150,
+    //     align: "center",
+    //     cellTemplate: CellMaker.makeButton({
+    //       text: '<i class="fa-solid fa-trash"></i>', // override bound text
+    //       click: (e: MouseEvent, ctx: ICellTemplateContext) => {
+    //         this.onDeleteRowSelected();
+    //       }
+    //     })
+    //   }))
+    // })
+
+    //add column group
+    // flexGrid.columnGroups = [
+
+    // ]
+    this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id as number)
+
   }
 
   //**flex Tab Initialized*/
@@ -183,11 +199,14 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     // console.log(flex.collectionView.currentItem);
   }
   private onHandleCollectionViewCurrentChanged(): void {
-    this.selectedItems = this.flex.selectedItems;
+    this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id);
+    // this.selectedItems = this.flex.selectedItems;  get selected items
+    this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
   }
   public onDeleteRowSelected(): void {
     this.flex && this.flex.deferUpdate(() => {
-      this.selectedItems.length && this.selectedItems.forEach(item => this.flex.editableCollectionView.remove(item))
+      // this.selectedItems.length && this.selectedItems.forEach(item => this.flex.editableCollectionView.remove(item)) //-> delete selected rows
+      this.flex.editableCollectionView.remove(this.selectedItem) //-> delete selected row
     })
   }
 

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { mergeMap, Observable, of, Subject } from 'rxjs';
+import { combineLatest, map, mergeMap, Observable, of, Subject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +14,7 @@ export class HttpProductService {
   }))
   private selectedProductSubject = new Subject<any>();
   public selectedProductAction$ = this.selectedProductSubject.asObservable();
+  public productSelectedWithTab$ = combineLatest([this.products$, this.selectedProductAction$]).pipe(map(([products, productSelectedId]) => products.find((product: any) => product.Id === productSelectedId)));
   public selectedProductChange(id: number): void {
     this.selectedProductSubject.next(id);
   }

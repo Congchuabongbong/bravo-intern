@@ -3,8 +3,8 @@
     <app-control-grid-item-layout-panel [overflow]="'auto hidden'">
         <div class="box-btn">
             <div class="box-btn--tab">
-                <button class="btn btn--tab" (click)="onDeleteRowSelected()">Delete Row</button>
-                <button class="btn btn--tab" (click)="onAddNewColumn()">Add Column</button>
+                <button class="btn btn--tab" (click)="onDeleteRowSelected()">Xoá sản phẩm</button>
+                <!-- <button class="btn btn--tab" (click)="onAddNewColumn()">Add Column</button> -->
                 <button class="btn btn--tab">Phân loại</button>
                 <button class="btn btn--tab">Đơn hàng mua</button>
                 <button class="btn btn--tab">Đơn hàng bán</button>
@@ -30,11 +30,12 @@
         </div>
     </app-control-grid-item-layout-panel>
     <!--** wijFlex data **-->
-    <app-control-grid-item-layout-panel [overflow]="'auto hidden'">
-        <wj-flex-grid #wjFlex [headersVisibility]="1" [itemsSource]="" (initialized)="flexInitialized(wjFlex)">
-            <wj-flex-grid-column header="Đvt" [width]="100" [align]="'left'">
+    <app-control-grid-item-layout-panel [overflow]="'auto hidden'" *ngIf="productSelected$ | async as productSelected">
+        <wj-flex-grid #wjFlex [headersVisibility]="1" [itemsSource]="[productSelected]"
+            (initialized)="flexInitialized(wjFlex)">
+            <wj-flex-grid-column [binding]="'Id'" [header]="'Mã'" [width]="100" [align]="'left'">
             </wj-flex-grid-column>
-            <wj-flex-grid-column header="Hệ số" [width]="100" [align]="'left'">
+            <wj-flex-grid-column [binding]="'Name'" header="Tên vật tư" [width]="300" [align]="'left'">
             </wj-flex-grid-column>
         </wj-flex-grid>
     </app-control-grid-item-layout-panel>

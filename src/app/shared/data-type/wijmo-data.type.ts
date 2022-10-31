@@ -58,4 +58,7 @@ export interface IWjFlexLayoutConfig {
     tabGridData?: IPositionGridItem;
 }
 
+export interface IWjFlexLayoutConfigs {
+    layouts: IWjFlexLayoutConfig[];
+}
 
