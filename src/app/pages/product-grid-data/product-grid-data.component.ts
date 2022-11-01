@@ -1,11 +1,9 @@
-import { ListBox } from '@grapecity/wijmo.input';
 import { Component, OnInit } from '@angular/core';
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
-import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-type/wijmo-data.type';
+import { IWjFlexColumnConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 import { Observable } from 'rxjs';
 import * as wjcGrid from '@grapecity/wijmo.grid';
-import { PropertyGroupDescription } from '@grapecity/wijmo';
 @Component({
   selector: 'app-product-grid-data',
   templateUrl: './product-grid-data.component.html',
