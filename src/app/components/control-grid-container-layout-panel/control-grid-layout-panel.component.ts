@@ -69,9 +69,8 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
         if (this.layoutConfig.row.arrayUnitRow) {
           this.gridLayout.heightRow = this.layoutConfig.row.arrayUnitRow;
         }
-        this.gridLayout.generateGridLayout();
+        this.gridLayout.generateGridLayout()
       }
-
     }
     //**general behavior grid layout pass type input decorator external component
     this._gridLayoutService.setDisplay(this._element, this.displayName);
