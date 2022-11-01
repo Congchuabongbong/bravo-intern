@@ -10,6 +10,7 @@ import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 export class ControlGridItemLayoutPanelComponent implements OnInit {
   @Input() position?: GridLayoutData.IPositionGridItem;
   @Input() width: string = '100%';
+  @Input() displayOption!: GridLayoutData.IDisplayOption;
   @Input() height!: string;
   @Input() minWidth!: string;
   @Input() minHeight!: string;
@@ -29,34 +30,19 @@ export class ControlGridItemLayoutPanelComponent implements OnInit {
     }
     //**general behavior grid layout pass type input decorator external component
     //**width */
-
     this._gridLayoutService.setDisplay(this._element, this.displayName);
     this._gridLayoutService.setOverflow(this._element, this.overflow);
-    if (this.width) {
-      this._gridLayoutService.setWidth(this._element, this.width);
-    }
-    if (this.minWidth) {
-      this._gridLayoutService.setMinWidth(this._element, this.minWidth);
-    }
-    if (this.maxWidth) {
-      this._gridLayoutService.setMaxWidth(this._element, this.maxWidth);
-    }
+    //**width */
+    this.width && this._gridLayoutService.setWidth(this._element, this.width);
+    this.minWidth && this._gridLayoutService.setMinWidth(this._element, this.minWidth);
+    this.maxWidth && this._gridLayoutService.setMaxWidth(this._element, this.maxWidth);
     //**height */
-    if (this.height) {
-      this._gridLayoutService.setHeight(this._element, this.height);
-    }
-    if (this.minHeight) {
-      this._gridLayoutService.setMinHeight(this._element, this.minHeight);
-    }
-    if (this.maxHeight) {
-      this._gridLayoutService.setMaxHeight(this._element, this.maxHeight);
-    }
-    if (this.class) {
-      this._gridLayoutService.setClass(this._element, this.class);
-    }
-    if (this.id) {
-      this._gridLayoutService.setId(this._element, this.id);
-    }
+    this.height && this._gridLayoutService.setHeight(this._element, this.height);
+    this.minHeight && this._gridLayoutService.setMinHeight(this._element, this.minHeight);
+    this.maxHeight && this._gridLayoutService.setMaxHeight(this._element, this.maxHeight);
+    //*class and id
+    this.class && this._gridLayoutService.setClass(this._element, this.class);
+    this.id && this._gridLayoutService.setId(this._element, this.id);
   }
 
 }

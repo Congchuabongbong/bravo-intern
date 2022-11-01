@@ -19,7 +19,6 @@ import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
   styleUrls: ['./control-grid-layout-panel.component.scss'],
 })
 export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
-  // @ViewChild('') subControlGridLayoutFormData !: ElementRef;
   //**Input and Out decorator here: */
   @Input() layoutConfig!: GridLayoutData.IGridLayout;
   @Input('formFieldConfig') formFieldConfig!: GridLayoutFormData.IControlGridLayoutFormData;
@@ -46,9 +45,9 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   }
   //** Lifecycle here: */
   ngOnInit(): void {
+
   }
   ngAfterViewInit(): void {
-
     if (this.formFieldConfig) {
       this._controlContainer = this.injector.get<ControlContainer>(ControlContainer); //dynamic add dependency injection service */
       //** this approach using component for grid layout form
@@ -72,47 +71,24 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
         }
         this.gridLayout.generateGridLayout();
       }
+
     }
     //**general behavior grid layout pass type input decorator external component
     this._gridLayoutService.setDisplay(this._element, this.displayName);
-    if (this.overflow) {
-      this._gridLayoutService.setOverflow(this._element, this.overflow);
-    }
-    if (this.rowGap) {
-      this._gridLayoutService.setRowGap(this._element, this.rowGap);
-    }
-    if (this.columnGap) {
-      this._gridLayoutService.setColumnGap(this._element, this.columnGap)
-    }
+    this.overflow && this._gridLayoutService.setOverflow(this._element, this.overflow);
+    this.rowGap && this._gridLayoutService.setRowGap(this._element, this.rowGap);
+    this.columnGap && this._gridLayoutService.setColumnGap(this._element, this.columnGap)
     //**width */
-    if (this.width) {
-      this._gridLayoutService.setWidth(this._element, this.width);
-    }
-    if (this.minWidth) {
-      this._gridLayoutService.setMinWidth(this._element, this.minWidth);
-    }
-    if (this.maxWidth) {
-      this._gridLayoutService.setMaxWidth(this._element, this.maxWidth);
-    }
+    this.width && this._gridLayoutService.setWidth(this._element, this.width);
+    this.minWidth && this._gridLayoutService.setMinWidth(this._element, this.minWidth);
+    this.maxWidth && this._gridLayoutService.setMaxWidth(this._element, this.maxWidth);
     //**height */
-    if (this.height) {
-      this._gridLayoutService.setHeight(this._element, this.height);
-    }
-    if (this.minHeight) {
-      this._gridLayoutService.setMinHeight(this._element, this.minHeight);
-    }
-    if (this.maxHeight) {
-      this._gridLayoutService.setMaxHeight(this._element, this.maxHeight);
-    }
-    if (this.class) {
-      this._gridLayoutService.setClass(this._element, this.class);
-    }
-    if (this.id) {
-      this._gridLayoutService.setId(this._element, this.id);
-    }
-    if (this.positionLine) {
-      this.gridLayout.setPositionGirdItem(this._element, this.positionLine);
-    }
+    this.height && this._gridLayoutService.setHeight(this._element, this.height);
+    this.minHeight && this._gridLayoutService.setMinHeight(this._element, this.minHeight);
+    this.maxHeight && this._gridLayoutService.setMaxHeight(this._element, this.maxHeight);
+    this.class && this._gridLayoutService.setClass(this._element, this.class);
+    this.id && this._gridLayoutService.setId(this._element, this.id);
+    this.positionLine && this.gridLayout.setPositionGirdItem(this._element, this.positionLine);
   }
   //** generate grid layout form for approach component for grid layout form
   private generateGridLayoutFormDataPanel(): void {

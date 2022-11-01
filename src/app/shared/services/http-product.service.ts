@@ -9,7 +9,7 @@ export class HttpProductService {
 
   constructor(private _http: HttpClient) { }
   //** Products */
-  public products$: Observable<any> = this._http.get<any>('assets/data/product-data.json').pipe(mergeMap(({ vB20Item, ...rest }) => {
+  public products$: Observable<any> = this._http.get<any>('assets/data/product-data.json').pipe(mergeMap(({ vB20Item }) => {
     return of(vB20Item);
   }))
   private selectedProductSubject = new Subject<any>();

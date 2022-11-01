@@ -27,5 +27,16 @@ export interface IGridLayout {
   column: IColumn;
 }
 
+export interface IDisplayOption {
+  width?: string;
+  maxWidth?: string;
+  minWidth?: string;
+  height?: string;
+  maxHeight?: string;
+  minHeight?: string;
+  class?: string;
+  id?: string;
+  displayType?: string;
+}
 
 

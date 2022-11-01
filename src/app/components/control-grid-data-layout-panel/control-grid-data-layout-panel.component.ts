@@ -31,10 +31,11 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   public selectedItems!: any[];
   public selectedItem!: any;
   public wijFlexLayout$: Observable<IWjFlexLayoutConfig> = this._httpLayoutService.wijFlexLayout$;
-  //**constructor
-  constructor(private _wijFlexGridService: WijFlexGridService, private _renderer: Renderer2, private _el: ElementRef, private _httpProductService: HttpProductService, private _httpLayoutService: HttpLayoutService) {
-    this.wijFlexLayout$.subscribe(data => console.log(JSON.stringify(data)));
+  public wijFlexLayout!: IWjFlexLayoutConfig;
 
+
+  //**constructor
+  constructor(private _wijFlexGridService: WijFlexGridService, private _renderer: Renderer2, private _el: ElementRef, private _httpProductService: HttpProductService, private _httpLayoutService: HttpLayoutService, private _ref: ChangeDetectorRef) {
   }
 
   //**lifecycle hooks
@@ -47,7 +48,6 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   ngOnDestroy(): void {
     this.wijFlexMainInitialized.unsubscribe();
     this.wijFlexTabInitialized.unsubscribe();
-    this.wjFlexMain.dispose();
   }
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {

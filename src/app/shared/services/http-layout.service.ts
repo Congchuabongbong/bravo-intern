@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, startWith, Subject, tap, forkJoin } from 'rxjs';
 import { IWjFlexColumnConfig, IWjFlexLayoutConfig, IWjFlexLayoutConfigs } from '../data-type/wijmo-data.type';
 
 @Injectable({
@@ -19,7 +19,6 @@ export class HttpLayoutService {
     this.selectedLayoutSubject.next(value)
   }
   public wijFlexLayout$: Observable<IWjFlexLayoutConfig> = combineLatest([this._http.get<IWjFlexLayoutConfigs>('assets/data/wjFlex-layout-config.data.json'), this.selectedLayoutAction$]).pipe(
-    map(([layoutConfig, layoutNumber]) => (layoutConfig.layouts[layoutNumber])),
-    tap(data => console.log(JSON.stringify(data)))
+    map(([layoutConfig, layoutNumber]) => ({ ...layoutConfig.layouts[layoutNumber] }))
   );
 }

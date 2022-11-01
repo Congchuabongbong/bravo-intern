@@ -16,6 +16,8 @@ export class HeaderComponent implements OnInit {
     this.sideBarEvent.emit((this.isSideBar = !this.isSideBar));
   }
   public onSelectChange(event: any) {
-    this._httpLayoutService.selectedLayoutChange(event.target.value);
+
+    this._httpLayoutService.selectedLayoutChange(+event.target.value);
+
   };
 }
