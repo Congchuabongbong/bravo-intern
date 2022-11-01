@@ -4,7 +4,7 @@ import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventAr
 import { ListBox } from '@grapecity/wijmo.input';
 import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
-import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter';
+import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter.util';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
 import { Observable } from 'rxjs';

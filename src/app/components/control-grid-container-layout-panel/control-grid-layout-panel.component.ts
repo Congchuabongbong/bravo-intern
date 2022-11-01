@@ -8,10 +8,13 @@ import {
   Input,
   OnInit,
   Renderer2,
+  SimpleChanges,
 } from '@angular/core';
 import { GridLayoutData, GridLayoutFormData } from 'src/app/shared/data-type';
-import GridLayout from 'src/app/shared/utils/grid-layout.class';
+import GridLayout from 'src/app/shared/utils/grid-layout.util';
 import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
+import { updateStyle } from 'src/app/shared/utils/style.util';
+import { IStyleOptions } from 'src/app/shared/data-type/grid-layout.data.type';
 
 @Component({
   selector: 'app-control-grid-container-layout-panel',
@@ -20,7 +23,15 @@ import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 })
 export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   //**Input and Out decorator here: */
-  @Input() layoutConfig!: GridLayoutData.IGridLayout;
+  @Input()
+  get layoutConfig() {
+    return this._layoutConfig;
+
+  }
+  set layoutConfig(value: GridLayoutData.IGridLayout) {
+    this._layoutConfig = value;
+    this.generateGridLayout();
+  };
   @Input('formFieldConfig') formFieldConfig!: GridLayoutFormData.IControlGridLayoutFormData;
   @Input() columnGap!: string;
   @Input() rowGap!: string;
@@ -36,16 +47,28 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input() groupNameForm!: string;
   @Input() displayName: string = 'grid'
   @Input() overflow: string = 'visible'
+  @Input() styleOptions!: IStyleOptions;
   // **Declare property class here:
   public gridLayout!: GridLayout;
   public instanceForm!: any;
   public _controlContainer !: ControlContainer;
+  private _layoutConfig!: GridLayoutData.IGridLayout;
   //** constructor */
   constructor(private _element: ElementRef, private _renderer: Renderer2, private _cd: ChangeDetectorRef, private _gridLayoutService: GridLayoutService, private injector: Injector) {
   }
+
+
   //** Lifecycle here: */
   ngOnInit(): void {
 
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    // if (this.layoutConfig && changes['layoutConfig']) {
+    //   //** this approach using content projection for every thing elements is grid item
+    //   if (this.layoutConfig) {
+
+    //   }
+    // }
   }
   ngAfterViewInit(): void {
     if (this.formFieldConfig) {
@@ -54,25 +77,8 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
       this.generateGridLayoutFormDataPanel();
       this.instanceForm = this._controlContainer.control as FormGroup;
       this._cd.detectChanges();
-    } else {
-      //** this approach using content projection for every thing elements is grid item
-      if (this.layoutConfig) {
-        this.gridLayout = new GridLayout(
-          this._element,
-          this.layoutConfig.row.rowOfNumber,
-          this.layoutConfig.column.columnOfNumber,
-          this._renderer
-        );
-        if (this.layoutConfig.column.arrayUnitColumn) {
-          this.gridLayout.widthColumn = this.layoutConfig.column.arrayUnitColumn;
-        }
-        if (this.layoutConfig.row.arrayUnitRow) {
-          this.gridLayout.heightRow = this.layoutConfig.row.arrayUnitRow;
-        }
-        this.gridLayout.generateGridLayout();
-      }
-
     }
+
     //**general behavior grid layout pass type input decorator external component
     this._gridLayoutService.setDisplay(this._element, this.displayName);
     this.overflow && this._gridLayoutService.setOverflow(this._element, this.overflow);
@@ -89,6 +95,7 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
     this.class && this._gridLayoutService.setClass(this._element, this.class);
     this.id && this._gridLayoutService.setId(this._element, this.id);
     this.positionLine && this.gridLayout.setPositionGirdItem(this._element, this.positionLine);
+
   }
   //** generate grid layout form for approach component for grid layout form
   private generateGridLayoutFormDataPanel(): void {
@@ -107,5 +114,21 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
       }
       this.gridLayout.generateGridLayout();
     }
+  }
+  //**Generate Layout */
+  private generateGridLayout(): void {
+    this.gridLayout = new GridLayout(
+      this._element,
+      this.layoutConfig.row.rowOfNumber,
+      this.layoutConfig.column.columnOfNumber,
+      this._renderer
+    );
+    if (this.layoutConfig.column.arrayUnitColumn) {
+      this.gridLayout.widthColumn = this.layoutConfig.column.arrayUnitColumn;
+    }
+    if (this.layoutConfig.row.arrayUnitRow) {
+      this.gridLayout.heightRow = this.layoutConfig.row.arrayUnitRow;
+    }
+    this.gridLayout.generateGridLayout();
   }
 }

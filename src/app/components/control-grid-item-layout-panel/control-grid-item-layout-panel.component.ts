@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
 import { GridLayoutData } from 'src/app/shared/data-type';
 import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 
@@ -8,9 +8,15 @@ import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
   styleUrls: ['./control-grid-item-layout-panel.component.scss']
 })
 export class ControlGridItemLayoutPanelComponent implements OnInit {
-  @Input() position?: GridLayoutData.IPositionGridItem;
+  @Input() set position(value: GridLayoutData.IPositionGridItem) {
+    this._position = value;
+    this._gridLayoutService.setPositionGirdItem(this._element, this.position)
+  }
+  get position() {
+    return this._position;
+  };
   @Input() width: string = '100%';
-  @Input() displayOption!: GridLayoutData.IDisplayOption;
+  @Input() displayOption!: GridLayoutData.IStyleOptions;
   @Input() height!: string;
   @Input() minWidth!: string;
   @Input() minHeight!: string;
@@ -20,14 +26,16 @@ export class ControlGridItemLayoutPanelComponent implements OnInit {
   @Input('classIp') class!: string;
   @Input() displayName: string = 'block'
   @Input() overflow: string = 'visible';
+
+  private _position!: GridLayoutData.IPositionGridItem;
+  //**Constructor */
   constructor(private _element: ElementRef, private _gridLayoutService: GridLayoutService) { }
+
 
   ngOnInit(): void {
   }
   ngAfterViewInit(): void {
-    if (this.position) {
-      this._gridLayoutService.setPositionGirdItem(this._element, this.position)
-    }
+
     //**general behavior grid layout pass type input decorator external component
     //**width */
     this._gridLayoutService.setDisplay(this._element, this.displayName);
@@ -44,5 +52,9 @@ export class ControlGridItemLayoutPanelComponent implements OnInit {
     this.class && this._gridLayoutService.setClass(this._element, this.class);
     this.id && this._gridLayoutService.setId(this._element, this.id);
   }
-
+  private updateStyle(displayOptions: GridLayoutData.IStyleOptions, render: Renderer2, elementRef: ElementRef) {
+    Object.entries(displayOptions).forEach(([styleName, styleValue]) => {
+      styleValue && render.setStyle(elementRef.nativeElement, styleName, styleValue);
+    });
+  }
 }

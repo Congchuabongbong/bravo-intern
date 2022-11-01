@@ -53,7 +53,7 @@ export class ProductFormComponent implements OnInit {
   }
   //**Event binding */
   public onChangeFormTab(formTab: GridLayoutFormData.IFormTab): void {
-    this.activeTab = formTab
+    this.activeTab = formTab;
   }
 
 }
