@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, Column, ICellTemplateContext } from '@grapecity/wijmo.grid';
-import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, toggleClass, Control, CollectionView } from '@grapecity/wijmo';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs } from '@grapecity/wijmo.grid';
+import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
@@ -109,7 +109,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     // })
     //**add event listener key press */
     flexGrid.addEventListener(flexGrid.hostElement, 'keydown', (e: KeyboardEvent) => {
-      if (e.altKey && e.key.charAt.name == 'd') {
+      if (e.altKey) {
         e.preventDefault();
         flexGrid.editableCollectionView.remove(flexGrid.collectionView.currentItem);
       }
