@@ -30,9 +30,7 @@ export class ErrorMessageComponent implements OnInit, OnDestroy {
     }
   }
   ngOnDestroy(): void {
-    if (this.errorMessage$) {
-      this.errorMessage$.unsubscribe();
-    }
+    this.errorMessage$ && this.errorMessage$.unsubscribe();
   }
   //**get Error Message */
   getErrorMessage() {

@@ -99,27 +99,21 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     //onHandleCopying
     flexGrid.copying.addHandler(this.onHandleCopying);
     this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
-    /*add delete column*/
-    // flexGrid.deferUpdate(() => {
-    //   this.flex.columns.unshift(new Column({
-    //     header: "Delete Action",
-    //     width: 150,
-    //     align: "center",
-    //     cellTemplate: CellMaker.makeButton({
-    //       text: '<i class="fa-solid fa-trash"></i>', // override bound text
-    //       click: (e: MouseEvent, ctx: ICellTemplateContext) => {
-    //         this.onDeleteRowSelected();
-    //       }
-    //     })
-    //   }))
+    this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id as number); //next signal selected
+    //**add event listeners mouse move */
+    // flexGrid.addEventListener(flexGrid.hostElement, 'mousemove', (e: MouseEvent) => {
+    //   let ht = flexGrid.hitTest(e);
+    //   if (ht.row != -1 && ht.col != -1) {
+    //     console.log(ht.panel.getCellData(ht.row, ht.col, false));
+    //   }
     // })
-
-    //add column group
-    // flexGrid.columnGroups = [
-
-    // ]
-    this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id as number)
-
+    //**add event listener key press */
+    flexGrid.addEventListener(flexGrid.hostElement, 'keydown', (e: KeyboardEvent) => {
+      if (e.altKey && e.key.charAt.name == 'd') {
+        e.preventDefault();
+        flexGrid.editableCollectionView.remove(flexGrid.collectionView.currentItem);
+      }
+    })
   }
 
   //**flex Tab Initialized*/
