@@ -1,11 +1,10 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs } from '@grapecity/wijmo.grid';
-import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass } from '@grapecity/wijmo';
+import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, GridPanel } from '@grapecity/wijmo.grid';
+import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, Control } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter.util';
-import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
 import { Observable } from 'rxjs';
 import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
@@ -31,7 +30,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   public selectedItems!: any[];
   public selectedItem!: any;
   public wijFlexLayout$: Observable<IWjFlexLayoutConfig> = this._httpLayoutService.wijFlexLayout$;
-  public wijFlexLayout!: IWjFlexLayoutConfig;
+
 
 
   //**constructor
@@ -43,7 +42,12 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   }
 
   ngAfterViewInit(): void {
-  }
+    setTimeout(() => {
+      console.log(this.flex);
+      const gridPanel = new GridPanel(this.flex, CellType.Cell, this.flex.rows, this.flex.columns, this.flex.hostElement);
+      console.log(gridPanel.getCellElement(0, 2));
+    }, 5000);
+  };
 
   ngOnDestroy(): void {
     this.wijFlexMainInitialized.unsubscribe();
@@ -98,15 +102,15 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     flexGrid.copied.addHandler(this.onHandleCopied);
     //onHandleCopying
     flexGrid.copying.addHandler(this.onHandleCopying);
+    flexGrid.refreshed.addHandler(() => {
+      console.log('refreshed');
+    }, this)
+    flexGrid.refreshing.addHandler(() => {
+      console.log(flexGrid.isUpdating);
+    })
     this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
     this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id as number); //next signal selected
-    //**add event listeners mouse move */
-    // flexGrid.addEventListener(flexGrid.hostElement, 'mousemove', (e: MouseEvent) => {
-    //   let ht = flexGrid.hitTest(e);
-    //   if (ht.row != -1 && ht.col != -1) {
-    //     console.log(ht.panel.getCellData(ht.row, ht.col, false));
-    //   }
-    // })
+    //**add event listeners mouse move *
     //**add event listener key press */
     flexGrid.addEventListener(flexGrid.hostElement, 'keydown', (e: KeyboardEvent) => {
       if (e.altKey) {
@@ -114,6 +118,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
         flexGrid.editableCollectionView.remove(flexGrid.collectionView.currentItem);
       }
     })
+    console.log('s');
   }
 
   //**flex Tab Initialized*/
@@ -126,9 +131,6 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
       this.columnPicker.itemsSource = this.wjFlexMain.columns;
       this.columnPicker.checkedMemberPath = 'visible';
       this.columnPicker.displayMemberPath = 'header';
-      // this.columnPicker.itemChecked.addHandler((s, e) => {
-      //   console.log(s.checkedItems);
-      // })
       this.columnPicker.lostFocus.addHandler(() => { //-> trigger when blur out listBox
         hidePopup(this.columnPicker.hostElement); //-> hidden listBox
       });
@@ -148,11 +150,13 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
         }
       });
     }
+
   }
 
   //?Handling Event for main flex data here
   //**event format item */
   private onHandelFormatItem(flex: FlexGrid, event: FormatItemEventArgs): void {
+
     //add icon setting on top-left cell
     if (event.panel == flex.topLeftCells && this.isColumPicker) {
       event.cell.innerHTML = '<i class="column-picker fa-solid fa-gear"></i>';
@@ -190,7 +194,6 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     /** 
     @trigger : Occurs after selection changes.
     */
-    // console.log(flex.collectionView.currentItem);
   }
   private onHandleCollectionViewCurrentChanged(): void {
     this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id);
@@ -319,4 +322,8 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   }
 }
 
+
+function addStyle() {
+  throw new Error('Function not implemented.');
+}
 

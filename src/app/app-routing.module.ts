@@ -8,24 +8,10 @@ import {
 } from '@angular/router';
 import { ProductFormComponent } from './pages/product-form/product-form.component';
 import { ProductGridDataComponent } from './pages/product-grid-data/product-grid-data.component';
+import { TestBaseControlComponent } from './pages/test-base-control/test-base-control.component';
 const routes: Routes = [
   {
     path: 'vat-tu',
-    title: 'Vật Tư',
-    component: ProductFormComponent,
-  },
-  {
-    path: 'lay-nha-cung-cap',
-    title: 'Vật Tư',
-    component: ProductFormComponent,
-  },
-  {
-    path: 'lay-phan-loai',
-    title: 'Vật Tư',
-    component: ProductFormComponent,
-  },
-  {
-    path: 'nhom-vat-tu',
     title: 'Vật Tư',
     component: ProductFormComponent,
   },
@@ -34,6 +20,11 @@ const routes: Routes = [
     title: 'Dữ Liệu Vật Tư',
     component: ProductGridDataComponent,
   },
+  {
+    path: 'test-control',
+    title: 'Tess Base Control',
+    component: TestBaseControlComponent,
+  }
 ];
 
 @Injectable({ providedIn: 'root' })
