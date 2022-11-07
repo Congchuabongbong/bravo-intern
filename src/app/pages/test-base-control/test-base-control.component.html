@@ -1,3 +1,11 @@
-<app-custom-control #inputDate [styleOptions]="styleOptions">
+<app-custom-control #inputDate [value]="value" (initializeInputDate)="inputInitialized(inputDate)">
 </app-custom-control>
+<br>
+<br>
+<input type="text" [(ngModel)]="background" placeholder="Enter your background...">
+<br>
+<input type="text" [(ngModel)]="border" placeholder="Enter your border...">
+<br>
+<input type="text" [(ngModel)]="padding" placeholder="Enter your padding...">
+<br>
 <button (click)="onClick()">Update Style</button>

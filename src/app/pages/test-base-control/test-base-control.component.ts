@@ -19,6 +19,10 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
     background: 'red',
     border: '5px solid yellow',
   }
+  public background: any;
+  public border: any;
+  public padding: any;
+  public value = new Date('2022-01-31');
   //** constructor */
   constructor(private _http: HttpClient) { }
 
@@ -29,11 +33,11 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.inputDate.onValueChanged();
     this.inputDate.valueChanged.addHandler((sender: CustomControlComponent, e: EventArgs) => {
-      alert(`Value have changed ${sender.value}`)
+      // alert(`Value have changed ${sender.value}`)
     }, this);
     //** Handle on style updated */
-    this.inputDate.updatedStyle.addHandler((customControl: CustomControlComponent, e: EventArgs) => {
-      alert('updated style!')
+    this.inputDate.updatedStyle.addHandler((sender: CustomControlComponent, e: EventArgs) => {
+
     }, this);
     //** Handle on style updating */
     this.inputDate.updatingStyle.addHandler((sender: CustomControlComponent, e: CancelEventArgs) => {
@@ -43,6 +47,14 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   }
 
   public onClick(): void {
-    this.inputDate.onUpdatedStyle();
+    this.inputDate.onUpdatedStyle({
+      background: this.background ??= 'yellow',
+      border: this.border ??= '5px solid red',
+      padding: this.padding ??= '10px'
+    });
+  }
+
+  inputInitialized(inputDate: CustomControlComponent) {
+    console.log(inputDate);
   }
 }
