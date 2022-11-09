@@ -1,4 +1,4 @@
-import { Control, EventArgs, addClass, Binding, Event as wjEven, CancelEventArgs } from '@grapecity/wijmo';
+import { Control, EventArgs, addClass, Binding, Event as wjEven } from '@grapecity/wijmo';
 import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, OnDestroy, AfterViewInit } from '@angular/core';
 import { from, tap } from 'rxjs';
 
@@ -8,7 +8,7 @@ import { from, tap } from 'rxjs';
   styleUrls: ['./select-control-panel.component.scss']
 })
 export class SelectControlPanelComponent extends Control implements OnInit, AfterViewInit, OnDestroy {
-  //**Properties Declaration
+  //**Properties Declaration\
   static controlTemplate = '<select wj-part="select"></select>';
   private _select!: HTMLSelectElement;
   private _options!: HTMLOptionsCollection;
@@ -22,6 +22,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   private _selectedIndex!: number; // done
   private _selectedItem!: any;
   private _selectedValue!: any;
+  private _selectedValuePath!: string;
   get selectElement(): HTMLSelectElement {
     return this._select;
   }
@@ -63,6 +64,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   @Output('initialize') initializedNg = new EventEmitter<any>();
   //**Event
   public itemsSourceChanged = new wjEven<this, EventArgs>();
+  public selectedIndexChanged = new wjEven<this, EventArgs>();
   //**constructor */
   constructor(_el: ElementRef, _injector: Injector) {
     super(_el.nativeElement) //-> call parent constructor
@@ -72,7 +74,8 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     addClass(this.hostElement, "br-combobox"); // -> add class for hostElement
     addClass(this.selectElement, "br-select"); // -> add class for select
     this._isInitialized = !0; //-> flag isInitialized = true;
-    this.addEventListener(this.selectElement, "change", this.onSelectedChange, false); // -> add event listener!;
+    this.selectElement.addEventListener("change", this.onSelectedChange.bind(this), false); // -> add event listener!;
+
   }
   //**Lifecycle methods
   ngOnInit(): void {
@@ -119,7 +122,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this._isGenerated = !0;
   }
 
-
   private _setText(option: HTMLOptionElement, value: any): void {
     option.text = this._displayMemberBinding.getValue(value);
   }
@@ -159,12 +161,15 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   }
 
   public onItemsSourceChanged(e?: EventArgs): void {
-    this.itemsSourceChanged.hasHandlers && this.itemsSourceChanged.raise(this, e)
+    this.itemsSourceChanged.hasHandlers && this.itemsSourceChanged.raise(this, e);
+  }
+  public onSelectedIndexChanged(e?: EventArgs) {
+    this.selectedIndexChanged.hasHandlers && this.selectedIndexChanged.raise(this, e);
   }
   //**method handle Event selected change;
   private onSelectedChange(e: any): void {
     this.selectedIndex = e.currentTarget.selectedIndex;
-    // console.log(e.currentTarget.value);
+    this.onSelectedIndexChanged();
   }
 
   //** Trigger Signals */
@@ -178,6 +183,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.removeEventListener(this.selectElement);
     this.initializedNg.unsubscribe();
     this.itemsSourceChanged.removeAllHandlers();
+    this.selectedIndexChanged.removeAllHandlers();
   }
 
 
