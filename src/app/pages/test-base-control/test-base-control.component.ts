@@ -2,59 +2,84 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
 import * as wjcInput from '@grapecity/wijmo.input';
-import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event } from '@grapecity/wijmo';
+import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event, Binding } from '@grapecity/wijmo';
 import { CustomControlComponent } from 'src/app/components/custom-control/custom-control.component';
+import { SelectControlPanelComponent } from 'src/app/components/select-control-panel/select-control-panel.component';
+import { WjComboBox } from '@grapecity/wijmo.angular2.input'
 
 @Component({
   selector: 'app-test-base-control',
   templateUrl: './test-base-control.component.html',
-  styleUrls: ['./test-base-control.component.scss']
+  styleUrls: ['./test-base-control.component.scss'],
+
 })
 export class TestBaseControlComponent implements OnInit, AfterViewInit {
   //**declaration Input, Output, ViewChild*/
-  @ViewChild('inputDate') inputDate!: CustomControlComponent;
+  public comboSelect!: SelectControlPanelComponent;
 
+  public products$ = this._http.get<any>('https://dummyjson.com/products');
+  public displayMemberPath$ = this._http.get<any>('https://dummyjson.com/products').pipe(map((data) => {
+    return Object.keys(data.products[0]);
+  }));
+
+  public biding = new Binding('title');
   //** declared property here */
-  public styleOptions: any = {
-    background: 'red',
-    border: '5px solid yellow',
-  }
-  public background: any;
-  public border: any;
-  public padding: any;
-  public value = new Date('2022-01-31');
+
   //** constructor */
   constructor(private _http: HttpClient) { }
 
   //** lifecycle here */
   ngOnInit(): void {
+
   }
 
   ngAfterViewInit(): void {
-    this.inputDate.onValueChanged();
-    this.inputDate.valueChanged.addHandler((sender: CustomControlComponent, e: EventArgs) => {
-      // alert(`Value have changed ${sender.value}`)
-    }, this);
-    //** Handle on style updated */
-    this.inputDate.updatedStyle.addHandler((sender: CustomControlComponent, e: EventArgs) => {
 
-    }, this);
-    //** Handle on style updating */
-    this.inputDate.updatingStyle.addHandler((sender: CustomControlComponent, e: CancelEventArgs) => {
-      e.cancel = true;
-      alert('updating style!')
-    })
   }
 
   public onClick(): void {
-    this.inputDate.onUpdatedStyle({
-      background: this.background ??= 'yellow',
-      border: this.border ??= '5px solid red',
-      padding: this.padding ??= '10px'
-    });
+
+  }
+  //Select box
+  public initializedSelectBox(comboBox: SelectControlPanelComponent): void {
+    this.comboSelect = comboBox;
+    comboBox.headerPath = 'id';
+    comboBox.displayMemberPath = 'title'
   }
 
-  inputInitialized(inputDate: CustomControlComponent) {
-    console.log(inputDate);
+  onChanged(value: string): void {
+    this.comboSelect.displayMemberPath = value;
   }
+  // ComboBox
+  initializedComboBox(comboBox: WjComboBox) {
+    // comboBox.refreshed.addHandler(() => {
+    //   console.log('refreshed!');
+    // });
+
+    // setTimeout(() => {
+    //   comboBox.headerPath = 'title';
+    //   comboBox.displayMemberPath = 'title'
+    // }, 2000);
+
+
+
+    // comboBox.autoExpandSelection = false
+    // setTimeout(() => {
+    //   comboBox.displayMemberPath = 'title';
+    //   comboBox.headerPath = 'title' // chọn trường của 
+    // }, 5000);
+    // comboBox.handleWheel = true; // cho phép lăn chuột thay đổi giá trị input
+    // comboBox.inputElement.style.border = '1px solid red'; //-> lấy ra input custom input
+    // comboBox.inputType = 'text' //-> set type for input
+    // comboBox.isAnimated = true;
+    // comboBox.isContentHtml = true;
+    // comboBox.isDisabled = false;  //default is false
+    // comboBox.isDroppedDown = false; //fault false
+    // comboBox.isEditable = true;
+    // comboBox.selectedValuePath = 'title';
+    // console.log(comboBox.getDisplayText());
+    // comboBox.selectedIndex = 10
+  }
+
+
 }

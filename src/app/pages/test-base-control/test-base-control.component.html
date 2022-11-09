@@ -1,11 +1,15 @@
-<app-custom-control #inputDate [value]="value" (initializeInputDate)="inputInitialized(inputDate)">
-</app-custom-control>
+<ng-container *ngIf="products$ | async as products">
+    <BravoComboBox #comboBox (initialize)="initializedSelectBox(comboBox)" [itemsSource]="products.products">
+    </BravoComboBox>
+</ng-container>
+<!-- 
+<ng-container *ngIf="products$ | async as products">
+    <wj-combo-box #theComboString id="theComboString" (initialized)="initializedComboBox(theComboString)"
+        [itemsSource]="products.products">
+    </wj-combo-box>
+</ng-container> -->
 <br>
-<br>
-<input type="text" [(ngModel)]="background" placeholder="Enter your background...">
-<br>
-<input type="text" [(ngModel)]="border" placeholder="Enter your border...">
-<br>
-<input type="text" [(ngModel)]="padding" placeholder="Enter your padding...">
-<br>
-<button (click)="onClick()">Update Style</button>
+<select #select name="" id="" *ngIf="displayMemberPath$ | async as displayMemberPath"
+    (change)="onChanged(select.value)">
+    <option *ngFor="let member of displayMemberPath" [value]="member">{{member}}</option>
+</select>
