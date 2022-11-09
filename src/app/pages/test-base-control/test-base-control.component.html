@@ -9,6 +9,7 @@
     </wj-combo-box>
 </ng-container> -->
 <br>
+
 <select #select name="" id="" *ngIf="displayMemberPath$ | async as displayMemberPath"
     (change)="onChanged(select.value)">
     <option *ngFor="let member of displayMemberPath" [value]="member">{{member}}</option>

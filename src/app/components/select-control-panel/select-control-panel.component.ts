@@ -1,4 +1,4 @@
-import { Control, EventArgs, addClass, Binding } from '@grapecity/wijmo';
+import { Control, EventArgs, addClass, Binding, Event as wjEven, CancelEventArgs } from '@grapecity/wijmo';
 import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, OnDestroy, AfterViewInit } from '@angular/core';
 import { from, tap } from 'rxjs';
 
@@ -8,10 +8,28 @@ import { from, tap } from 'rxjs';
   styleUrls: ['./select-control-panel.component.scss']
 })
 export class SelectControlPanelComponent extends Control implements OnInit, AfterViewInit, OnDestroy {
-  //**Input
+  //**Properties Declaration
+  static controlTemplate = '<select wj-part="select"></select>';
+  private _select!: HTMLSelectElement;
+  private _options!: HTMLOptionsCollection;
+  private _itemsSource!: any[];
+  private _displayMemberPath!: string;
+  private _displayMemberBinding!: Binding;
+  private _headerPath!: string;
+  private _headerBinding!: Binding;
+  private _isInitialized: boolean = false;
+  private _isGenerated: boolean = false;
+  private _selectedIndex!: number; // done
+  private _selectedItem!: any;
+  private _selectedValue!: any;
+  get selectElement(): HTMLSelectElement {
+    return this._select;
+  }
+  //**Input declaration
   @Input() set itemsSource(value: any[]) {
     if (this._itemsSource != value) {
       this._itemsSource = value;
+      this.onItemsSourceChanged();
       this.onGenerateOptions();
     }
   }
@@ -41,53 +59,31 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   get selectedIndex(): number {
     return this._selectedIndex;
   }
-  //**Output
+  //**Output declaration
   @Output('initialize') initializedNg = new EventEmitter<any>();
   //**Event
-
-
-  //**Properties Declaration
-  static controlTemplate = '<select wj-part="select"></select>';
-  private _select!: HTMLSelectElement;
-  private _options!: HTMLOptionsCollection;
-  private _itemsSource!: any[];
-  private _displayMemberPath!: string;
-  private _displayMemberBinding!: Binding;
-  private _headerPath!: string;
-  private _headerBinding!: Binding;
-  private _initialized: boolean = false;
-  private _isGenerated: boolean = false;
-  private _selectedIndex: number = -1;
-  get selectElement(): HTMLElement {
-    return this._select;
-  }
+  public itemsSourceChanged = new wjEven<this, EventArgs>();
   //**constructor */
   constructor(_el: ElementRef, _injector: Injector) {
     super(_el.nativeElement) //-> call parent constructor
     this.applyTemplate('wj-control', this.getTemplate(), { //->apply template for control 
       _select: 'select',
     })
-    addClass(this.hostElement, "br-combobox");
-    addClass(this._select, "br-select");
-    this._initialized = !0;
+    addClass(this.hostElement, "br-combobox"); // -> add class for hostElement
+    addClass(this.selectElement, "br-select"); // -> add class for select
+    this._isInitialized = !0; //-> flag isInitialized = true;
+    this.addEventListener(this.selectElement, "change", this.onSelectedChange, false); // -> add event listener!;
   }
   //**Lifecycle methods
   ngOnInit(): void {
-    //**Emit Event support via Output*/
-    this.initializedNg.emit(); //-> emit event when component is initialized
-    this.refreshed.addHandler(() => {
-      console.log('refreshed!');
-    })
-
-
+    this.triggerSignals();
   }
+
   ngAfterViewInit(): void {
 
   }
   ngOnDestroy(): void {
-    this.initializedNg.unsubscribe();
-    this.removeEventListener(this.hostElement);
-    this.removeEventListener(this._select);
+    this.cleanEvent();//->clean all event
   }
 
   //**Override method properties of the control class
@@ -99,9 +95,12 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   }
 
   //**method Properties of control */
+
+  /** @desc : generate options by amount of itemsSource*/
   private _generateOptions(): void {
+    const optionsEl: HTMLOptionElement[] = [];
     from(this.itemsSource).pipe(tap(item => {
-      let option: HTMLOptionElement = document.createElement("option");
+      const option: HTMLOptionElement = document.createElement("option");
       addClass(option, 'br-listbox-item')
       if (typeof item === 'object') {
         this._headerBinding ? this._setValue(option, item) : option.value = item;
@@ -110,19 +109,26 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
         option.value = item;
         option.text = item;
       }
-      this._select.appendChild(option);
+      option.setAttribute('data', item)
+      optionsEl.push(option)
     })).subscribe().unsubscribe();
-    this._options = this._select.options;
-    this._isGenerated = true;
+    this.selectElement.append(...optionsEl);
+    this.selectElement.selectedIndex = this.selectedIndex || 0;
+    this._updateSelected() //-> update selected index
+    this._options = this.selectElement.options;
+    this._isGenerated = !0;
   }
+
 
   private _setText(option: HTMLOptionElement, value: any): void {
     option.text = this._displayMemberBinding.getValue(value);
   }
+
   private _setValue(option: HTMLOptionElement, value: any): void {
     option.value = this._headerBinding.getValue(value)
   }
 
+  /**@desc: update binding value when headerBinding changed */
   private _updateBindingValue() {
     this.deferUpdate(() => {
       for (let i = 0; i < this._options.length; i++) {
@@ -131,6 +137,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     })
   }
 
+  /**@desc: update binding value when displayMemberBinding changed */
   private _updateBindText() {
     this.deferUpdate(() => {
       for (let i = 0; i < this._options.length; i++) {
@@ -139,12 +146,38 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     })
   }
 
-  private _updateSelect(): boolean {
-    return true;
+  /**@desc: using dispatch event to update selectedIndex the first time;*/
+  private _updateSelected(): void {
+    let event = new Event("change");
+    this.selectElement.dispatchEvent(event)
   }
 
+
+  //*method raise event
   public onGenerateOptions(e?: EventArgs): void {
     this.invalidate();
+  }
+
+  public onItemsSourceChanged(e?: EventArgs): void {
+    this.itemsSourceChanged.hasHandlers && this.itemsSourceChanged.raise(this, e)
+  }
+  //**method handle Event selected change;
+  private onSelectedChange(e: any): void {
+    this.selectedIndex = e.currentTarget.selectedIndex;
+    // console.log(e.currentTarget.value);
+  }
+
+  //** Trigger Signals */
+  private triggerSignals(): void {
+    //**Emit Event support via Output*/
+    this.initializedNg.emit(); //-> emit event when component is initialized
+  }
+  //**Clean Event*/
+  private cleanEvent(): void {
+    this.removeEventListener(this.hostElement);
+    this.removeEventListener(this.selectElement);
+    this.initializedNg.unsubscribe();
+    this.itemsSourceChanged.removeAllHandlers();
   }
 
 

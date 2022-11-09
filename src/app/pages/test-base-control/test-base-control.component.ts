@@ -56,10 +56,6 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
     //   console.log('refreshed!');
     // });
 
-    // setTimeout(() => {
-    //   comboBox.headerPath = 'title';
-    //   comboBox.displayMemberPath = 'title'
-    // }, 2000);
 
 
 
