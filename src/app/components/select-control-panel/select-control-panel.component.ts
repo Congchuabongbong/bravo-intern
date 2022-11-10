@@ -23,7 +23,7 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
 export class SelectControlPanelComponent extends Control implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor, Validator {
   //**Properties Declaration
   static controlTemplate = '<select wj-part="select"></select>';
-  private _select!: HTMLSelectElement;
+  private _selectElement!: HTMLSelectElement;
   private _itemsSource!: any[];
   private _displayMemberPath!: string;
   private _displayMemberBinding!: Binding;
@@ -37,7 +37,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   public override isDisabled: boolean = false;
   private touched = false;
   get selectElement(): HTMLSelectElement {
-    return this._select;
+    return this._selectElement;
   }
   get selectedItem(): any {
     return this.itemsSource[this.selectedIndex];
@@ -101,7 +101,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   constructor(_el: ElementRef, _injector: Injector) {
     super(_el.nativeElement) //-> call parent constructor
     this.applyTemplate('wj-control', this.getTemplate(), { //->apply template for control 
-      _select: 'select',
+      _selectElement: 'select',
     })
     addClass(this.hostElement, "br-comboBox"); // -> add class for hostElement
     addClass(this.selectElement, "br-select"); // -> add class for select
@@ -137,8 +137,8 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
         option.value = item.toString();
         option.text = item.toString();
       } else {
-        this._headerBinding ? this._setValue(option, item) : option.value = item;
-        this._displayMemberBinding ? this._setText(option, item) : option.text = item;
+        option.value = this._headerBinding && this._headerBinding.getValue(item) || item;
+        option.text = this._displayMemberBinding && this._displayMemberBinding.getValue(item) || item;
       }
       optionsEl.push(option)
     }).unsubscribe();
@@ -148,15 +148,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.selectElement.disabled = this.isDisabled;
     this._isGenerated = !0; // switch flag _isGenerated = true
   }
-
-  private _setText(option: HTMLOptionElement, value: any): void {
-    option.text = this._displayMemberBinding.getValue(value) || value;
-  }
-
-  private _setValue(option: HTMLOptionElement, value: any): void {
-    option.value = this._headerBinding.getValue(value) || value;
-  }
-
   /**
    * @desc: support updated binding value when headerBinding changed 
    * @deprecated : deprecated
@@ -227,7 +218,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.selectedIndex = e.currentTarget.selectedIndex;
     this.onChange(e.currentTarget.value);
     this.onSelectedIndexChanged();
-
   }
   //** Trigger Signals */
   /**@desc: using to trigger event of component when initialized component */
@@ -246,6 +236,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.itemsSourceChangedNg.unsubscribe();
     this.selectedIndexChanged.removeAllHandlers();
     this.selectedIndexChangedNg.unsubscribe();
+    this.dispose();
   }
   //**custom form 
   public onChange = (value: any) => { return value };

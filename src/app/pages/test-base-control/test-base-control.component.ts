@@ -51,7 +51,7 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
     comboBox.displayMemberPath = 'title'
     comboBox.selectedValuePath = 'title'
     comboBox.selectedIndex = 10;
-    comboBox.selectedIndexChanged.addHandler(() => { console.log(comboBox.selectedItem); });
+    comboBox.selectedIndexChanged.addHandler(() => { console.log(comboBox.selectedValue); });
   }
 
   onSelectedChanged(comboBox: SelectControlPanelComponent, e?: EventArgs): void {

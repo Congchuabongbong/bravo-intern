@@ -1,7 +1,7 @@
 <form [formGroup]="formDemo">
     <ng-container *ngIf="products$ | async as products">
         <BravoComboBox #comboBox (initialize)="initializedSelectBox(comboBox)" [itemsSource]="products.products"
-            formControlName="item" (selectedIndexChanged)="onSelectedChanged(comboBox,$event)">
+            formControlName="item">
         </BravoComboBox>
     </ng-container>
 </form>
