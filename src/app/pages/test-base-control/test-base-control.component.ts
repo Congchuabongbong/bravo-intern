@@ -33,7 +33,7 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   //** lifecycle here */
   ngOnInit(): void {
     this.formDemo = this._fb.group({
-      item: [1],
+      item: [{ value: "", disabled: false }],
     })
   }
 
@@ -49,20 +49,15 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
     this.comboSelect = comboBox;
     comboBox.headerPath = 'id';
     comboBox.displayMemberPath = 'title'
-    comboBox.selectedValuePath = 'thumbnail';
-    // comboBox.selectedIndex = 10;
-    comboBox.selectedIndexChanged.addHandler((sender: SelectControlPanelComponent) => {
-      console.log(sender.selectedValue);
-    }, this);
+    comboBox.selectedValuePath = 'title'
+    comboBox.selectedIndex = 10;
+    comboBox.selectedIndexChanged.addHandler(() => { console.log(comboBox.selectedItem); });
   }
 
+  onSelectedChanged(comboBox: SelectControlPanelComponent, e?: EventArgs): void {
+    console.log(comboBox.selectedItem);
+  };
   onChanged(value: string): void {
     this.comboSelect.displayMemberPath = value;
   }
-  // ComboBox
-  initializedComboBox(comboBox: WjComboBox) {
-
-  }
-
-
 }
