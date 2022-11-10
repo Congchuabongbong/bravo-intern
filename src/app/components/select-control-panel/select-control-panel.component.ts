@@ -58,7 +58,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   get itemsSource(): any[] {
     return this._itemsSource;
   };
-  /** @desc:specified or get displayMemberPath to binding text for select option*/
+  /** @desc:specified or get displayMemberPath to bind text for select option*/
   @Input() set displayMemberPath(value: string) {
     this._displayMemberPath = value;
     this._displayMemberBinding = new Binding(value);
@@ -67,7 +67,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   get displayMemberPath(): string {
     return this._displayMemberPath;
   };
-  /** @desc:specified or get headerPath to binding value for select option*/
+  /** @desc:specified or get headerPath to bind value for select option*/
   @Input() set headerPath(value: string) {
     this._headerPath = value;
     this._headerBinding = new Binding(value);
@@ -82,7 +82,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   get selectedIndex(): number {
     return this._selectedIndex ??= 0;
   }
-  /**@desc:specified or get selectedValuePath to binding with selected item */
+  /**@desc:specified or get selectedValuePath to bind with selected item */
   @Input() set selectedValuePath(value: string) {
     this._selectedValuePath = value;
     this._selectedValueBinding = new Binding(value);
@@ -110,10 +110,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   }
   //**Lifecycle methods
   ngOnInit(): void {
-    this.triggerSignals();
-    this.refreshed.addHandler(() => {
-      console.log('refreshed!');
-    })
+    this.triggerSignalsInit();
   }
 
   ngAfterViewInit(): void {
@@ -235,7 +232,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   }
   //** Trigger Signals */
   /**@desc: using to trigger event of component when initialized component */
-  private triggerSignals(): void {
+  private triggerSignalsInit(): void {
     //**Emit Event support via Output*/
     this.initializedNg.emit(); //-> emit event when component is initialized
     this._isInitialized = !0; //-> flag isInitialized = true;
