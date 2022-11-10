@@ -35,7 +35,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   private _selectedValuePath!: string;
   private _selectedValueBinding!: Binding;
   public override isDisabled: boolean = false;
-  public valueFiled!: any;
   private touched = false;
   get selectElement(): HTMLSelectElement {
     return this._select;
