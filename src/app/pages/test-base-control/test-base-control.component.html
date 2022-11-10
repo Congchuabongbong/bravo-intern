@@ -1,16 +1,22 @@
-<ng-container *ngIf="products$ | async as products">
-    <BravoComboBox #comboBox (initialize)="initializedSelectBox(comboBox)" [itemsSource]="products.products">
-    </BravoComboBox>
-</ng-container>
+<form [formGroup]="formDemo">
+    <ng-container *ngIf="products$ | async as products">
+        <BravoComboBox #comboBox (initialize)="initializedSelectBox(comboBox)" [itemsSource]="products.products"
+            formControlName="item">
+        </BravoComboBox>
+    </ng-container>
+</form>
+
+
 <!-- 
 <ng-container *ngIf="products$ | async as products">
     <wj-combo-box #theComboString id="theComboString" (initialized)="initializedComboBox(theComboString)"
         [itemsSource]="products.products">
     </wj-combo-box>
-</ng-container> -->
-<br>
-
+</ng-container>
+<br> -->
+<!-- 
 <select #select name="" id="" *ngIf="displayMemberPath$ | async as displayMemberPath"
     (change)="onChanged(select.value)">
     <option *ngFor="let member of displayMemberPath" [value]="member">{{member}}</option>
-</select>
+</select> -->
+<button (click)="onClick()">submit</button>

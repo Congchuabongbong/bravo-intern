@@ -1,6 +1,7 @@
+import { FormBuilder, FormGroup, Validator } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { map, Observable, tap } from 'rxjs';
+import { from, map, Observable, tap } from 'rxjs';
 import * as wjcInput from '@grapecity/wijmo.input';
 import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event, Binding } from '@grapecity/wijmo';
 import { CustomControlComponent } from 'src/app/components/custom-control/custom-control.component';
@@ -23,14 +24,17 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   }));
 
   public biding = new Binding('title');
+  public formDemo!: FormGroup;
   //** declared property here */
 
   //** constructor */
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient, private _fb: FormBuilder) { }
 
   //** lifecycle here */
   ngOnInit(): void {
-
+    this.formDemo = this._fb.group({
+      item: [1],
+    })
   }
 
   ngAfterViewInit(): void {
@@ -38,17 +42,18 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   }
 
   public onClick(): void {
-
+    console.log(this.formDemo.value);
   }
   //Select box
   public initializedSelectBox(comboBox: SelectControlPanelComponent): void {
     this.comboSelect = comboBox;
     comboBox.headerPath = 'id';
     comboBox.displayMemberPath = 'title'
-    comboBox.selectedIndex = 10;
+    comboBox.selectedValuePath = 'thumbnail';
+    // comboBox.selectedIndex = 10;
     comboBox.selectedIndexChanged.addHandler((sender: SelectControlPanelComponent) => {
-      console.log(sender.selectedIndex);
-    }, this)
+      console.log(sender.selectedValue);
+    }, this);
   }
 
   onChanged(value: string): void {
@@ -56,29 +61,7 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   }
   // ComboBox
   initializedComboBox(comboBox: WjComboBox) {
-    // comboBox.refreshed.addHandler(() => {
-    //   console.log('refreshed!');
-    // });
 
-
-
-
-    // comboBox.autoExpandSelection = false
-    // setTimeout(() => {
-    //   comboBox.displayMemberPath = 'title';
-    //   comboBox.headerPath = 'title' // chọn trường của 
-    // }, 5000);
-    // comboBox.handleWheel = true; // cho phép lăn chuột thay đổi giá trị input
-    // comboBox.inputElement.style.border = '1px solid red'; //-> lấy ra input custom input
-    // comboBox.inputType = 'text' //-> set type for input
-    // comboBox.isAnimated = true;
-    // comboBox.isContentHtml = true;
-    // comboBox.isDisabled = false;  //default is false
-    // comboBox.isDroppedDown = false; //fault false
-    // comboBox.isEditable = true;
-    // comboBox.selectedValuePath = 'title';
-    // console.log(comboBox.getDisplayText());
-    // comboBox.selectedIndex = 10
   }
 
 
