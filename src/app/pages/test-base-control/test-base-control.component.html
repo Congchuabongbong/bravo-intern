@@ -13,3 +13,9 @@
     <option *ngFor="let member of displayMemberPath" [value]="member">{{member}}</option>
 </select>
 <button (click)="onClick()">submit</button>
+<!-- 
+
+<ng-container *ngIf="products$ | async as products">
+    <wj-combo-box #theComboString id="theComboString" [itemsSource]="products.products" [headerPath]="'id'"
+        [displayMemberPath]="'title'" (initialized)="initializedComboBox(theComboString)"></wj-combo-box>
+</ng-container> -->

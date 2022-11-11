@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { from, map, Observable, tap } from 'rxjs';
 import * as wjcInput from '@grapecity/wijmo.input';
-import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event, Binding } from '@grapecity/wijmo';
+import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription } from '@grapecity/wijmo';
 import { CustomControlComponent } from 'src/app/components/custom-control/custom-control.component';
 import { SelectControlPanelComponent } from 'src/app/components/select-control-panel/select-control-panel.component';
 import { WjComboBox } from '@grapecity/wijmo.angular2.input'
@@ -47,11 +47,20 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   //Select box
   public initializedSelectBox(comboBox: SelectControlPanelComponent): void {
     this.comboSelect = comboBox;
-    comboBox.headerPath = 'id';
-    comboBox.displayMemberPath = 'title'
-    comboBox.selectedValuePath = 'title'
-    comboBox.selectedIndex = 10;
-    comboBox.selectedIndexChanged.addHandler(() => { console.log(comboBox.selectedValue); });
+    comboBox.initialize({
+      headerPath: 'id',
+      displayMemberPath: 'title',
+      selectedValuePath: 'brand',
+
+    })
+    comboBox.selectedIndexChanged.addHandler(() => {
+
+    });
+    comboBox.itemsSourceChanged.addHandler(() => {
+      console.log('itemsSourceChanged');
+
+    });
+    comboBox.collectionView.sortDescriptions.push(new SortDescription('rating', true));
   }
 
   onSelectedChanged(comboBox: SelectControlPanelComponent, e?: EventArgs): void {
@@ -59,5 +68,10 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   };
   onChanged(value: string): void {
     this.comboSelect.displayMemberPath = value;
+  }
+
+
+  public initializedComboBox(comboBox: WjComboBox) {
+
   }
 }

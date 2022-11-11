@@ -1,4 +1,4 @@
-import { Control, EventArgs, addClass, Binding, Event as wjEven } from '@grapecity/wijmo';
+import { Control, EventArgs, addClass, Binding, Event as wjEven, CollectionView, isDate } from '@grapecity/wijmo';
 import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, OnDestroy, AfterViewInit } from '@angular/core';
 import { from } from 'rxjs';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
@@ -29,12 +29,14 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   private _displayMemberBinding!: Binding;
   private _headerPath!: string;
   private _headerBinding!: Binding;
-  private _isInitialized: boolean = false;
-  private _isGenerated: boolean = false;
+  private _isGeneratedFirstTime: boolean = false;
   private _selectedIndex!: number;
   private _selectedValuePath!: string;
   private _selectedValueBinding!: Binding;
-  public override isDisabled: boolean = false;
+  private _valuesOption: any[] = [];
+  public collectionView!: CollectionView;
+  private _valueBidingForm !: any;
+  public override isDisabled!: boolean;
   private touched = false;
   get selectElement(): HTMLSelectElement {
     return this._selectElement;
@@ -50,18 +52,18 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   /** @desc:specified or get itemsSource to generate select option*/
   @Input() set itemsSource(value: any[]) {
     this._itemsSource = value;
+    this.collectionView = new CollectionView(value);
     this.onGenerateOptions();
-    this._isGenerated && this._isInitialized && this.onItemsSourceChanged();
-    // this._collectionView = new CollectionView(value);
+    this._isGeneratedFirstTime && this.onItemsSourceChanged();
   }
   get itemsSource(): any[] {
-    return this._itemsSource;
+    return this.collectionView.items;
   };
   /** @desc:specified or get displayMemberPath to bind text for select option*/
   @Input() set displayMemberPath(value: string) {
     this._displayMemberPath = value;
     this._displayMemberBinding = new Binding(value);
-    this._isGenerated && this._updateBindingText();
+    this._isGeneratedFirstTime && this.onGenerateOptions();
   }
   get displayMemberPath(): string {
     return this._displayMemberPath;
@@ -116,55 +118,40 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   }
   ngOnDestroy(): void {
     this.cleanEvent();//->clean all event
+    this.dispose();
   }
 
   //**Override method properties of the control class
   override refresh(fullUpdate?: boolean | undefined): void {
     super.refresh(fullUpdate);
     if (this.hostElement) {
-      !this._isGenerated && this._generateOptions();
+      this._generateOptions();
     }
   }
 
   //**method Properties of control */
   /** @desc : generate options equal amount of itemsSource*/
   private _generateOptions(): void {
+    this._isGeneratedFirstTime && this.selectElement.replaceChildren();
     const optionsEl: HTMLOptionElement[] = [];
-    from(this.itemsSource).subscribe(item => {
+    from(this.collectionView.items).subscribe(item => {
       const option: HTMLOptionElement = document.createElement("option");
-      addClass(option, 'br-listBox-item')
-      if (item.getMonth === 'function') {
+      addClass(option, 'br-listBox-item');
+      if (isDate(item)) {
         option.value = item.toString();
         option.text = item.toString();
       } else {
         option.value = this._headerBinding && this._headerBinding.getValue(item) || item;
         option.text = this._displayMemberBinding && this._displayMemberBinding.getValue(item) || item;
       }
+      this._valuesOption.push(option.value);
       optionsEl.push(option)
     }).unsubscribe();
     this.selectElement.append(...optionsEl);
-    this.selectElement.selectedIndex = this.selectedIndex; // default is selected index = 0 
-    this._updateSelected();
-    this.selectElement.disabled = this.isDisabled;
-    this._isGenerated = !0; // switch flag _isGenerated = true
-  }
-  /**
-   * @desc: support updated binding value when headerBinding changed 
-   * @deprecated : deprecated
-  */
-  private _updateBindingValue() {
-    this.deferUpdate(() => {
-      this._isGenerated = this._isInitialized && false;
-      this._isGenerated || this.selectElement.replaceChildren();
-    })
-  }
-
-  /**@desc: support updated binding value when displayMemberBinding changed */
-  private _updateBindingText() {
-    this.deferUpdate(() => {
-      this._isGenerated = this._isInitialized && false;
-      this._isGenerated || this.selectElement.replaceChildren();
-    })
+    this._valueBidingForm ? this.selectElement.value = this._valueBidingForm : this.selectElement.selectedIndex = this.selectedIndex;
+    this.selectElement.disabled = this.isDisabled || false;
+    this._isGeneratedFirstTime = !0;
+    this._isGeneratedFirstTime || this._updateSelected();
   }
 
   /**@desc: using dispatch event to update selectedIndex the first time generate options;*/
@@ -173,6 +160,14 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.selectElement.dispatchEvent(event);
   }
 
+  public indexOf(search: string, fullMatch: boolean): number {
+    return -1
+  }
+  public getDisplayText(index?: number, trimText?: boolean): string {
+    index ??= this.selectedIndex;
+    let displayText: string = this._displayMemberBinding && this._displayMemberBinding.getValue(this.collectionView.items[index]) || '';
+    return trimText ? displayText.trim() : displayText;
+  };
   //*method raise event
   /**
    * @desc: call method reset to generate options and raise event generating and generated options!
@@ -192,8 +187,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.deferUpdate(() => {
       this.itemsSourceChanged.hasHandlers && this.itemsSourceChanged.raise(this, e);
       this.itemsSourceChangedNg.emit(e);
-      this._isGenerated = this._isInitialized && false;
-      this.selectElement.replaceChildren();
     })
   }
 
@@ -224,7 +217,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   private triggerSignalsInit(): void {
     //**Emit Event support via Output*/
     this.initializedNg.emit(); //-> emit event when component is initialized
-    this._isInitialized = !0; //-> flag isInitialized = true;
   }
   //**Clean Event*/
   /**@desc: using to remove all event of component when destroy component */
@@ -236,7 +228,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.itemsSourceChangedNg.unsubscribe();
     this.selectedIndexChanged.removeAllHandlers();
     this.selectedIndexChangedNg.unsubscribe();
-    this.dispose();
   }
   //**custom form 
   public onChange = (value: any) => { return value };
@@ -247,7 +238,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     return;
   }
   public writeValue(value: any): void {
-    this.selectElement.value = value;
+    this._valueBidingForm = value;
   }
   public registerOnChange(onChange: any): void {
     this.onChange = onChange;
@@ -263,7 +254,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     }
   }
   public setDisabledState(disabled: boolean) {
-    this.selectElement.disabled = disabled;
+    this.isDisabled = disabled;
   }
   //**implemented validator */
   validate(control: AbstractControl<any, any>): ValidationErrors | null {
