@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { from, map, Observable, tap } from 'rxjs';
 import * as wjcInput from '@grapecity/wijmo.input';
-import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription } from '@grapecity/wijmo';
+import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription, Globalize } from '@grapecity/wijmo';
 import { CustomControlComponent } from 'src/app/components/custom-control/custom-control.component';
 import { SelectControlPanelComponent } from 'src/app/components/select-control-panel/select-control-panel.component';
 import { WjComboBox } from '@grapecity/wijmo.angular2.input'
+import { FormatItemEventArgs } from '@grapecity/wijmo.input';
 
 @Component({
   selector: 'app-test-base-control',
@@ -51,16 +52,17 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
       headerPath: 'id',
       displayMemberPath: 'title',
       selectedValuePath: 'brand',
-
     })
     comboBox.selectedIndexChanged.addHandler(() => {
-
     });
     comboBox.itemsSourceChanged.addHandler(() => {
       console.log('itemsSourceChanged');
-
     });
     comboBox.collectionView.sortDescriptions.push(new SortDescription('rating', true));
+    comboBox.itemsSource = [new Date(2019, 0, 1), new Date(2019, 1, 12), new Date(2019, 1, 22), new Date(2019, 4, 13), new Date(2019, 4, 24), new Date(2019, 8, 19)]
+    comboBox.formatItem.addHandler((sender: SelectControlPanelComponent, e: FormatItemEventArgs) => {
+      e.item.textContent = Globalize.format(e.data, 'd');
+    })
   }
 
   onSelectedChanged(comboBox: SelectControlPanelComponent, e?: EventArgs): void {

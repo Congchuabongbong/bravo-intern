@@ -1,4 +1,5 @@
 import { Control, EventArgs, addClass, Binding, Event as wjEven, CollectionView, isDate } from '@grapecity/wijmo';
+import { FormatItemEventArgs } from '@grapecity/wijmo.input';
 import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, OnDestroy, AfterViewInit } from '@angular/core';
 import { from } from 'rxjs';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
@@ -24,7 +25,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   //**Properties Declaration
   static controlTemplate = '<select wj-part="select"></select>';
   private _selectElement!: HTMLSelectElement;
-  private _itemsSource!: any[];
   private _displayMemberPath!: string;
   private _displayMemberBinding!: Binding;
   private _headerPath!: string;
@@ -51,7 +51,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   //**Input declaration
   /** @desc:specified or get itemsSource to generate select option*/
   @Input() set itemsSource(value: any[]) {
-    this._itemsSource = value;
     this.collectionView = new CollectionView(value);
     this.onGenerateOptions();
     this._isGeneratedFirstTime && this.onItemsSourceChanged();
@@ -96,9 +95,11 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   @Output('initialize') initializedNg = new EventEmitter<any>();
   @Output('itemsSourceChanged') itemsSourceChangedNg = new EventEmitter<any>();
   @Output('selectedIndexChanged') selectedIndexChangedNg = new EventEmitter<any>();
+  @Output('formatItem') formatItemNg = new EventEmitter<any>();
   //**Event
   public itemsSourceChanged = new wjEven<this, EventArgs>();
   public selectedIndexChanged = new wjEven<this, EventArgs>();
+  public formatItem = new wjEven<this, FormatItemEventArgs>();
   //**constructor */
   constructor(_el: ElementRef, _injector: Injector) {
     super(_el.nativeElement) //-> call parent constructor
@@ -130,28 +131,31 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   }
 
   //**method Properties of control */
-  /** @desc : generate options equal amount of itemsSource*/
+  /** @desc : generate options equal amount of itemsSource */
   private _generateOptions(): void {
     this._isGeneratedFirstTime && this.selectElement.replaceChildren();
     const optionsEl: HTMLOptionElement[] = [];
     from(this.collectionView.items).subscribe(item => {
-      const option: HTMLOptionElement = document.createElement("option");
-      addClass(option, 'br-listBox-item');
+      const optionEL: HTMLOptionElement = document.createElement("option");
+      addClass(optionEL, 'br-listBox-item');
       if (isDate(item)) {
-        option.value = item.toString();
-        option.text = item.toString();
+        optionEL.value = item.toString();
+        optionEL.text = item.toString();
       } else {
-        option.value = this._headerBinding && this._headerBinding.getValue(item) || item;
-        option.text = this._displayMemberBinding && this._displayMemberBinding.getValue(item) || item;
+        optionEL.value = this._headerBinding && this._headerBinding.getValue(item) || item;
+        optionEL.text = this._displayMemberBinding && this._displayMemberBinding.getValue(item) || item;
       }
-      this._valuesOption.push(option.value);
-      optionsEl.push(option)
+      const formatItemEventArgs = new FormatItemEventArgs(this.collectionView.items.indexOf(item), item, optionEL)
+      this.formatItem.hasHandlers && this.formatItem.raise(this, formatItemEventArgs);
+      this.formatItemNg.emit(formatItemEventArgs)
+      optionsEl.push(optionEL);
+      this._valuesOption.push(optionEL.value);
     }).unsubscribe();
     this.selectElement.append(...optionsEl);
     this._valueBidingForm ? this.selectElement.value = this._valueBidingForm : this.selectElement.selectedIndex = this.selectedIndex;
     this.selectElement.disabled = this.isDisabled || false;
-    this._isGeneratedFirstTime = !0;
     this._isGeneratedFirstTime || this._updateSelected();
+    this._isGeneratedFirstTime = !0;
   }
 
   /**@desc: using dispatch event to update selectedIndex the first time generate options;*/
@@ -159,25 +163,24 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     let event = new Event("change");
     this.selectElement.dispatchEvent(event);
   }
-
-  public indexOf(search: string, fullMatch: boolean): number {
-    return -1
-  }
+  /**
+   * @desc: Gets the string displayed in the option element (always plain text).
+   * @param: {index: The index of the item to retrieve the text for, trimText: Optionally override the value of the trimText property}
+   * @return: {string}
+  */
   public getDisplayText(index?: number, trimText?: boolean): string {
     index ??= this.selectedIndex;
-    let displayText: string = this._displayMemberBinding && this._displayMemberBinding.getValue(this.collectionView.items[index]) || '';
-    return trimText ? displayText.trim() : displayText;
+    let displayText: string = this._displayMemberBinding && this._displayMemberBinding.getValue(this.collectionView.items[index]) || this.collectionView.items[index] || '';
+    return (trimText && typeof displayText === 'string') ? displayText.trim() : displayText;
   };
   //*method raise event
   /**
    * @desc: call method reset to generate options and raise event generating and generated options!
-   * @param: {e?:EventArgs} 
    * @return: void
    * */
-  public onGenerateOptions(e?: EventArgs): void {
+  public onGenerateOptions(): void {
     this.invalidate();
   }
-
   /**
    * @desc: using to raise event when itemSource changed
    * @param: {e?:EventArgs}
@@ -228,6 +231,8 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.itemsSourceChangedNg.unsubscribe();
     this.selectedIndexChanged.removeAllHandlers();
     this.selectedIndexChangedNg.unsubscribe();
+    this.formatItem.removeAllHandlers();
+    this.formatItemNg.unsubscribe();
   }
   //**custom form 
   public onChange = (value: any) => { return value };
