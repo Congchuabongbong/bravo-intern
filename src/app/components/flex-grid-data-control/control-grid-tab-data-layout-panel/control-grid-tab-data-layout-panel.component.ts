@@ -48,7 +48,7 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
     //**next signal here */
   }
   public onDeleteRowSelected() {
-    this.actionDelete.emit()
+    this.actionDelete.emit();
   }
   public onAddNewColumn() {
     this.actionAdd.emit();

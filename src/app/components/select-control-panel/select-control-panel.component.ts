@@ -1,9 +1,7 @@
 import { Control, EventArgs, addClass, Binding, Event as wjEven, CollectionView, isDate } from '@grapecity/wijmo';
 import { FormatItemEventArgs } from '@grapecity/wijmo.input';
 import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, OnDestroy, AfterViewInit } from '@angular/core';
-import { from } from 'rxjs';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
-
 @Component({
   selector: 'BravoComboBox',
   templateUrl: './select-control-panel.component.html',
@@ -24,6 +22,8 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
 export class SelectControlPanelComponent extends Control implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor, Validator {
   //**Properties Declaration
   static controlTemplate = '<select wj-part="select"></select>';
+  public collectionView!: CollectionView;
+  public override isDisabled!: boolean;
   private _selectElement!: HTMLSelectElement;
   private _displayMemberPath!: string;
   private _displayMemberBinding!: Binding;
@@ -34,9 +34,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   private _selectedValuePath!: string;
   private _selectedValueBinding!: Binding;
   private _valuesOption: any[] = [];
-  public collectionView!: CollectionView;
   private _valueBidingForm !: any;
-  public override isDisabled!: boolean;
   private touched = false;
   get selectElement(): HTMLSelectElement {
     return this._selectElement;
@@ -90,7 +88,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   get selectedValuePath(): string {
     return this._selectedValuePath;
   }
-
   //**Output declaration
   @Output('initialize') initializedNg = new EventEmitter<any>();
   @Output('itemsSourceChanged') itemsSourceChangedNg = new EventEmitter<any>();
@@ -108,7 +105,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     })
     addClass(this.hostElement, "br-comboBox"); // -> add class for hostElement
     addClass(this.selectElement, "br-select"); // -> add class for select
-    this.selectElement.addEventListener("change", this.onSelectedChange.bind(this), false); // -> add event listener!;
+    this.addEventListener(this.selectElement, "change", this.onSelectedChange.bind(this), false); // -> add event listener!;
   }
   //**Lifecycle methods
   ngOnInit(): void {
@@ -135,7 +132,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   private _generateOptions(): void {
     this._isGeneratedFirstTime && this.selectElement.replaceChildren();
     const optionsEl: HTMLOptionElement[] = [];
-    from(this.collectionView.items).subscribe(item => {
+    this.collectionView.items.forEach(item => {
       const optionEL: HTMLOptionElement = document.createElement("option");
       addClass(optionEL, 'br-listBox-item');
       if (isDate(item)) {
@@ -150,7 +147,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
       this.formatItemNg.emit(formatItemEventArgs)
       optionsEl.push(optionEL);
       this._valuesOption.push(optionEL.value);
-    }).unsubscribe();
+    });
     this.selectElement.append(...optionsEl);
     this._valueBidingForm ? this.selectElement.value = this._valueBidingForm : this.selectElement.selectedIndex = this.selectedIndex;
     this.selectElement.disabled = this.isDisabled || false;
