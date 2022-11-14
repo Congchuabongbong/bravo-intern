@@ -42,11 +42,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      console.log(this.flex);
-      const gridPanel = new GridPanel(this.flex, CellType.Cell, this.flex.rows, this.flex.columns, this.flex.hostElement);
-      console.log(gridPanel.getCellElement(0, 2));
-    }, 5000);
+
   };
 
   ngOnDestroy(): void {
@@ -63,45 +59,45 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
       this._wijFlexGridService.generateWijColumn(flexGrid, this.wjFlexColumnConfig)
     }
     //event formatItem
-    flexGrid.formatItem.addHandler(this.onHandelFormatItem.bind(this));
+    flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
     //autoSizedColumn
-    flexGrid.autoSizedColumn.addHandler(this.onHandleAutoSizedColumn.bind(this));
+    flexGrid.autoSizedColumn.addHandler(this.onHandleAutoSizedColumn, this);
     //autoSizedRow
-    flexGrid.autoSizedRow.addHandler(this.onHandleAutoSizedRow.bind(this));
+    flexGrid.autoSizedRow.addHandler(this.onHandleAutoSizedRow, this);
     //onScrollPositionChanged
-    flexGrid.scrollPositionChanged.addHandler(this.onHandleScrollPositionChanged.bind(this));
+    flexGrid.scrollPositionChanged.addHandler(this.onHandleScrollPositionChanged, this);
     //onSelectionChanged
-    flexGrid.selectionChanged.addHandler(this.onHandleSelectionChanged.bind(this));
+    flexGrid.selectionChanged.addHandler(this.onHandleSelectionChanged, this);
     //collectionView currentChanged
-    flexGrid.collectionView.currentChanged.addHandler(this.onHandleCollectionViewCurrentChanged.bind(this))
+    flexGrid.collectionView.currentChanged.addHandler(this.onHandleCollectionViewCurrentChanged, this)
     //onSelectionChanging
-    flexGrid.selectionChanging.addHandler(this.onHandleSelectionChanging.bind(this));
+    flexGrid.selectionChanging.addHandler(this.onHandleSelectionChanging, this);
     //onHandleSortedColumn
-    flexGrid.sortedColumn.addHandler(this.onHandleSortedColumn.bind(this));
+    flexGrid.sortedColumn.addHandler(this.onHandleSortedColumn, this);
     //onHandleSortingColumn
-    flexGrid.sortingColumn.addHandler(this.onHandleSortingColumn.bind(this));
+    flexGrid.sortingColumn.addHandler(this.onHandleSortingColumn, this);
     //starSizedColumns
-    flexGrid.starSizedColumns.addHandler(this.onHandleStarSizedColumns.bind(this));
+    flexGrid.starSizedColumns.addHandler(this.onHandleStarSizedColumns, this);
     //onHandleUpdatedLayout
-    flexGrid.updatedLayout.addHandler(this.onHandleUpdatedLayout.bind(this));
+    flexGrid.updatedLayout.addHandler(this.onHandleUpdatedLayout, this);
     //onHandleUpdatingLayout
-    flexGrid.updatingLayout.addHandler(this.onHandleUpdatingLayout.bind(this));
+    flexGrid.updatingLayout.addHandler(this.onHandleUpdatingLayout, this);
     //onHandleUpdatedView
-    flexGrid.updatedView.addHandler(this.onHandleUpdatedView.bind(this));
+    flexGrid.updatedView.addHandler(this.onHandleUpdatedView, this);
     //onHandleUpdatingView
-    flexGrid.updatingView.addHandler(this.onHandleUpdatingView.bind(this));
+    flexGrid.updatingView.addHandler(this.onHandleUpdatingView, this);
     //beginningEdit
-    flexGrid.beginningEdit.addHandler(this.onHandleBeginningEdit.bind(this))
+    flexGrid.beginningEdit.addHandler(this.onHandleBeginningEdit, this)
     //onCellEditEnding
-    flexGrid.cellEditEnding.addHandler(this.onHandleCellEditEnding.bind(this));
+    flexGrid.cellEditEnding.addHandler(this.onHandleCellEditEnding, this);
     //onHandleCellEditEnded
-    flexGrid.cellEditEnded.addHandler(this.onHandleCellEditEnded.bind(this));
+    flexGrid.cellEditEnded.addHandler(this.onHandleCellEditEnded, this);
     //onHandleColumnGroupCollapsedChanged
     flexGrid.columnGroupCollapsedChanged.addHandler(this.onHandleColumnGroupCollapsedChanged);
     //onHandleCopied
-    flexGrid.copied.addHandler(this.onHandleCopied);
+    flexGrid.copied.addHandler(this.onHandleCopied, this);
     //onHandleCopying
-    flexGrid.copying.addHandler(this.onHandleCopying);
+    flexGrid.copying.addHandler(this.onHandleCopying, this);
     flexGrid.refreshed.addHandler(() => {
       console.log('refreshed');
     }, this)

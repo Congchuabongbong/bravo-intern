@@ -57,10 +57,11 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
       console.log('itemsSourceChanged');
     });
     comboBox.collectionView.sortDescriptions.push(new SortDescription('rating', true));
-    comboBox.itemsSource = [new Date(2019, 0, 1), new Date(2019, 1, 12), new Date(2019, 1, 22), new Date(2019, 4, 13), new Date(2019, 4, 24), new Date(2019, 8, 19)]
-    comboBox.formatItem.addHandler((sender: SelectControlPanelComponent, e: FormatItemEventArgs) => {
-      e.item.textContent = Globalize.format(e.data, 'M');
-    });
+    // comboBox.itemsSource = [new Date(2019, 0, 1), new Date(2019, 1, 12), new Date(2019, 1, 22), new Date(2019, 4, 13), new Date(2019, 4, 24), new Date(2019, 8, 19)]
+    // comboBox.formatItem.addHandler((sender: SelectControlPanelComponent, e: FormatItemEventArgs) => {
+    //   e.item.textContent = Globalize.format(e.data, 'M');
+    // });
+
   }
 
   onSelectedChanged(comboBox: SelectControlPanelComponent, e?: EventArgs): void {

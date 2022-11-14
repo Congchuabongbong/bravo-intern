@@ -1,7 +1,8 @@
 import { Control, EventArgs, addClass, Binding, Event as wjEven, CollectionView, isDate } from '@grapecity/wijmo';
 import { FormatItemEventArgs } from '@grapecity/wijmo.input';
-import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Injector, Input, OnInit, Output, OnDestroy, AfterViewInit, Injectable } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
+
 @Component({
   selector: 'BravoComboBox',
   templateUrl: './select-control-panel.component.html',
@@ -19,6 +20,7 @@ import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR
     }
   ]
 })
+@Injectable()
 export class SelectControlPanelComponent extends Control implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor, Validator {
   //**Properties Declaration
   static controlTemplate = '<select wj-part="select"></select>';
@@ -98,8 +100,8 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   public selectedIndexChanged = new wjEven<this, EventArgs>();
   public formatItem = new wjEven<this, FormatItemEventArgs>();
   //**constructor */
-  constructor(_el: ElementRef, _injector: Injector) {
-    super(_el.nativeElement) //-> call parent constructor
+  constructor(private _el: ElementRef, private _injector: Injector) {
+    super(_el.nativeElement, _injector) //-> call parent constructor
     this.applyTemplate('wj-control', this.getTemplate(), { //->apply template for control 
       _selectElement: 'select',
     })

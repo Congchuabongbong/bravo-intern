@@ -25,7 +25,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     this.menuList = [
       {
         title: 'Công cụ nhập liệu',
-        submenu: ['Vật tư'],
+        submenu: ['Vật tư', 'Dữ liệu', 'Select ComboBox'],
       },
     ];
   }

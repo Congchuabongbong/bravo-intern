@@ -56,7 +56,7 @@ import { SelectControlPanelComponent } from './components/select-control-panel/s
 
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule, WjGridModule, WjInputModule, WjGridFilterModule],
-  providers: [RxDbService, {
+  providers: [{
     provide: APP_INITIALIZER,
     useFactory: () => initDatabase,
     multi: true,

@@ -16,12 +16,12 @@ const routes: Routes = [
     component: ProductFormComponent,
   },
   {
-    path: 'vat-tu-data',
+    path: 'du-lieu',
     title: 'Dữ Liệu Vật Tư',
     component: ProductGridDataComponent,
   },
   {
-    path: 'test-control',
+    path: 'select-combobox',
     title: 'Tess Base Control',
     component: TestBaseControlComponent,
   }
