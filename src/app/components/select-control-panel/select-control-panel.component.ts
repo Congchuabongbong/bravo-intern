@@ -112,9 +112,11 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   //**Lifecycle methods
   ngOnInit(): void {
     this.triggerSignalsInit();
+    this.refreshed.addHandler(() => console.log('refreshed'))
   }
 
   ngAfterViewInit(): void {
+
   }
   ngOnDestroy(): void {
     this.cleanEvent();//->clean all event
@@ -178,7 +180,10 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
    * @return: void
    * */
   public onGenerateOptions(): void {
-    this.invalidate();
+    // setInterval(() => {
+    //   this.isUpdating || this.invalidate();
+    // }, 11);
+    this.isUpdating || this.invalidate()
   }
   /**
    * @desc: using to raise event when itemSource changed
@@ -189,7 +194,22 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.deferUpdate(() => {
       this.itemsSourceChanged.hasHandlers && this.itemsSourceChanged.raise(this, e);
       this.itemsSourceChangedNg.emit(e);
-    })
+    });
+  }
+
+  public endUpdateSync() {
+    this._updating--;
+    this._updating <= 0 && this.refresh();
+  }
+  public deferUpdateSync(fn: Function): void {
+    try {
+      this.beginUpdate();
+      fn();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.endUpdateSync();
+    }
   }
 
   /**

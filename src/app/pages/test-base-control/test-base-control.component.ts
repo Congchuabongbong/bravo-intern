@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { from, map, Observable, tap, AsyncSubject } from 'rxjs';
 import * as wjcInput from '@grapecity/wijmo.input';
-import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription, Globalize } from '@grapecity/wijmo';
+import { setCss, IEventHandler, EventArgs, CancelEventArgs, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription, Globalize, ArrayBase } from '@grapecity/wijmo';
 import { CustomControlComponent } from 'src/app/components/custom-control/custom-control.component';
 import { SelectControlPanelComponent } from 'src/app/components/select-control-panel/select-control-panel.component';
 import { WjComboBox } from '@grapecity/wijmo.angular2.input'
@@ -38,6 +38,8 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+
+
   }
 
   public onClick(): void {
@@ -52,15 +54,18 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
       selectedValuePath: 'brand',
     })
     comboBox.selectedIndexChanged.addHandler(() => {
+      console.log(comboBox.containsFocus());;
     });
     comboBox.itemsSourceChanged.addHandler(() => {
       console.log('itemsSourceChanged');
     });
     comboBox.collectionView.sortDescriptions.push(new SortDescription('rating', true));
-    // comboBox.itemsSource = [new Date(2019, 0, 1), new Date(2019, 1, 12), new Date(2019, 1, 22), new Date(2019, 4, 13), new Date(2019, 4, 24), new Date(2019, 8, 19)]
-    // comboBox.formatItem.addHandler((sender: SelectControlPanelComponent, e: FormatItemEventArgs) => {
-    //   e.item.textContent = Globalize.format(e.data, 'M');
-    // });
+    setTimeout(() => {
+      comboBox.itemsSource = [new Date(2019, 0, 1), new Date(2019, 1, 12), new Date(2019, 1, 22), new Date(2019, 4, 13), new Date(2019, 4, 24), new Date(2019, 8, 19)]
+      comboBox.formatItem.addHandler((sender: SelectControlPanelComponent, e: FormatItemEventArgs) => {
+        e.item.textContent = Globalize.format(e.data, 'M');
+      });
+    }, 4000);
 
   }
 
