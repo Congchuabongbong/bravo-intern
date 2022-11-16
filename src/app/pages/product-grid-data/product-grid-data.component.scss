@@ -8,3 +8,27 @@
 ::ng-deep body:has(.app-main.active) .main-content {
   width: 100vw !important;
 }
+.spinner {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  animation: spin 1s linear infinite;
+  i {
+    display: inline-block;
+    font-size: 5rem;
+  }
+}
+
+.spinner.active {
+  display: flex;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

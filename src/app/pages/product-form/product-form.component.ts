@@ -49,7 +49,7 @@ export class ProductFormComponent implements OnInit {
           this.activeTab = formTabs[0]
           this._dataService.sendDataByEventEmitter(formTabs);
         })
-      )
+      );
   }
   //**Event binding */
   public onChangeFormTab(formTab: GridLayoutFormData.IFormTab): void {
