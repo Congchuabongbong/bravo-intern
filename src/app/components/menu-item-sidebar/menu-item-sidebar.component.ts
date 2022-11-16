@@ -20,17 +20,17 @@ export class MenuItemSidebarComponent implements OnInit, AfterViewInit {
   }[];
   public btnSubMenu!: ElementRef[];
   constructor(
-    private handleStringService: HandleStringService,
-    private el: ElementRef
+    private _handleStringService: HandleStringService,
+    private _el: ElementRef
   ) { }
 
   ngOnInit(): void { }
   ngAfterViewInit(): void {
-    this.btnSubMenu = this.el.nativeElement.querySelectorAll(
+    this.btnSubMenu = this._el.nativeElement.querySelectorAll(
       '.sideNav__sub-menu--item'
     );
   }
   public convertStringToRoute(value: string): string {
-    return this.handleStringService.handleSpecialCharacter(value);
+    return this._handleStringService.handleSpecialCharacter(value);
   }
 }

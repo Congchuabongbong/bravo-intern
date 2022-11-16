@@ -61,3 +61,7 @@
     opacity: 0.5;
   }
 }
+::ng-deep .wj-flexgrid .wj-marquee,
+::ng-deep .wj-flexgrid .wj-header {
+  transition: all 0.2s;
+}

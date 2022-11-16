@@ -3,7 +3,8 @@
     <!--** main grid data **-->
     <app-control-grid-item-layout-panel [position]="wijFlexLayout.mainGridData" [overflow]="'auto hidden'">
         <wj-flex-grid #wjFlexMain [itemsSource]="dataSource" (initialized)="flexMainInitialized(wjFlexMain)"
-            [showSelectedHeaders]="'1'" [allowPinning]="'SingleColumn'" [selectionMode]="'CellRange'">
+            [showSelectedHeaders]="'1'" [allowPinning]="'SingleColumn'" [selectionMode]="'CellRange'"
+            [showMarquee]="true">
         </wj-flex-grid>
         <div style=" display:none">
             <wj-list-box #columnPicker class="column-picker" (initialized)="listBoxInitialized(columnPicker)">

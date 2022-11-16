@@ -1,0 +1,11 @@
+::ng-deep .app-custom-control {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+::ng-deep .wj-flexgrid {
+  height: 400px;
+  width: 100%;
+  border-radius: unset;
+}

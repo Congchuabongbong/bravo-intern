@@ -17,6 +17,7 @@ export class ProductGridDataComponent implements OnInit {
   }
   //**Lifecycle hooks
   ngOnInit(): void {
+
   }
 
   public flexMainInitialized(flexGrid: wjcGrid.FlexGrid) {
