@@ -51,7 +51,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   //**Input declaration
   /** @desc:specified or get itemsSource to generate select option*/
   @Input() set itemsSource(value: any[]) {
-    this.collectionView = new CollectionView(value);
+    this.collectionView = new CollectionView<any>(value);
     this.onGenerateOptions();
     this._isGeneratedFirstTime && this.onItemsSourceChanged();
   }
@@ -112,7 +112,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   //**Lifecycle methods
   ngOnInit(): void {
     this.triggerSignalsInit();
-    this.refreshed.addHandler(() => console.log('refreshed'))
+    // this.refreshed.addHandler(() => console.log('refreshed'))
   }
 
   ngAfterViewInit(): void {
@@ -155,7 +155,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.selectElement.append(...optionsEl);
     this._valueBidingForm ? this.selectElement.value = this._valueBidingForm : this.selectElement.selectedIndex = this.selectedIndex;
     this.selectElement.disabled = this.isDisabled || false;
-    this._isGeneratedFirstTime || this._updateSelected();
+    this._updateSelected();
     this._isGeneratedFirstTime = !0;
   }
 
@@ -172,7 +172,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   public getDisplayText(index?: number, trimText?: boolean): string {
     index ??= this.selectedIndex;
     let displayText: string = this._displayMemberBinding && this._displayMemberBinding.getValue(this.collectionView.items[index]) || this.collectionView.items[index] || '';
-    return (trimText && typeof displayText === 'string') ? displayText.trim() : displayText;
+    return trimText ? displayText.trim() : displayText;
   };
   //*method raise event
   /**
@@ -254,7 +254,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.formatItemNg.unsubscribe();
   }
   //**custom form 
-  public onChange = (value: any) => { return value };
+  public onChange = (value: any) => value;
   public onTouched = () => { };
   public onChangeChecked(value: any) {
     this.markAsTouched();
