@@ -191,7 +191,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
    * @return: void
    */
   public onItemsSourceChanged(e?: EventArgs): void {
-    this.deferUpdate(() => {
+    this.deferUpdateSync(() => {
       this.itemsSourceChanged.hasHandlers && this.itemsSourceChanged.raise(this, e);
       this.itemsSourceChangedNg.emit(e);
     });

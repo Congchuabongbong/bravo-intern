@@ -1,4 +1,4 @@
-<!-- <form [formGroup]="formDemo">
+<form [formGroup]="formDemo">
     <ng-container *ngIf="products$ | async as products">
         <BravoComboBox #comboBox (initialize)="initializedSelectBox(comboBox)" [itemsSource]="products.products"
             formControlName="item">
@@ -7,27 +7,3 @@
     <button (click)="onClick()">submit</button>
 </form>
 <br>
-
-<app-custom-control [itemsSource]="[1,2,3,4]"></app-custom-control> -->
-
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Age</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let item of arr.items">
-            <td>{{item.name}}</td>
-            <td>{{item.age}}</td>
-        </tr>
-    </tbody>
-    <tfoot>
-        <tr>
-            <td>Name</td>
-            <td>Age</td>
-        </tr>
-    </tfoot>
-</table>

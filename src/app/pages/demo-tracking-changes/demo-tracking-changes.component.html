@@ -1,0 +1,19 @@
+<div class="main-content" *ngIf="products$ | async as products">
+    <div class="wj-primary">
+        <wj-flex-grid #pri [itemsSource]="view" (initialized)="initializedPrimary(pri)"></wj-flex-grid>
+    </div>
+    <div class="wj-foreign">
+        <div class="wj-add">
+            <h1>Added Items:</h1>
+            <wj-flex-grid [itemsSource]="view.itemsAdded"></wj-flex-grid>
+        </div>
+        <div class="wj-edit">
+            <h1>Edited Items:</h1>
+            <wj-flex-grid [itemsSource]="view.itemsEdited"></wj-flex-grid>
+        </div>
+        <div class="wj-remove">
+            <h1>Removed Items:</h1>
+            <wj-flex-grid [itemsSource]="view.itemsRemoved"></wj-flex-grid>
+        </div>
+    </div>
+</div>

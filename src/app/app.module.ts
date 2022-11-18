@@ -29,6 +29,8 @@ import { ControlFlexContainerPanelComponent } from './components/flex-control/co
 import { ControlFlexItemPanelComponent } from './components/flex-control/control-flex-item-panel/control-flex-item-panel.component';
 import { TestBaseControlComponent } from './pages/test-base-control/test-base-control.component';
 import { SelectControlPanelComponent } from './components/select-control-panel/select-control-panel.component';
+import { DemoCollectionViewComponent } from './pages/demo-collection-view/demo-collection-view.component';
+import { DemoTrackingChangesComponent } from './pages/demo-tracking-changes/demo-tracking-changes.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -53,6 +55,8 @@ import { SelectControlPanelComponent } from './components/select-control-panel/s
     ControlFlexItemPanelComponent,
     TestBaseControlComponent,
     SelectControlPanelComponent,
+    DemoCollectionViewComponent,
+    DemoTrackingChangesComponent,
 
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule, WjGridModule, WjInputModule, WjGridFilterModule],

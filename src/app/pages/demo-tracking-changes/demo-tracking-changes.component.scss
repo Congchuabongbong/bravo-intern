@@ -1,0 +1,37 @@
+.main-content {
+  display: flex;
+  flex-flow: row nowrap;
+  height: calc(100vh - 5rem) !important;
+  width: calc(100vw - 27rem);
+  background-color: #f5f5f5;
+}
+
+.wj-primary {
+  display: flex;
+  flex: 0 1 60%;
+  overflow: scroll;
+}
+.wj-foreign {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-around;
+  flex: 0 0 30%;
+  overflow: scroll;
+
+  .wj-add {
+    flex-basis: 30%;
+    overflow: scroll;
+  }
+  .wj-edit {
+    flex-basis: 30%;
+    overflow: scroll;
+  }
+  .wj-remove {
+    flex-basis: 30%;
+    height: 30%;
+    overflow: scroll;
+  }
+}
+::ng-deep body:has(.app-main.active) .main-content {
+  width: 100vw !important;
+}

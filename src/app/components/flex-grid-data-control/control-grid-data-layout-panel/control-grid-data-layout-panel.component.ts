@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, GridPanel } from '@grapecity/wijmo.grid';
-import { showPopup, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, Control } from '@grapecity/wijmo';
+import { showPopup, IEventHandler, INotifyCollectionChanged, NotifyCollectionChangedEventArgs, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, Control, CollectionView, ICollectionView } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
@@ -17,7 +17,12 @@ import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('columnPicker', { static: true }) columnPicker!: ListBox;
   @ViewChild('wjFlexMain', { static: true }) wjFlexMain!: FlexGrid;
-  @Input() dataSource!: any[];
+  @Input() set dataSource(value: any[]) {
+
+    this.viewCollection = new CollectionView(value, {
+      trackChanges: true
+    });
+  }
   @Input() dataTabSource!: any[];
   @Input() wjFlexColumnConfig!: IWjFlexColumnConfig;
   @Input() isDrawIdOddAndEven: boolean = false;
@@ -30,8 +35,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   public selectedItems!: any[];
   public selectedItem!: any;
   public wijFlexLayout$: Observable<IWjFlexLayoutConfig> = this._httpLayoutService.wijFlexLayout$;
-
-
+  public viewCollection!: CollectionView<any>;
 
   //**constructor
   constructor(private _wijFlexGridService: WijFlexGridService, private _renderer: Renderer2, private _el: ElementRef, private _httpProductService: HttpProductService, private _httpLayoutService: HttpLayoutService, private _ref: ChangeDetectorRef) {
@@ -51,6 +55,8 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   }
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
+    flexGrid.allowAddNew = true;
+    flexGrid.allowAddNew = true;
     this.flex = flexGrid;
     new EditHighlighter(flexGrid, 'cell-changed');
     this.wijFlexMainInitialized.emit(flexGrid);
@@ -58,6 +64,8 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     if (this.wjFlexColumnConfig) {
       this._wijFlexGridService.generateWijColumn(flexGrid, this.wjFlexColumnConfig)
     }
+
+
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
     //autoSizedColumn
@@ -99,10 +107,10 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     //onHandleCopying
     flexGrid.copying.addHandler(this.onHandleCopying, this);
     flexGrid.refreshed.addHandler(() => {
-      console.log('refreshed');
+
     }, this)
     flexGrid.refreshing.addHandler(() => {
-      console.log(flexGrid.isUpdating);
+
     })
     this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
     this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id as number); //next signal selected
@@ -114,7 +122,9 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
         flexGrid.editableCollectionView.remove(flexGrid.collectionView.currentItem);
       }
     })
-    console.log('s');
+    flexGrid.collectionView.collectionChanged.addHandler((sender, e) => {
+      this.viewCollection.itemsRemoved.forEach(item => console.log(item))
+    })
   }
 
   //**flex Tab Initialized*/
@@ -170,7 +180,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   }
   //**Auto Sized Column and Row*/
   private onHandleAutoSizedColumn(flex: FlexGrid, event: CellRangeEventArgs): void {
-    console.log('trigger when column auto size changed!');
+    // console.log('trigger when column auto size changed!');
     /**
       @cellRangeEventArgs 
       @method : getColumn(), getRow()
@@ -178,7 +188,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     */
   }
   private onHandleAutoSizedRow(flex: FlexGrid, event: CellRangeEventArgs): void {
-    console.log('trigger when row auto size changed!');
+    // console.log('trigger when row auto size changed!');
     // console.log(cellRangeEventArgs.getRow().dataItem);
   }
   //**scroll position Changed*/
@@ -215,14 +225,14 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     @trigger : Occurs after the user applies a sort by clicking on a column header.
      */
     // console.log(event.getColumn());
-    console.log('trigger when column sorted!');
+    // console.log('trigger when column sorted!');
   }
   private onHandleSortingColumn(flex: FlexGrid, event: CellRangeEventArgs): void {
     /**
     @trigger : Occurs before the user applies a sort by clicking on a column header.
      */
     // console.log(event.getColumn());
-    console.log('trigger when column sorting!');
+    // console.log('trigger when column sorting!');
     if (event.getColumn().binding == 'Id') event.cancel = true;
   }
   //**onStarSizedColumns
@@ -285,14 +295,15 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
       event.stayInEditMode = event.cancel; //-> remain in edit mode 
       return event.cancel;
     }
-    console.log('Trigger when Edit ending!');
+    // console.log('Trigger when Edit ending!');
     return true;
   }
   private onHandleCellEditEnded(flex: FlexGrid, event: CellRangeEventArgs) {
     /**
     @trigger : Occurs when a cell edit has been committed or canceled.
    */
-    console.log('Trigger when Edit ended!');
+    // console.log('Trigger when Edit ended!');
+
   }
   // **column Group Collapsed Changed
   private onHandleColumnGroupCollapsedChanged(flex: FlexGrid, event: CellRangeEventArgs): void {
@@ -303,14 +314,14 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     /**
     @trigger : Occurs after the user has copied the selection content.
     */
-    console.log('trigger when copied!');
+    // console.log('trigger when copied!');
   }
   private onHandleCopying(flex: FlexGrid, event: CellRangeEventArgs): void {
     /**
     @trigger : Occurs after the user has copied the selection content.
     */
     event.cancel = true; // cancel event
-    console.log('trigger when copying!');
+    // console.log('trigger when copying!');
   }
   //**Handle action here
   public onAddNewColumn(): void {

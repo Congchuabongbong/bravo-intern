@@ -4,6 +4,7 @@ import { IWjFlexColumnConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 import { Observable } from 'rxjs';
 import * as wjcGrid from '@grapecity/wijmo.grid';
+import { CollectionView } from '@grapecity/wijmo'
 @Component({
   selector: 'app-product-grid-data',
   templateUrl: './product-grid-data.component.html',
@@ -30,4 +31,5 @@ export class ProductGridDataComponent implements OnInit {
   public flexTabInitialized(flexGrid: wjcGrid.FlexGrid) {
     flexGrid.headersVisibility = wjcGrid.HeadersVisibility.Column; // -> headers visibility
   }
+
 }
