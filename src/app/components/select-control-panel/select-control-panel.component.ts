@@ -35,7 +35,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   private _selectedIndex!: number;
   private _selectedValuePath!: string;
   private _selectedValueBinding!: Binding;
-  private _valuesOption: any[] = [];
   private _valueBidingForm !: any;
   private touched = false;
   get selectElement(): HTMLSelectElement {
@@ -150,7 +149,6 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
       this.formatItem.hasHandlers && this.formatItem.raise(this, formatItemEventArgs);
       this.formatItemNg.emit(formatItemEventArgs)
       optionsEl.push(optionEL);
-      this._valuesOption.push(optionEL.value);
     });
     this.selectElement.append(...optionsEl);
     this._valueBidingForm ? this.selectElement.value = this._valueBidingForm : this.selectElement.selectedIndex = this.selectedIndex;

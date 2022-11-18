@@ -6,6 +6,7 @@
             <option value="3">less than 100</option>
             <option value="4">All</option>
         </select>
+        <button (click)="onHandleAddNewItem()">Add New Product</button>
     </div>
     <table>
         <thead>
@@ -26,9 +27,9 @@
                     </td>
                 </tr>
                 <tr *ngFor="let item of item.products ;let i = index">
-                    <td style=" text-align: center;"> {{i + 1}}</td>
+                    <td style=" text-align: center;"> {{item.id}}</td>
                     <td style=" text-align: center;"> {{item.title}}</td>
-                    <td style=" text-align: center;"> {{item.price | currency}}</td>
+                    <td style=" text-align: center;"> {{item.price}}</td>
                     <td style=" text-align: center;"> <i class="fa-solid fa-star"></i>{{item.rating}}</td>
                     <td style=" text-align: center;"> <img src="{{item.thumbnail}}" alt=""></td>
                 </tr>
