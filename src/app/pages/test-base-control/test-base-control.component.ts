@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { map, Observable, tap, AsyncSubject, switchMap, of, Subject, combineLatest, startWith } from 'rxjs';
 import * as wjcInput from '@grapecity/wijmo.input';
-import { setCss, PropertyGroupDescription, IPredicate, IGetError, IEventHandler, EventArgs, CancelEventArgs, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription, Globalize, ArrayBase, CollectionView } from '@grapecity/wijmo';
+import { setCss, PropertyGroupDescription, IPredicate, IGetError, IEventHandler, EventArgs, CancelEventArgs, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription, Globalize, ArrayBase, CollectionView, Control } from '@grapecity/wijmo';
 import { CustomControlComponent } from 'src/app/components/custom-control/custom-control.component';
 import { SelectControlPanelComponent } from 'src/app/components/select-control-panel/select-control-panel.component';
 import { WjComboBox } from '@grapecity/wijmo.angular2.input'
@@ -66,7 +66,7 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
       selectedValuePath: 'brand',
     })
     comboBox.selectedIndexChanged.addHandler(() => {
-
+      console.log(Control.getControl('#comboBox'));
     });
     comboBox.itemsSourceChanged.addHandler(() => {
 

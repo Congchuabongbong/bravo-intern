@@ -11,44 +11,42 @@ import { setCss, PropertyGroupDescription, IPredicate, IGetError, IEventHandler,
 })
 export class DemoCollectionViewComponent implements OnInit, OnDestroy {
   private selectedSubject = new Subject<number>();
-  private addNewSubject = new Subject<any>();
-  public addNewAction$ = this.addNewSubject.asObservable();
   private notifierCompleted = new Subject();
-  public selectedAction = this.selectedSubject.asObservable().pipe(takeUntil(this.notifierCompleted), tap((selectNumber) => {
-    console.log(selectNumber);
-    this.arr.filter = (item: any) => {
-      switch (selectNumber) {
-        case 1:
-          return item.price > 1000;
-        case 2:
-          return (item.price < 1000) && (item.price > 500);
-        case 3:
-          return item.price < 100;
-        default:
-          return item;
-      }
-    }
-  }));
+  public selectedAction$ = this.selectedSubject.asObservable().pipe(takeUntil(this.notifierCompleted), startWith(0));
   public products$ = this._http.get<any>('https://dummyjson.com/products').pipe(takeUntil(this.notifierCompleted), tap(({ products }) => {
     this.arr = new CollectionView(products, {
       trackChanges: true,
       canAddNew: true,
       canCancelEdit: true,
-      pageSize: 4,
+      pageSize: 0,
       newItemCreator: () => ({}),
       //... config here....
     });
     this.arr.groupDescriptions.clear();
     this.arr.groupDescriptions.push(new PropertyGroupDescription('rating', (item) => { // add group
       if (item.price > 1000) return 'High';
-      if (item.price > 500 && item.age < 1000) return 'Medium';
+      else if (item.price > 500 || item.age < 1000) return 'Medium';
       return 'Low';
     }))
     this.arr.sortDescriptions.push(new SortDescription('price', false));
   }));
-  public productWithSelectedAction$ = combineLatest([this.products$, this.selectedAction.pipe(startWith(1)), this.addNewAction$.pipe(startWith(null))]).pipe(takeUntil(this.notifierCompleted),
-    map(([{ products }, selectNumber, itemNew]) => {
-      this.arr.moveToNextPage();
+  public productWithSelectedAction$ = combineLatest([this.products$, this.selectedAction$]).pipe(takeUntil(this.notifierCompleted),
+    map(([{ products }, selectNumber]) => {
+      console.log(selectNumber);
+      this.arr.filter = (item: any) => {
+        switch (selectNumber) {
+          case 0:
+            return item;
+          case 1:
+            return item.price > 1000;
+          case 2:
+            return ((item.price < 1000) && (item.price > 500));
+          case 3:
+            return item.price < 500;
+          default:
+            return item;
+        }
+      }
       return this.arr;
     }),
     map(({ groups, ...rest }) => {
@@ -72,6 +70,7 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
+
   }
   ngOnDestroy(): void {
     this.stopObs();
@@ -81,7 +80,11 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
   };
 
   public onHandleAddNewItem(): void {
-    this.addNewSubject.next(null);
+    this.arr.addNew({ id: 1, title: 'something', price: 2000 }, true);
+  }
+  public printDirect() {
+    window.print();
+
   }
 
 }
