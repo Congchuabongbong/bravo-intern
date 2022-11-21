@@ -1,6 +1,6 @@
 .main-content {
-  height: calc(100vh - 5rem) !important;
-  width: calc(100vw - 27rem);
+  max-height: calc(100vh - 5rem) !important;
+  max-width: calc(100vw - 27rem);
   background-color: #f5f5f5;
   overflow: scroll;
 }
@@ -23,12 +23,45 @@ td img {
   height: 10rem;
 }
 
-td {
-}
-
 tr:nth-child(even) {
   background-color: #dddddd;
 }
 ::ng-deep body:has(.app-main.active) .main-content {
   width: 100vw !important;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+.container-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 5rem) !important;
+  width: calc(100vw - 27rem);
+  overflow: hidden;
+}
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

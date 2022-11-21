@@ -55,8 +55,16 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   }
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
+    //properties: 
+    let activeCell = flexGrid.activeCell;
+    // flexGrid.allowDragging = 3;
+    flexGrid.allowSorting = 2;
     flexGrid.allowAddNew = true;
-    flexGrid.allowAddNew = true;
+    flexGrid.alternatingRowStep = 1;
+    flexGrid.anchorCursor = true;
+    flexGrid.bigCheckboxes = true;
+    flexGrid.autoScroll = true
+    // const gridPanel = new GridPanel(flexGrid, flexGrid.cells.cellType, flexGrid.rows, flexGrid.columns,) )
     this.flex = flexGrid;
     new EditHighlighter(flexGrid, 'cell-changed');
     this.wijFlexMainInitialized.emit(flexGrid);
@@ -64,8 +72,6 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     if (this.wjFlexColumnConfig) {
       this._wijFlexGridService.generateWijColumn(flexGrid, this.wjFlexColumnConfig)
     }
-
-
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
     //autoSizedColumn
@@ -200,11 +206,14 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     /** 
     @trigger : Occurs after selection changes.
     */
+    flex.cellFactory.updateCell(event.panel, event.row, event.col, event.panel.getCellElement(event.row, event.col), undefined, true);
+
   }
   private onHandleCollectionViewCurrentChanged(): void {
     this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id);
     // this.selectedItems = this.flex.selectedItems;  get selected items
     this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
+
   }
   public onDeleteRowSelected(): void {
     this.flex && this.flex.deferUpdate(() => {
@@ -280,7 +289,10 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   private onHandleBeginningEdit(flex: FlexGrid, event: CellRangeEventArgs): void {
     /**
     @trigger : Occurs before a cell enters edit mode; The event handler may cancel the edit operation.
+    
    */
+    let activeEditor = this.flex.activeEditor;
+    console.log(activeEditor);
   }
   //**cell Edit Ending and ended:
   private onHandleCellEditEnding(flex: FlexGrid, event: CellEditEndingEventArgs): boolean {

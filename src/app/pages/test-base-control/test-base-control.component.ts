@@ -61,28 +61,27 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
     const e: CancelEventArgs = new CancelEventArgs();
     this.comboSelect = comboBox;
     comboBox.initialize({
-      headerPath: 'id',
-      displayMemberPath: 'title',
+      headerPath: 'title',
       selectedValuePath: 'brand',
     })
     comboBox.selectedIndexChanged.addHandler(() => {
-      console.log(Control.getControl('#comboBox'));
+      console.log(comboBox.selectedValue);;
     });
     comboBox.itemsSourceChanged.addHandler(() => {
 
     });
     comboBox.collectionView.sortDescriptions.push(new SortDescription('rating', true));
 
-    comboBox.itemsSource = [new Date(2019, 0, 1), new Date(2019, 1, 12), new Date(2019, 1, 22), new Date(2019, 4, 13), new Date(2019, 4, 24), new Date(2019, 8, 19)]
-    comboBox.formatItem.addHandler((sender: SelectControlPanelComponent, e: FormatItemEventArgs) => {
-      e.item.textContent = Globalize.format(e.data, 'dd-MM-yyyy', true)
-    });
+    // comboBox.itemsSource = [new Date(2019, 0, 1), new Date(2019, 1, 12), new Date(2019, 1, 22), new Date(2019, 4, 13), new Date(2019, 4, 24), new Date(2019, 8, 19)]
+    // comboBox.formatItem.addHandler((sender: SelectControlPanelComponent, e: FormatItemEventArgs) => {
+    //   e.item.textContent = Globalize.format(e.data, 'dd-MM-yyyy', true)
+    // });
 
 
   }
 
   onChanged(value: string): void {
-    this.comboSelect.displayMemberPath = value;
+    // this.comboSelect.displayMemberPath = value;
   }
 
 

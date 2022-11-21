@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { map, Observable, tap, AsyncSubject, switchMap, of, Subject, combineLatest, startWith, takeUntil, interval, takeWhile, filter, merge } from 'rxjs';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ElementRef } from '@angular/core';
+import { map, Observable, tap, AsyncSubject, switchMap, of, Subject, combineLatest, startWith, takeUntil, interval, takeWhile, filter, merge, finalize, delay } from 'rxjs';
 import * as wjcInput from '@grapecity/wijmo.input';
-import { setCss, PropertyGroupDescription, IPredicate, IGetError, IEventHandler, NotifyCollectionChangedEventArgs, EventArgs, CancelEventArgs, ObservableArray, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription, Globalize, ArrayBase, CollectionView } from '@grapecity/wijmo';
+import { setCss, assert, closest, closestClass, clamp, PropertyGroupDescription, IPredicate, IGetError, IEventHandler, NotifyCollectionChangedEventArgs, EventArgs, CancelEventArgs, ObservableArray, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription, Globalize, ArrayBase, CollectionView } from '@grapecity/wijmo';
 @Component({
   selector: 'app-demo-collection-view',
   templateUrl: './demo-collection-view.component.html',
@@ -12,14 +12,15 @@ import { setCss, PropertyGroupDescription, IPredicate, IGetError, IEventHandler,
 export class DemoCollectionViewComponent implements OnInit, OnDestroy {
   private selectedSubject = new Subject<number>();
   private notifierCompleted = new Subject();
-  public selectedAction$ = this.selectedSubject.asObservable().pipe(takeUntil(this.notifierCompleted), startWith(0));
+  public isLoading: boolean = true;
+  public selectedAction$ = this.selectedSubject.asObservable().pipe(takeUntil(this.notifierCompleted), startWith(0), tap(() => this.isLoading = true));
   public products$ = this._http.get<any>('https://dummyjson.com/products').pipe(takeUntil(this.notifierCompleted), tap(({ products }) => {
     this.arr = new CollectionView(products, {
       trackChanges: true,
       canAddNew: true,
       canCancelEdit: true,
       pageSize: 0,
-      newItemCreator: () => ({}),
+      newItemCreator: (): any => ({}),
       //... config here....
     });
     this.arr.groupDescriptions.clear();
@@ -31,8 +32,8 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
     this.arr.sortDescriptions.push(new SortDescription('price', false));
   }));
   public productWithSelectedAction$ = combineLatest([this.products$, this.selectedAction$]).pipe(takeUntil(this.notifierCompleted),
-    map(([{ products }, selectNumber]) => {
-      console.log(selectNumber);
+    delay(2000)
+    , map(([{ products }, selectNumber]) => {
       this.arr.filter = (item: any) => {
         switch (selectNumber) {
           case 0:
@@ -57,7 +58,8 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
         }
       })
       return productsByGrp
-    })
+    }),
+    tap(() => this.isLoading = false)
   )
 
   private stopObs() {
@@ -66,11 +68,12 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
   }
 
   public arr!: CollectionView;
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient, private _el: ElementRef) { }
 
 
   ngOnInit(): void {
-
+    console.log(clamp(-1, 0, 3));
+    // assert(false, 'something is wrong')
   }
   ngOnDestroy(): void {
     this.stopObs();

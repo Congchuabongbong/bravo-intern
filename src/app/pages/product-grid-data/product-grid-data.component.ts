@@ -22,10 +22,10 @@ export class ProductGridDataComponent implements OnInit {
   }
 
   public flexMainInitialized(flexGrid: wjcGrid.FlexGrid) {
-    flexGrid.allowDragging = wjcGrid.AllowDragging.Both; //-> allow dragging
-    flexGrid.allowResizing = wjcGrid.AllowResizing.Both; // -> allow resizing
+    // flexGrid.allowDragging = wjcGrid.AllowDragging.Both; //-> allow dragging
+    // flexGrid.allowResizing = wjcGrid.AllowResizing.Both; // -> allow resizing
     // flexGrid.headersVisibility = wjcGrid.HeadersVisibility.Column; // -> headers visibility
-    flexGrid.allowMerging = 1; // ->allow merging
+    // flexGrid.allowMerging = 1; // ->allow merging
   }
 
   public flexTabInitialized(flexGrid: wjcGrid.FlexGrid) {

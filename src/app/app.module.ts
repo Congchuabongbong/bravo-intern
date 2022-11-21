@@ -31,6 +31,7 @@ import { TestBaseControlComponent } from './pages/test-base-control/test-base-co
 import { SelectControlPanelComponent } from './components/select-control-panel/select-control-panel.component';
 import { DemoCollectionViewComponent } from './pages/demo-collection-view/demo-collection-view.component';
 import { DemoTrackingChangesComponent } from './pages/demo-tracking-changes/demo-tracking-changes.component';
+import { CustomPipePipe } from './shared/pipes/custom-pipe.pipe';
 @NgModule({
   declarations: [
     AppComponent,
@@ -57,6 +58,7 @@ import { DemoTrackingChangesComponent } from './pages/demo-tracking-changes/demo
     SelectControlPanelComponent,
     DemoCollectionViewComponent,
     DemoTrackingChangesComponent,
+    CustomPipePipe,
 
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule, WjGridModule, WjInputModule, WjGridFilterModule],
