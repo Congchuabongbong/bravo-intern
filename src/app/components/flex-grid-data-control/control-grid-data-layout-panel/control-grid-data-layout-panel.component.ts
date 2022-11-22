@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
-import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, GridPanel } from '@grapecity/wijmo.grid';
-import { showPopup, IEventHandler, INotifyCollectionChanged, NotifyCollectionChangedEventArgs, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, Control, CollectionView, ICollectionView } from '@grapecity/wijmo';
+import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, GridPanel, Row } from '@grapecity/wijmo.grid';
+import { showPopup, Point, Globalize, IEventHandler, INotifyCollectionChanged, NotifyCollectionChangedEventArgs, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, Control, CollectionView, ICollectionView } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
@@ -8,6 +8,7 @@ import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter.util';
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
 import { Observable } from 'rxjs';
 import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
+import { RouterLinkWithHref } from '@angular/router';
 
 @Component({
   selector: 'app-control-grid-data-layout-panel',
@@ -56,16 +57,35 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     //properties: 
-    let activeCell = flexGrid.activeCell;
-    // flexGrid.allowDragging = 3;
+
+    flexGrid.allowDragging = 3;
     flexGrid.allowSorting = 2;
-    flexGrid.allowAddNew = true;
+    // flexGrid.allowAddNew = true;
+    // flexGrid.isReadOnly = false;
     flexGrid.alternatingRowStep = 1;
     flexGrid.anchorCursor = true;
     flexGrid.bigCheckboxes = true;
-    flexGrid.autoScroll = true
-    // const gridPanel = new GridPanel(flexGrid, flexGrid.cells.cellType, flexGrid.rows, flexGrid.columns,) )
+    flexGrid.autoScroll = true;
+    flexGrid.keyActionTab = 4;
+    flexGrid.showErrors = true;
+    const hostElement: HTMLElement = flexGrid.hostElement;
+    // flexGrid.lazyRender = true;
+    flexGrid.showSelectedHeaders = 3
+    this.viewCollection.newItemCreator = (): { Id: number } => {
+      return { Id: 123123 }
+    }
+    flexGrid.rows.insert(0, new Row(this.viewCollection.newItemCreator()));
+
+
+
+    // flexGrid.itemValidator = (row: number, col: number, parsing?: boolean) => {
+    //   // console.log(parsing);
+    //   let item = flexGrid.rows[row].dataItem, prop = flexGrid.columns[col].binding;
+    //   if (prop == 'Id' && item.Id < 5000) return 'Id < 5000!'
+    //   return null;
+    // }
     this.flex = flexGrid;
+
     new EditHighlighter(flexGrid, 'cell-changed');
     this.wijFlexMainInitialized.emit(flexGrid);
     //generate specify columns */
@@ -129,7 +149,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
       }
     })
     flexGrid.collectionView.collectionChanged.addHandler((sender, e) => {
-      this.viewCollection.itemsRemoved.forEach(item => console.log(item))
+      this.viewCollection.itemsAdded.forEach(item => console.log(item))
     })
   }
 
@@ -162,13 +182,11 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
         }
       });
     }
-
   }
 
   //?Handling Event for main flex data here
   //**event format item */
   private onHandelFormatItem(flex: FlexGrid, event: FormatItemEventArgs): void {
-
     //add icon setting on top-left cell
     if (event.panel == flex.topLeftCells && this.isColumPicker) {
       event.cell.innerHTML = '<i class="column-picker fa-solid fa-gear"></i>';
@@ -206,14 +224,13 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     /** 
     @trigger : Occurs after selection changes.
     */
-    flex.cellFactory.updateCell(event.panel, event.row, event.col, event.panel.getCellElement(event.row, event.col), undefined, true);
 
   }
   private onHandleCollectionViewCurrentChanged(): void {
-    this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id);
+    this.flex.collectionView.currentItem?.Id && this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id);
     // this.selectedItems = this.flex.selectedItems;  get selected items
     this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
-
+    console.log(this.flex.collectionView.currentItem);
   }
   public onDeleteRowSelected(): void {
     this.flex && this.flex.deferUpdate(() => {
@@ -291,8 +308,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     @trigger : Occurs before a cell enters edit mode; The event handler may cancel the edit operation.
     
    */
-    let activeEditor = this.flex.activeEditor;
-    console.log(activeEditor);
+
   }
   //**cell Edit Ending and ended:
   private onHandleCellEditEnding(flex: FlexGrid, event: CellEditEndingEventArgs): boolean {

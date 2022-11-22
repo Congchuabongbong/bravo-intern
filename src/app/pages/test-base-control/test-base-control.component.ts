@@ -65,7 +65,7 @@ export class TestBaseControlComponent implements OnInit, AfterViewInit {
       selectedValuePath: 'brand',
     })
     comboBox.selectedIndexChanged.addHandler(() => {
-      console.log(comboBox.selectedValue);;
+      console.log(comboBox.selectedValue);
     });
     comboBox.itemsSourceChanged.addHandler(() => {
 
