@@ -1,14 +1,16 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FlexGrid, FormatItemEventArgs, CellType, CellRangeEventArgs, CellEditEndingEventArgs, GridPanel, Row } from '@grapecity/wijmo.grid';
-import { showPopup, Point, Globalize, IEventHandler, INotifyCollectionChanged, NotifyCollectionChangedEventArgs, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, Control, CollectionView, ICollectionView } from '@grapecity/wijmo';
+import { showPopup, Point, Globalize, IEventHandler, INotifyCollectionChanged, NotifyCollectionChangedEventArgs, hidePopup, hasClass, PopupPosition, EventArgs, CancelEventArgs, addClass, Control, CollectionView, ICollectionView, tryCast } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import { IWjFlexColumnConfig, IWjFlexLayoutConfig } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter.util';
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
-import { Observable } from 'rxjs';
+import { Observable, repeatWhen } from 'rxjs';
 import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 import { RouterLinkWithHref } from '@angular/router';
+import * as Excel from 'exceljs';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-control-grid-data-layout-panel',
@@ -56,8 +58,8 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   }
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
+    this.flex = flexGrid;
     //properties: 
-
     flexGrid.allowDragging = 3;
     flexGrid.allowSorting = 2;
     // flexGrid.allowAddNew = true;
@@ -84,7 +86,7 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     //   if (prop == 'Id' && item.Id < 5000) return 'Id < 5000!'
     //   return null;
     // }
-    this.flex = flexGrid;
+
 
     new EditHighlighter(flexGrid, 'cell-changed');
     this.wijFlexMainInitialized.emit(flexGrid);
@@ -224,7 +226,6 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     /** 
     @trigger : Occurs after selection changes.
     */
-
   }
   private onHandleCollectionViewCurrentChanged(): void {
     this.flex.collectionView.currentItem?.Id && this._httpProductService.selectedProductChange(this.flex.collectionView.currentItem.Id);
@@ -355,10 +356,60 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
   public onAddNewColumn(): void {
 
   }
+  public async onActionExportExcel(): Promise<void> {
+    // this.flex.columns.forEach(col => {
+    //   console.log(col.width);
+    // })
+    const workBook = new Excel.Workbook();
+    const workSheet = workBook.addWorksheet('My sheet');
+    const header = this.flex.hostElement.querySelector(".wj-header");
+
+    try {
+      const headerComputedStyle = getComputedStyle(header as HTMLElement);
+      console.log(headerComputedStyle.getPropertyValue('color'));
+      const cols: any[] = this.flex.columns.map(col => ({
+        header: col.header || col.binding,
+        key: col.binding,
+        width: col.width / 10,
+        style: {
+          font: {
+            bold: headerComputedStyle.getPropertyValue('fontWeight') === 'bold',
+            size: headerComputedStyle.getPropertyValue('font-size').match(/\d+/),
+            color: {
+              argb: this.rgba2hex('rgba(34, 163, 159,0.5)')
+            },
+            family: this.convertFontFamilyExcel(headerComputedStyle.getPropertyValue('font-family')),
+          },
+        }
+      }));
+      console.log(cols);
+      workSheet.columns = cols;
+    } catch (error) {
+      console.log(error);
+    }
+    workSheet.getRow(1).height = 33;
+
+
+    const buf = await workBook.xlsx.writeBuffer();
+    FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
+  }
+
+
+
+  convertFontFamilyExcel(fontFamily: string): number {
+    const fonts = fontFamily.split(',').map(value => value.trim());
+    if (fonts.includes('serif')) return 1;
+    if (fonts.includes('sans-serif')) return 2;
+    if (fonts.includes('mono')) return 3;
+    return 0;
+  }
+
+  rgba2hex = (rgba: any) => `${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n: any, i: any) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+
 }
 
 
-function addStyle() {
-  throw new Error('Function not implemented.');
-}
+
+
+
 

@@ -1,44 +1,46 @@
-<div class="main-content" *ngIf="productWithSelectedAction$ | async as productsGr">
-    <ng-container *ngIf="!isLoading">
-        <div>
-            <select (change)="selectChangeHandler($event)">
-                <option value="0">All</option>
-                <option value="1">High</option>
-                <option value="2">Medium</option>
-                <option value="3">Low</option>
-            </select>
-            <!-- <button (click)="onHandleAddNewItem()">Add New Product</button> -->
-            <button (click)="printDirect()">Print Direct</button>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Rate</th>
-                    <th>Image</th>
-                </tr>
-            </thead>
-            <tbody>
-                <ng-container *ngFor="let item of productsGr">
+<div class="main-content">
+    <div>
+        <select (change)="selectChangeHandler($event)">
+            <option value="0">All</option>
+            <option value="1">High</option>
+            <option value="2">Medium</option>
+            <option value="3">Low</option>
+        </select>
+        <!-- <button (click)="onHandleAddNewItem()">Add New Product</button> -->
+        <button (click)="printDirect()">Print Direct</button>
+    </div>
+    <ng-container *ngIf="productWithSelectedAction$ | async as productsGr">
+        <ng-container *ngIf="!isLoading">
+            <table>
+                <thead>
                     <tr>
-                        <td colspan="5"
-                            style="background-color: red;text-align:center;vertical-align: middle; line-height: 20px;">
-                            {{item.name}}: {{item.products.length}} products
-                        </td>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Rate</th>
+                        <th>Image</th>
                     </tr>
-                    <tr *ngFor="let item of item.products ;let i = index">
-                        <td style=" text-align: center;"> {{item.id}}</td>
-                        <td style=" text-align: center;"> {{item.title}}</td>
-                        <td style=" text-align: center;"> {{item.price}}</td>
-                        <td style=" text-align: center;"> <i class="fa-solid fa-star"></i>{{item.rating}}</td>
-                        <td style=" text-align: center;"> <img src="{{item.thumbnail}}" alt=""></td>
-                    </tr>
-                </ng-container>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let item of productsGr">
+                        <tr>
+                            <td colspan="5"
+                                style="background-color: red;text-align:center;vertical-align: middle; line-height: 20px;">
+                                {{item.name}}: {{item.products.length}} products
+                            </td>
+                        </tr>
+                        <tr *ngFor="let item of item.products ;let i = index">
+                            <td style=" text-align: center;"> {{item.id}}</td>
+                            <td style=" text-align: center;"> {{item.title}}</td>
+                            <td style=" text-align: center;"> {{item.price}}</td>
+                            <td style=" text-align: center;"> <i class="fa-solid fa-star"></i>{{item.rating}}</td>
+                            <td style=" text-align: center;"> <img src="{{item.thumbnail}}" alt=""></td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
 
+        </ng-container>
     </ng-container>
 
 </div>

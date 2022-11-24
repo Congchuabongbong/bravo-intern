@@ -1,8 +1,13 @@
+import { Worksheet } from 'exceljs';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ElementRef } from '@angular/core';
-import { map, Observable, tap, AsyncSubject, switchMap, of, Subject, combineLatest, startWith, takeUntil, interval, takeWhile, filter, merge, finalize, delay } from 'rxjs';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ElementRef, createPlatform } from '@angular/core';
+import { map, Observable, tap, AsyncSubject, switchMap, of, Subject, combineLatest, startWith, takeUntil, interval, takeWhile, filter, merge, finalize, delay, throwError, from, scan, takeLast } from 'rxjs';
 import * as wjcInput from '@grapecity/wijmo.input';
 import { setCss, assert, closest, closestClass, clamp, PropertyGroupDescription, IPredicate, IGetError, IEventHandler, NotifyCollectionChangedEventArgs, EventArgs, CancelEventArgs, ObservableArray, Event, Binding, asFunction, createElement, tryCast, isNullOrWhiteSpace, SortDescription, Globalize, ArrayBase, CollectionView } from '@grapecity/wijmo';
+import * as Excel from 'exceljs';
+import * as FileSaver from 'file-saver';
+
+
 @Component({
   selector: 'app-demo-collection-view',
   templateUrl: './demo-collection-view.component.html',
@@ -32,7 +37,7 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
     this.arr.sortDescriptions.push(new SortDescription('price', false));
   }));
   public productWithSelectedAction$ = combineLatest([this.products$, this.selectedAction$]).pipe(takeUntil(this.notifierCompleted),
-    delay(2000)
+    delay(0)
     , map(([{ products }, selectNumber]) => {
       this.arr.filter = (item: any) => {
         switch (selectNumber) {
@@ -51,13 +56,13 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
       return this.arr;
     }),
     map(({ groups, ...rest }) => {
-      let productsByGrp = groups.map(gr => {
+      this.dataVw = groups.map(gr => {
         return {
           name: gr.name,
-          products: gr.items
+          products: gr.items.map(item => ({ id: item.id, title: item.title, price: item.price, rating: item.price, thumbnail: item.thumbnail }))
         }
       })
-      return productsByGrp
+      return this.dataVw;
     }),
     tap(() => this.isLoading = false)
   )
@@ -68,12 +73,17 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
   }
 
   public arr!: CollectionView;
+  public dataVw!: any[];
+
+  //**WorkBook and WorkSheet declaration here */
+  public workBook: Excel.Workbook = new Excel.Workbook();
+  public workSheet!: Excel.Worksheet;
+
+  //**constructor */
   constructor(private _http: HttpClient, private _el: ElementRef) { }
 
 
   ngOnInit(): void {
-    console.log(clamp(-1, 0, 3));
-    // assert(false, 'something is wrong')
   }
   ngOnDestroy(): void {
     this.stopObs();
@@ -85,9 +95,75 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
   public onHandleAddNewItem(): void {
     this.arr.addNew({ id: 1, title: 'something', price: 2000 }, true);
   }
-  public printDirect() {
-    window.print();
 
+
+  public generateHeader(colKey: any[], colHeader?: any[]): Partial<Excel.Column>[] {
+    let headers = colKey.map((key, index) => {
+      return {
+        header: colHeader && colHeader[index] || key,
+        key: key
+      }
+    })
+    return headers;
+  }
+
+
+
+
+  public async printDirect() {
+
+    this.workSheet = this.workBook.addWorksheet();
+    let tdHead = this._el.nativeElement.querySelectorAll('th') as HTMLTableCellElement[];
+    const cols: any[] = [];
+    from(tdHead).pipe(
+      map((td) => {
+        cols.push({
+          header: td.textContent,
+          style: getComputedStyle(td)
+        })
+        return cols;
+      }),
+      takeLast(1)
+    ).subscribe(td => {
+      this.workSheet.columns = td;
+    })
+
+    let tdCell = this._el.nativeElement.querySelectorAll('tr') as HTMLTableRowElement[];
+
+    tdCell.forEach((tRow) => {
+
+    });
+
+    // let headers = Object.keys(this.dataVw[0].products[0]).map(key => key);
+    // this.workSheet.columns = this.generateHeader(headers, ['Id', 'Title', 'Price', 'Rating', 'Thumbnail']);
+    console.log(tdCell.length);
+    // console.log(tdCell.length);
+
+
+
+    // this.dataVw.forEach(data => {
+    //   data.products.forEach((product: any) => {
+    //     let row = this.workSheet.addRow(Object.values(product));
+    //     row.height = 37;
+    //     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+
+    //       cell.fill = {
+    //         type: 'pattern',
+    //         pattern: 'solid', //darkVertical
+    //         fgColor: {
+    //           argb: '0000FF',
+    //         },
+    //       }
+
+    //     })
+    //   })
+    // });
+    // console.log(this.workSheet.actualRowCount * this.workSheet.getRow(1).actualCellCount)
+
+
+
+    const buf = await this.workBook.xlsx.writeBuffer();
+    FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
   }
 
 }
