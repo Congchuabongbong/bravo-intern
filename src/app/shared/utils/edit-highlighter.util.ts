@@ -1,7 +1,5 @@
 import { isUndefined, isDate, toggleClass } from '@grapecity/wijmo';
 import { FlexGrid, CellRangeEventArgs, FormatItemEventArgs } from '@grapecity/wijmo.grid';
-import * as debug from 'debug';
-
 /**
  * Class that highlights cells that have been edited in a FlexGrid.
  */
