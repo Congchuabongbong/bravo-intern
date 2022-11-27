@@ -1,5 +1,5 @@
 import { Alignment, Font, Style } from 'exceljs';
-import { convertFormatColorToHex } from './color.method.ultil';
+import { convertFormatColorToHex } from './color.method.util';
 export type VerticalExcelProp = 'superscript' | 'subscript';
 export type UnderlineExcelProp = boolean | 'none' | 'single' | 'double' | 'singleAccounting' | 'doubleAccounting';
 export type Horizontal = 'left' | 'center' | 'right' | 'fill' | 'justify' | 'centerContinuous' | 'distributed';
