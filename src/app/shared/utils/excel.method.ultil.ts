@@ -1,9 +1,28 @@
-import { Alignment, Font, Style } from 'exceljs';
+import { hexRegex } from './color.method.util';
+
+import { Alignment, Color, Font, Style } from 'exceljs';
 import { convertFormatColorToHex } from './color.method.util';
 export type VerticalExcelProp = 'superscript' | 'subscript';
 export type UnderlineExcelProp = boolean | 'none' | 'single' | 'double' | 'singleAccounting' | 'doubleAccounting';
 export type Horizontal = 'left' | 'center' | 'right' | 'fill' | 'justify' | 'centerContinuous' | 'distributed';
 export type Vertical = 'top' | 'middle' | 'bottom' | 'distributed' | 'justify';
+
+// export interface Font {
+// 	name: string;
+// 	size: number;
+// 	family: number;
+// 	scheme: 'minor' | 'major' | 'none';
+// 	charset: number;
+// 	color: Partial<Color>;
+// 	bold: boolean;
+// 	italic: boolean;
+// 	underline: boolean | 'none' | 'single' | 'double' | 'singleAccounting' | 'doubleAccounting';
+// 	vertAlign: 'superscript' | 'subscript';
+// 	strike: boolean;
+// 	outline: boolean;
+// }
+
+
 export function getFontExcelFromElement(element: HTMLElement, setFont?: Partial<Font>): Partial<Font> {
     let crawlStyle: Partial<Font> = { ...setFont };
     let computedStyle: CSSStyleDeclaration = window.getComputedStyle(element);
@@ -33,11 +52,19 @@ export function getFontExcelFromElement(element: HTMLElement, setFont?: Partial<
     }
     return crawlStyle;
 }
+export function setFontExcel(baseFont: Partial<Font>, newFont: Partial<Font>): Partial<Font> {
+    return {
+        ...baseFont,
+        ...newFont
+    };
+}
+
 
 export function getAlignmentFromElement(element: HTMLElement, setAlignment?: Partial<Alignment>): Partial<Alignment> {
     let crawlStyle: Partial<Alignment> = { ...setAlignment };
     let computedStyle: CSSStyleDeclaration = window.getComputedStyle(element);
     crawlStyle.horizontal = convertHorizontalExcel(computedStyle.getPropertyValue('text-align')) as Horizontal;
+    crawlStyle.wrapText = computedStyle.getPropertyValue('word-wrap') === 'break-word'
     return crawlStyle;
 }
 

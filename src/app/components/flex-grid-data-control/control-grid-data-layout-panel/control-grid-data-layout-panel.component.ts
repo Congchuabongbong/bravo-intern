@@ -11,7 +11,7 @@ import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 import { RouterLinkWithHref } from '@angular/router';
 import * as Excel from 'exceljs';
 import * as FileSaver from 'file-saver';
-import { getAlignmentFromElement, getFontExcelFromElement } from 'src/app/shared/utils/excel.method.ultil';
+import { getAlignmentFromElement, getFontExcelFromElement, setFontExcel } from 'src/app/shared/utils/excel.method.ultil';
 
 @Component({
   selector: 'app-control-grid-data-layout-panel',
@@ -375,9 +375,17 @@ export class ControlGridDataLayoutPanelComponent implements OnInit, AfterViewIni
     // const buf = await workBook.xlsx.writeBuffer();
     // FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
 
-    let el = this.flex.hostElement.querySelector('.wj-cell.wj-alt') as HTMLElement;
-    const alignment = getAlignmentFromElement(el)
-    console.log(alignment);
+    // let el = this.flex.hostElement.querySelector('.wj-cell.wj-alt') as HTMLElement;
+    // const alignment = getAlignmentFromElement(el)
+    // console.log(alignment);
+    console.log(this.flex.hostElement);
+    let fontBase = getFontExcelFromElement(this.flex.hostElement);
+    let fontExcel = setFontExcel(fontBase, { color: { argb: '' }, family: 44 });
+    console.log(fontExcel);
+    console.log(fontBase);
+
+
+
   }
 }
 
