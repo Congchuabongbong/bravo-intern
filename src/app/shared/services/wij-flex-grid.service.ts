@@ -12,7 +12,7 @@ export class WijFlexGridService {
     flexGrid.columns.clear();
     columnConfig.flexColumns.forEach(col => {
       flexGrid.columns.push(new wjcGrid.Column(col));
-    });
+    })
   }
 
   public drawBgOddAndEven() {
