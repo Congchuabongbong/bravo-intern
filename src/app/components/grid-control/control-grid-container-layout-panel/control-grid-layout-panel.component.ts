@@ -11,9 +11,8 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { GridLayoutData, GridLayoutFormData } from 'src/app/shared/data-type';
-import GridLayout from 'src/app/shared/utils/grid-layout.util';
+import GridLayout from 'src/app/shared/utils/grid-layout.class.util';
 import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
-import { updateStyle } from 'src/app/shared/utils/style.util';
 import { IStyleOptions } from 'src/app/shared/data-type/grid-layout.data.type';
 
 @Component({
