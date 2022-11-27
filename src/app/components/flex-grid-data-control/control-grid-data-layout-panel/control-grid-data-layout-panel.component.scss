@@ -10,7 +10,6 @@
 ::ng-deep .wj-cell.wj-header {
   background: #dfe3e8;
   color: #333;
-  font-weight: 500;
 }
 
 ::ng-deep.wj-cell {
@@ -38,10 +37,10 @@
 }
 
 ::ng-deep.wj-cell.even {
-  background-color: #ffddd2;
+  background-color: #ffddd2 !important;
 }
 ::ng-deep.wj-cell.odd {
-  background-color: #82cd47;
+  background-color: #82cd47 !important;
 }
 
 ::ng-deep.wj-flexgrid .cell-changed {
@@ -64,4 +63,9 @@
 ::ng-deep .wj-flexgrid .wj-marquee,
 ::ng-deep .wj-flexgrid .wj-header {
   transition: all 0.2s;
+}
+
+::ng-deep .wj-cell.wj-alt:not([class*="odd"]),
+::ng-deep .wj-cell.wj-alt:not([class*="even"]) {
+  background-color: #b7c4cf;
 }

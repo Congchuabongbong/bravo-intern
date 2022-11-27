@@ -31,6 +31,7 @@ export class MenuItemSidebarComponent implements OnInit, AfterViewInit {
     );
   }
   public convertStringToRoute(value: string): string {
+
     return this._handleStringService.handleSpecialCharacter(value);
   }
 }

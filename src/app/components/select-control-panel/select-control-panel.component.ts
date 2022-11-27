@@ -27,15 +27,12 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   public collectionView!: CollectionView;
   public override isDisabled!: boolean;
   private _selectElement!: HTMLSelectElement;
-  private _displayMemberPath!: string;
-  private _displayMemberBinding!: Binding;
   private _headerPath!: string;
   private _headerBinding!: Binding;
   private _isGeneratedFirstTime: boolean = false;
   private _selectedIndex!: number;
   private _selectedValuePath!: string;
   private _selectedValueBinding!: Binding;
-  private _valuesOption: any[] = [];
   private _valueBidingForm !: any;
   private touched = false;
   get selectElement(): HTMLSelectElement {
@@ -59,22 +56,14 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     return this.collectionView.items;
   };
   /** @desc:specified or get displayMemberPath to bind text for select option*/
-  @Input() set displayMemberPath(value: string) {
-    this._displayMemberPath = value;
-    this._displayMemberBinding = new Binding(value);
-    this._isGeneratedFirstTime && this.onGenerateOptions();
-  }
-  get displayMemberPath(): string {
-    return this._displayMemberPath;
-  };
-  /** @desc:specified or get headerPath to bind value for select option*/
   @Input() set headerPath(value: string) {
     this._headerPath = value;
     this._headerBinding = new Binding(value);
+    this._isGeneratedFirstTime && this.onGenerateOptions();
   }
   get headerPath(): string {
     return this._headerPath;
-  }
+  };
   /**@desc:specified or get index of selected option selected */
   @Input() set selectedIndex(value: number) {
     this._selectedIndex = value;
@@ -143,14 +132,13 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
         optionEL.value = item.toString();
         optionEL.text = item.toString();
       } else {
-        optionEL.value = this._headerBinding && this._headerBinding.getValue(item) || item;
-        optionEL.text = this._displayMemberBinding && this._displayMemberBinding.getValue(item) || item;
+        optionEL.value = this._selectedValueBinding && this._selectedValueBinding.getValue(item) || item;
+        optionEL.text = this._headerPath && this._headerBinding.getValue(item) || item;
       }
       const formatItemEventArgs = new FormatItemEventArgs(this.collectionView.items.indexOf(item), item, optionEL)
       this.formatItem.hasHandlers && this.formatItem.raise(this, formatItemEventArgs);
       this.formatItemNg.emit(formatItemEventArgs)
       optionsEl.push(optionEL);
-      this._valuesOption.push(optionEL.value);
     });
     this.selectElement.append(...optionsEl);
     this._valueBidingForm ? this.selectElement.value = this._valueBidingForm : this.selectElement.selectedIndex = this.selectedIndex;
@@ -171,7 +159,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   */
   public getDisplayText(index?: number, trimText?: boolean): string {
     index ??= this.selectedIndex;
-    let displayText: string = this._displayMemberBinding && this._displayMemberBinding.getValue(this.collectionView.items[index]) || this.collectionView.items[index] || '';
+    let displayText: string = this._headerBinding && this._headerBinding.getValue(this.collectionView.items[index]) || this.collectionView.items[index] || '';
     return trimText ? displayText.trim() : displayText;
   };
   //*method raise event
@@ -191,7 +179,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
    * @return: void
    */
   public onItemsSourceChanged(e?: EventArgs): void {
-    this.deferUpdate(() => {
+    this.deferUpdateSync(() => {
       this.itemsSourceChanged.hasHandlers && this.itemsSourceChanged.raise(this, e);
       this.itemsSourceChangedNg.emit(e);
     });

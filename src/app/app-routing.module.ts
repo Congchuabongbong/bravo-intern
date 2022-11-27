@@ -9,6 +9,10 @@ import {
 import { ProductFormComponent } from './pages/product-form/product-form.component';
 import { ProductGridDataComponent } from './pages/product-grid-data/product-grid-data.component';
 import { TestBaseControlComponent } from './pages/test-base-control/test-base-control.component';
+import { DemoCollectionViewComponent } from './pages/demo-collection-view/demo-collection-view.component';
+import { DemoTrackingChangesComponent } from './pages/demo-tracking-changes/demo-tracking-changes.component';
+import { TestExcelJsComponent } from './pages/test-excel-js/test-excel-js.component';
+
 const routes: Routes = [
   {
     path: 'vat-tu',
@@ -24,6 +28,21 @@ const routes: Routes = [
     path: 'select-combobox',
     title: 'Tess Base Control',
     component: TestBaseControlComponent,
+  },
+  {
+    path: 'demo-collectionsview',
+    title: 'Demo CollectionView',
+    component: DemoCollectionViewComponent,
+  },
+  {
+    path: 'demo-tracking',
+    title: 'Demo Tracking Changes Component',
+    component: DemoTrackingChangesComponent,
+  },
+  {
+    path: 'test-excel',
+    title: 'Test ExcelJs',
+    component: TestExcelJsComponent,
   }
 ];
 

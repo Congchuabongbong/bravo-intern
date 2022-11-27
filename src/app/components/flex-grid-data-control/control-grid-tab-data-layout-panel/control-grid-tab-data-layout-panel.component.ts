@@ -17,6 +17,7 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   @Output() flexTabInitialized = new EventEmitter<wjcGrid.FlexGrid>();
   @Output() actionDelete: EventEmitter<any> = new EventEmitter();
   @Output() actionAdd: EventEmitter<any> = new EventEmitter();
+  @Output() actionExportExcel: EventEmitter<any> = new EventEmitter();
   //**Property declarations*/
   public productSelected$: Observable<any> = this._httpProductService.productSelectedWithTab$;
   public configLayout = {
@@ -52,5 +53,10 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   }
   public onAddNewColumn() {
     this.actionAdd.emit();
+  }
+
+
+  public onExportExcel() {
+    this.actionExportExcel.emit();
   }
 }
