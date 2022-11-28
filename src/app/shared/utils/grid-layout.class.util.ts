@@ -117,45 +117,45 @@ export default class GridLayout {
 
   //**set position grid item */
   public setPositionGirdItem(elRef: ElementRef, position: GridLayoutData.IPositionGridItem) {
-    this.renderer.setStyle(elRef.nativeElement, 'grid-row', `${position.rowLine.startLine} / ${position.rowLine.endLine}`)
-    this.renderer.setStyle(elRef.nativeElement, 'grid-column', `${position.columnLine.startLine} / ${position.columnLine.endLine}`)
+    this.renderer.setStyle(elRef.nativeElement, 'grid-row', `${position.rowLine.startLine} / ${position.rowLine.endLine}`);
+    this.renderer.setStyle(elRef.nativeElement, 'grid-column', `${position.columnLine.startLine} / ${position.columnLine.endLine}`);
   }
   //**set width and height grid container */
   public setWidthGridContainer(width: string): void {
-    this.renderer.setStyle(this.gridContainer.nativeElement, 'width', width)
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'width', width);
   }
   public setHeightGridContainer(height: string): void {
-    this.renderer.setStyle(this.gridContainer.nativeElement, 'height', height)
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'height', height);
   }
   //**set min width and height  grid container
   public setMinWidthGridContainer(minWidth: string): void {
-    this.renderer.setStyle(this.gridContainer.nativeElement, 'min-width', minWidth)
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'min-width', minWidth);
   }
   public setMinHeightGridContainer(minHeight: string): void {
-    this.renderer.setStyle(this.gridContainer.nativeElement, 'min-height', minHeight)
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'min-height', minHeight);
   }
   //**set max height and width  grid container
   public setMaxWidthGridContainer(maxWidth: string): void {
-    this.renderer.setStyle(this.gridContainer.nativeElement, 'max-width', maxWidth)
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'max-width', maxWidth);
   }
   public setMaxHeightGridContainer(maxHeight: string): void {
-    this.renderer.setStyle(this.gridContainer.nativeElement, 'max-height', maxHeight)
+    this.renderer.setStyle(this.gridContainer.nativeElement, 'max-height', maxHeight);
   }
   //** Set class */
   public setClass(className: string): void {
-    this.renderer.addClass(this.gridContainer.nativeElement, className)
+    this.renderer.addClass(this.gridContainer.nativeElement, className);
   }
   //** Set id */
   public setId(idName: string): void {
-    this.renderer.setAttribute(this.gridContainer.nativeElement, 'id', idName)
+    this.renderer.setAttribute(this.gridContainer.nativeElement, 'id', idName);
   }
   //** Set attribute */
   public setAttribute(name: string, value: string): void {
-    this.renderer.setAttribute(this.gridContainer.nativeElement, name, value)
+    this.renderer.setAttribute(this.gridContainer.nativeElement, name, value);
   }
   //**set style */
   public setStyle(name: string, value: string): void {
-    this.renderer.setStyle(this.gridContainer.nativeElement, name, value)
+    this.renderer.setStyle(this.gridContainer.nativeElement, name, value);
   }
   //** Check if obj is type of minMax type*/
   private isMinMax(obj: any): obj is GridLayoutData.IMinMax {

@@ -27,7 +27,7 @@ export class EditHighlighter {
                 let changed = this._hasChange(e.getRow().dataItem, e.getColumn().binding as string);
                 toggleClass(e.cell, cssClass, changed);
             }
-        })
+        });
     }
 
     /**
