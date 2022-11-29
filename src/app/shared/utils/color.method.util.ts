@@ -31,7 +31,7 @@ const convertRgbToHexExcel = (rgb: string): string | null => {
 };
 export const convertFormatColorToHex = (format: string): string | null => {
     if (hexRegex.test(format)) {
-        return format;
+        return format.slice(1, format.length);
     }
     if (rgbRegex.test(format)) {
         return convertRgbToHexExcel(format);

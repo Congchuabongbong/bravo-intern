@@ -2,7 +2,7 @@
   <app-control-grid-data-layout-panel *ngIf="wijFlexColumnConfig$ | async as wijFlexColumnConfig"
     [dataSource]="products" [wjFlexColumnConfig]="wijFlexColumnConfig"
     (wijFlexMainInitialized)="flexMainInitialized($event)" (wijFlexTabInitialized)="flexTabInitialized($event)"
-    [isColumPicker]="true" [isDrawIdOddAndEven]="true">
+    [isDrawIdOddAndEven]="true">
   </app-control-grid-data-layout-panel>
   <div [class]="products ? '' : 'active'" class="spinner"><i class="fa-solid fa-spinner"></i></div>
 </div>

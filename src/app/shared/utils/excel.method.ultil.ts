@@ -1,5 +1,5 @@
 import { Column as ColumnWj } from '@grapecity/wijmo.grid';
-import { Alignment, Borders, BorderStyle, Column, Fill, FillPattern, Font, Row, Style, Worksheet } from 'exceljs';
+import { Alignment, Borders, BorderStyle, Column, FillPattern, Font, Row, Style, Worksheet } from 'exceljs';
 import { convertFormatColorToHex } from './color.method.util';
 export type VerticalExcelProp = 'superscript' | 'subscript';
 export type UnderlineExcelProp = boolean | 'none' | 'single' | 'double' | 'singleAccounting' | 'doubleAccounting';
@@ -8,134 +8,115 @@ export type Vertical = 'top' | 'middle' | 'bottom' | 'distributed' | 'justify';
 
 //*Get and set Style excel 
 
-export function getStyleExcelFromStyleElement(element: HTMLElement, styleSetup?: Partial<Style>): Partial<Style> {
+export function getStyleExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclaration>, elementOverrideStyle?: HTMLElement, styleExcelOps?: Partial<Style>): Partial<Style> {
     let crawlStyle: Partial<Style> = {};
-    if (!element) return crawlStyle;
-    crawlStyle.font = getFontExcelFromStyleElement(element);
-    crawlStyle.border = getBorderExcelFromStyleElement(element);
-    crawlStyle.fill = getFillExcelFromStyleElement(element) as FillPattern;
-    crawlStyle.alignment = getAlignmentFromStyleElement(element);
-    return { ...crawlStyle, ...styleSetup };
+    crawlStyle.font = getFontExcelFromStyleElement(styleSetup, elementOverrideStyle);
+    crawlStyle.border = getBorderExcelFromStyleElement(styleSetup, elementOverrideStyle);
+    crawlStyle.fill = getFillExcelFromStyleElement(styleSetup, elementOverrideStyle) as FillPattern;
+    crawlStyle.alignment = getAlignmentFromStyleElement(styleSetup, elementOverrideStyle);
+    if (styleExcelOps) return { ...crawlStyle, ...styleExcelOps };
+    return crawlStyle;
 }
 //* Get and set Font Excel 
-export function getFontExcelFromStyleElement(element: HTMLElement, fontSetup?: Partial<Font>): Partial<Font> {
+export function getFontExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclaration>, elementOverrideStyle?: HTMLElement, fontExcelOps?: Partial<Font>): Partial<Font> {
     let crawlStyle: Partial<Font> = {};
-    if (!element) return crawlStyle;
-    let computedStyle: CSSStyleDeclaration = window.getComputedStyle(element);
+    let computedStyle: CSSStyleDeclaration = elementOverrideStyle ? { ...window.getComputedStyle(elementOverrideStyle), ...styleSetup } as CSSStyleDeclaration : styleSetup as CSSStyleDeclaration;
     //name
-    crawlStyle.name = getNameOrFamilyExcel(computedStyle.getPropertyValue('font-family'), 'name') as string;
+    if (computedStyle.fontFamily) crawlStyle.name = getNameOrFamilyExcel(computedStyle.fontFamily, 'name') as string;
     //size
-    crawlStyle.size = convertFontSizeToNumber(computedStyle.getPropertyValue('font-size'));
+    if (computedStyle.fontSize) crawlStyle.size = convertFontSizeToNumber(computedStyle.fontSize);
     //bold
-    crawlStyle.bold = computedStyle.getPropertyValue('font-weight') === '700';
+    if (computedStyle.fontWeight) crawlStyle.bold = computedStyle.fontWeight === '700' || computedStyle.fontWeight === 'bold';
     //family
-    crawlStyle.family = getNameOrFamilyExcel(computedStyle.getPropertyValue('font-family'), 'family') as number;
+    if (computedStyle.fontFamily) crawlStyle.family = getNameOrFamilyExcel(computedStyle.fontFamily, 'family') as number;
     //italic
-    crawlStyle.italic = computedStyle.getPropertyValue('font-style') === 'italic';
+    if (computedStyle.fontStyle) crawlStyle.italic = computedStyle.fontStyle === 'italic';
     //vertical
-    if (computedStyle.getPropertyValue('vertical-align') == 'sub' || computedStyle.getPropertyValue('vertical-align') == 'super') {
-        crawlStyle.vertAlign = computedStyle.getPropertyValue('vertical-align') as VerticalExcelProp;
-    }
+    if (computedStyle.verticalAlign == 'sub' || computedStyle.verticalAlign == 'super') crawlStyle.vertAlign = computedStyle.verticalAlign as VerticalExcelProp;
     //text-decoration-line
-    crawlStyle.strike = computedStyle.getPropertyValue('text-decoration-line') === 'line-through';
+    crawlStyle.strike = computedStyle.textDecorationLine === 'line-through';
     //underline
-    crawlStyle.underline = convertUnderlineExcel(computedStyle.getPropertyValue('text-decoration-line'), computedStyle.getPropertyValue('text-decoration-style'));
+    if (computedStyle.textDecorationLine && computedStyle.textDecorationStyle) crawlStyle.underline = convertUnderlineExcel(computedStyle.textDecorationLine, computedStyle.textDecorationStyle);
     //outline
-    crawlStyle.outline = !(computedStyle.getPropertyValue('outline-width') === '0px');
+    if (computedStyle.outlineWidth) crawlStyle.outline = !(computedStyle.outlineWidth === '0px');
     //color
-    crawlStyle.color = {
-        argb: convertFormatColorToHex(computedStyle.getPropertyValue('color')) as string
+    if (computedStyle.color) crawlStyle.color = {
+        argb: convertFormatColorToHex(computedStyle.color) as string
     };
-    return { ...crawlStyle, ...fontSetup };
+    if (fontExcelOps) return { ...crawlStyle, ...fontExcelOps };
+    return crawlStyle;
 }
-export function setFontExcel(baseFont: Partial<Font>, newFont: Partial<Font>): Partial<Font> {
-    return {
-        ...baseFont,
-        ...newFont
-    };
-}
+
 //* Get and set Alignment Excel
-export function getAlignmentFromStyleElement(element: HTMLElement, alignmentSetup?: Partial<Alignment>): Partial<Alignment> {
+export function getAlignmentFromStyleElement(styleSetup: Partial<CSSStyleDeclaration>, elementOverrideStyle?: HTMLElement, alignmentOps?: Partial<Alignment>): Partial<Alignment> {
     let crawlStyle: Partial<Alignment> = {};
-    let computedStyle: CSSStyleDeclaration = window.getComputedStyle(element);
-    if (!computedStyle) return crawlStyle;
-    crawlStyle.horizontal ??= convertHorizontalExcel(computedStyle.getPropertyValue('text-align')) as Horizontal;
-    crawlStyle.wrapText ??= computedStyle.getPropertyValue('word-wrap') === 'break-word';
-    crawlStyle.shrinkToFit ??= (computedStyle.getPropertyValue('flex-shrink') === '0');
-    return { ...crawlStyle, ...alignmentSetup };
+    let computedStyle: CSSStyleDeclaration = elementOverrideStyle ? { ...window.getComputedStyle(elementOverrideStyle), ...styleSetup } as CSSStyleDeclaration : styleSetup as CSSStyleDeclaration;
+    crawlStyle.horizontal ??= convertHorizontalExcel(computedStyle.textAlign) as Horizontal;
+    crawlStyle.wrapText ??= computedStyle.wordWrap === 'break-word';
+    crawlStyle.shrinkToFit ??= (computedStyle.flexShrink === '0');
+    if (alignmentOps) return { ...crawlStyle, ...alignmentOps };
+    return crawlStyle;
 }
-export function setAlignment(baseAlignment: Partial<Alignment>, newAlignment: Partial<Alignment>): Partial<Alignment> {
-    return {
-        ...baseAlignment,
-        ...newAlignment
-    };
-}
+
 //* Get and set Fills Excel
 //default fill Pattern
-export function getFillExcelFromStyleElement(element: HTMLElement, fillSetup?: Partial<FillPattern>): Partial<FillPattern> {
+export function getFillExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclaration>, elementOverrideStyle?: HTMLElement, fillExcelOps?: FillPattern): Partial<FillPattern> {
     let crawlStyle: Partial<FillPattern> = {};
-    let computedStyle: CSSStyleDeclaration = window.getComputedStyle(element);
-    if (!computedStyle) return crawlStyle;
-    crawlStyle.type ??= 'pattern';
-    crawlStyle.pattern ??= 'solid';
-    crawlStyle.fgColor ??= {
-        argb: convertFormatColorToHex(computedStyle.backgroundColor) as string,
+    let computedStyle: CSSStyleDeclaration = elementOverrideStyle ? { ...window.getComputedStyle(elementOverrideStyle), ...styleSetup } as CSSStyleDeclaration : styleSetup as CSSStyleDeclaration;
+    crawlStyle.type = 'pattern';
+    crawlStyle.pattern = 'solid';
+    if (computedStyle.backgroundColor) crawlStyle.fgColor = {
+        argb: convertFormatColorToHex(computedStyle.backgroundColor) as string
     };
-    return { ...crawlStyle, ...fillSetup };
+    if (fillExcelOps) return { ...crawlStyle, ...fillExcelOps };
+    return crawlStyle;
 }
 
-export function setFillExcel(baseFill: Partial<FillPattern>, newFill: Partial<FillPattern>): Partial<FillPattern> {
-    return { ...baseFill, ...newFill };
-}
+
 
 //* Get and set border excel
-export function getBorderExcelFromStyleElement(element: HTMLElement, borderSetup?: Partial<Borders>): Partial<Borders> {
+export function getBorderExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclaration>, elementOverrideStyle?: HTMLElement, borderExcelOps?: Partial<Borders>): Partial<Borders> {
     let crawlStyle: Partial<Borders> = {};
-    let computedStyle: CSSStyleDeclaration = window.getComputedStyle(element);
-    if (!computedStyle) return crawlStyle;
+    let computedStyle: CSSStyleDeclaration = elementOverrideStyle ? { ...window.getComputedStyle(elementOverrideStyle), ...styleSetup } as CSSStyleDeclaration : styleSetup as CSSStyleDeclaration;
+    //use case have border or properties border
     if (computedStyle.border) {
-        crawlStyle.top, crawlStyle.left, crawlStyle.right, crawlStyle.bottom ??= {
+        crawlStyle.top = crawlStyle.left = crawlStyle.right = crawlStyle.bottom = {
             style: convertBorderStyleExcel(computedStyle.borderStyle, convertFontSizeToNumber(computedStyle.borderWidth)),
             color: { argb: convertFormatColorToHex(computedStyle.borderColor) as string }
         };
-        return { ...crawlStyle, ...borderSetup };
+        if (borderExcelOps) return { ...crawlStyle, ...borderExcelOps };
+        return crawlStyle;
     }
-
-    if (computedStyle.borderTop.split(' ')[1] !== 'none') {
+    //use case have borderRight,left,bottom,top or properties border left,top,right,bottom
+    if (computedStyle.borderTopStyle !== 'none' && computedStyle.borderTopColor && computedStyle.borderTopWidth) {
         crawlStyle.top = {
-            style: convertBorderStyleExcel(computedStyle.borderTopStyle, convertFontSizeToNumber(computedStyle.borderWidth)),
+            style: convertBorderStyleExcel(computedStyle.borderTopStyle, convertFontSizeToNumber(computedStyle.borderTopWidth, 'border')),
             color: { argb: convertFormatColorToHex(computedStyle.borderTopColor) as string }
         };
     }
-
-    if (computedStyle.borderBottom.split(' ')[1] !== 'none') {
-        crawlStyle.bottom ??= {
-            style: convertBorderStyleExcel(computedStyle.borderBottomStyle, convertFontSizeToNumber(computedStyle.borderWidth)),
+    if (computedStyle.borderBottomStyle !== 'none' && computedStyle.borderBottomColor && computedStyle.borderBottomWidth) {
+        crawlStyle.bottom = {
+            style: convertBorderStyleExcel(computedStyle.borderBottomStyle, convertFontSizeToNumber(computedStyle.borderBottomWidth, 'border')),
             color: { argb: convertFormatColorToHex(computedStyle.borderBottomColor) as string }
         };
     }
-    if (computedStyle.borderLeft.split(' ')[1] !== 'none') {
-        crawlStyle.left ??= {
-            style: convertBorderStyleExcel(computedStyle.borderLeftStyle, convertFontSizeToNumber(computedStyle.borderWidth)),
+    if (computedStyle.borderLeftStyle !== 'none' && computedStyle.borderLeftColor && computedStyle.borderLeftWidth) {
+        crawlStyle.left = {
+            style: convertBorderStyleExcel(computedStyle.borderLeftStyle, convertFontSizeToNumber(computedStyle.borderLeftWidth, 'border')),
             color: { argb: convertFormatColorToHex(computedStyle.borderLeftColor) as string }
         };
     }
-    if (computedStyle.borderRight.split(' ')[1] !== 'none') {
-        crawlStyle.right ??= {
-            style: convertBorderStyleExcel(computedStyle.borderRightStyle, convertFontSizeToNumber(computedStyle.borderWidth)),
+    if (computedStyle.borderRightStyle !== 'none' && computedStyle.borderRightColor && computedStyle.borderRightWidth) {
+        crawlStyle.right = {
+            style: convertBorderStyleExcel(computedStyle.borderRightStyle, convertFontSizeToNumber(computedStyle.borderRightWidth, 'border')),
             color: { argb: convertFormatColorToHex(computedStyle.borderRightColor) as string }
         };
     }
+    if (borderExcelOps) return { ...crawlStyle, ...borderExcelOps };
     return crawlStyle;
 }
-export function setBorderExcel() {
 
-}
 //* creator Style, Font, Alignment, Fill
-const creatorStyleExcel = (): Partial<Style> => ({});
-const creatorFontExcel = (): Partial<Font> => ({});
-const creatorAlignmentExcel = (): Partial<Alignment> => ({});
-const creatorFillExcel = (): Partial<FillPattern> => ({});
 // ? handle convert function
 export function convertHorizontalExcel(textAlign: string): Horizontal {
     if (textAlign === 'center') return 'center';
@@ -144,16 +125,17 @@ export function convertHorizontalExcel(textAlign: string): Horizontal {
     if (textAlign === 'initial') return 'left';
     return 'left';
 }
-export function convertFontSizeToNumber(fontsize: string | null): number {
+export function convertFontSizeToNumber(fontsize: string, type?: string): number {
     let sizeStrings: string[] | null = fontsize && fontsize.match(/\d+/) || null;
     if (sizeStrings && sizeStrings.length > 0) {
         return +sizeStrings[0] as number;
     }
+    if (type === 'border') return 1;
     return 16;
 }
 
 export function getNameOrFamilyExcel(fontFamily: string, returnType: 'name' | 'family'): number | string {
-    let fontFamilyTrim = fontFamily.split(',').map(font => font.trim());
+    let fontFamilyTrim = fontFamily && fontFamily.split(',').map(font => font.trim());
     if (returnType === 'family') {
         if (fontFamilyTrim.includes('serif')) return 1;
         if (fontFamilyTrim.includes('sans-serif')) return 2;
@@ -179,13 +161,13 @@ export function convertBorderStyleExcel(borderStyle: string, borderWidth: number
         case 'dashed':
             return 'dashDot';
         case 'solid':
-            if (borderWidth && borderWidth >= 1 && borderWidth < 3) {
+            if (borderWidth >= 1 && borderWidth < 3) {
                 return 'thin';
             }
-            if (borderWidth && borderWidth >= 3 && borderWidth < 5) {
+            if (borderWidth >= 3 && borderWidth < 5) {
                 return 'medium';
             }
-            if (borderWidth && borderWidth <= 5) {
+            if (borderWidth >= 5) {
                 return 'thick';
             }
             return 'thin';
@@ -210,21 +192,10 @@ export function generateColumnsExcel(cols: ColumnWj[], style?: Partial<Style>): 
             style: style,
             header: (col.header || col.binding) as string,
             key: col.binding as string,
-            width: col.width as number,
+            width: (col.width as number) / 10,
         };
         if (style) colExcel.style = style;
         colsExcel.push(colExcel);
     });
     return colsExcel;
 }
-//css Selector
-export function getElementNotSelector(hostElement: HTMLElement, typeSelector: string, selector: string, selectorCondition: string) {
-    return hostElement.querySelector('');
-    // if (e instanceof Element) return e;
-    // if (isString(e)) try {
-    //     return document.querySelector(e);
-    // } catch (e) { }
-    // return e && e.jquery ? e[0] : null;
-}
-
-

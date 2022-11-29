@@ -60,8 +60,8 @@ import {
   getBorderExcelFromStyleElement,
   getFontExcelFromStyleElement,
   getStyleExcelFromStyleElement,
-  setFontExcel,
 } from 'src/app/shared/utils/excel.method.ultil';
+import { ExcelFlexUtil } from 'src/app/shared/utils/excel.class.util';
 
 @Component({
   selector: 'app-control-grid-data-layout-panel',
@@ -458,17 +458,31 @@ export class ControlGridDataLayoutPanelComponent
   //**Handle action here
   public onAddNewColumn(): void { }
   public async onActionExportExcel(): Promise<void> {
-    // let styleBase = getStyleExcelFromStyleElement(this.flex.hostElement);
-    // let fontBase = styleBase.font;
-    // let fillBase = styleBase.fill;
-    // let cellAntBg = getElement('.wj-alt') as HTMLElement;
-    // let cellOddBg = getElement('.odd') as HTMLElement;
-    // let cellEvenBg = getElement('.even') as HTMLElement;
-    // let activeBg = getElement('.wj-state-multi-selected') as HTMLElement;
-    // let styleColumHeader = getStyleExcelFromStyleElement(this.flex.hostElement.querySelector('.wj-colheader .wj-header:not(.wj-header.wj-state-multi-selected)') as HTMLElement);
-    // console.log(styleColumHeader);
-    // const workBook = new Excel.Workbook();
-    // const workSheet = workBook.addWorksheet('My sheet');
+    const workBook = new Excel.Workbook();
+    const workSheet = workBook.addWorksheet('My sheet');
+
+    let styleHeaderSetup: Partial<CSSStyleDeclaration> = {
+      backgroundColor: '#dfe3e8',
+      color: '#333',
+      font: '16px',
+      borderBottomColor: 'rgba(0, 0, 0, .2)',
+      borderRightColor: 'rgba(0, 0, 0, .2)',
+      borderBottomWidth: '1px',
+      borderRightWidth: '1px',
+      borderRightStyle: 'solid',
+      borderBottomStyle: 'solid',
+
+      //   border- right: 1px solid rgba(0, 0, 0, .2),
+      // border - bottom: 1px solid rgba(0, 0, 0, .2),
+    };
+    console.log(getStyleExcelFromStyleElement(styleHeaderSetup));
+    let colsHeader = generateColumnsExcel(this.flex.columns);
+    workSheet.columns = colsHeader;
+    workSheet.eachRow((row: Excel.Row) => {
+      row.eachCell((cell: Excel.Cell) => {
+        cell.style = getStyleExcelFromStyleElement(styleHeaderSetup);
+      });
+    });
     // const cols: any[] = this.flex.columns.map(col => ({
     //   header: col.header || col.binding,
     //   key: col.binding,
@@ -497,13 +511,16 @@ export class ControlGridDataLayoutPanelComponent
     //     }
     //   });
     // });
-    // const buf = await workBook.xlsx.writeBuffer();
-    // FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
+    const buf = await workBook.xlsx.writeBuffer();
+    FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
 
-    // let el = this.flex.hostElement.querySelector('.wj-cell.wj-alt') as HTMLElement;
 
-    let colsEx = generateColumnsExcel(this.flex.columns);
-    console.log();
+
+
+
+
+
+
 
 
   }

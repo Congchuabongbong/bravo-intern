@@ -30,13 +30,6 @@
             "align": "left"
         },
         {
-            "binding": "ParentCode",
-            "header": "Mã nhóm mẹ",
-            "width": 130,
-            "dataType": 1,
-            "align": "left"
-        },
-        {
             "binding": "ItemGroupCode",
             "header": "Nhóm hàng",
             "width": 150,

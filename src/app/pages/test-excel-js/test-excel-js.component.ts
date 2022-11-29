@@ -21,7 +21,7 @@ export class TestExcelJsComponent implements OnInit {
     this.workbook.views = [{
       x: 0, y: 0, width: 10000, height: 20000,
       firstSheet: 0, activeTab: 0, visibility: 'visible'
-    }]
+    }];
   }
 
   initialWorkSheet(name: string, optionConfig?: Partial<Excel.AddWorksheetOptions> | undefined) {
@@ -43,7 +43,7 @@ export class TestExcelJsComponent implements OnInit {
         oddFooter: "Page &P of &N",
         oddHeader: 'Odd Page'
       },
-    }
+    };
     //**initialize workBook
     this.initialWorkBook('Nguyen Van Binh', 'Somebody', new Date(2022, 11, 11), new Date(), new Date(2022, 11, 11));
     //** initialWorkSheet */
@@ -55,7 +55,7 @@ export class TestExcelJsComponent implements OnInit {
     //** Add column */
     this.worksheet.columns = [{ header: 'Id', key: 'id' },
     { header: 'Name', key: 'name' },
-    { header: 'Age', key: 'age' }]
+    { header: 'Age', key: 'age' }];
     //**add row 
     const data = [{ id: 1, name: 'John Doe', age: 35 }, { id: 2, name: 'Somebody', age: 45 }];
     const rows = this.worksheet.addRows(data);
@@ -76,9 +76,9 @@ export class TestExcelJsComponent implements OnInit {
           left: { style: 'double', color: { argb: 'FF00FF00' } },
           bottom: { style: 'double', color: { argb: 'FF00FF00' } },
           right: { style: 'double', color: { argb: 'FF00FF00' } }
-        } : {}
-      })
-    })
+        } : {};
+      });
+    });
 
 
 
