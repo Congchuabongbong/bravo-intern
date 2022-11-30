@@ -51,9 +51,10 @@ export function getFontExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclara
 export function getAlignmentFromStyleElement(styleSetup: Partial<CSSStyleDeclaration>, elementOverrideStyle?: HTMLElement, alignmentOps?: Partial<Alignment>): Partial<Alignment> {
     let crawlStyle: Partial<Alignment> = {};
     let computedStyle: CSSStyleDeclaration = elementOverrideStyle ? { ...window.getComputedStyle(elementOverrideStyle), ...styleSetup } as CSSStyleDeclaration : styleSetup as CSSStyleDeclaration;
-    crawlStyle.horizontal ??= convertHorizontalExcel(computedStyle.textAlign) as Horizontal;
-    crawlStyle.wrapText ??= computedStyle.wordWrap === 'break-word';
-    crawlStyle.shrinkToFit ??= (computedStyle.flexShrink === '0');
+    crawlStyle.horizontal = convertHorizontalExcel(computedStyle.textAlign) as Horizontal;
+    crawlStyle.wrapText = computedStyle.wordWrap === 'break-word';
+    crawlStyle.shrinkToFit = (computedStyle.flexShrink === '0');
+    crawlStyle.vertical = 'middle';
     if (alignmentOps) return { ...crawlStyle, ...alignmentOps };
     return crawlStyle;
 }
@@ -179,7 +180,7 @@ export function convertBorderStyleExcel(borderStyle: string, borderWidth: number
 }
 
 //*merge Cell
-function mergeCells(ws: Worksheet, row: Row, from: number, to: number): void {
+export function mergeCells(ws: Worksheet, row: Row, from: number, to: number): void {
     ws.mergeCells(`${row.getCell(from).address}:${row.getCell(to).address}`);
 }
 //*add Rows
@@ -192,7 +193,7 @@ export function generateColumnsExcel(cols: ColumnWj[], style?: Partial<Style>): 
             style: style,
             header: (col.header || col.binding) as string,
             key: col.binding as string,
-            width: (col.width as number) / 10,
+            width: (col.renderWidth as number) / 10,
         };
         if (style) colExcel.style = style;
         colsExcel.push(colExcel);

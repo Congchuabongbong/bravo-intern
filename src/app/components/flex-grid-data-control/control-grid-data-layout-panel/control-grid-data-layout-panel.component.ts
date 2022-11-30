@@ -19,10 +19,12 @@ import {
   CellRangeEventArgs,
   CellEditEndingEventArgs,
   GridPanel,
+
   Row,
 } from '@grapecity/wijmo.grid';
 import {
-  showPopup,
+  showPopup, PropertyGroupDescription,
+
   getActiveElement,
   getElement,
   Point,
@@ -40,6 +42,7 @@ import {
   CollectionView,
   ICollectionView,
   tryCast,
+  CollectionViewGroup
 } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import {
@@ -49,7 +52,7 @@ import {
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter.class.util';
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
-import { Observable, repeatWhen } from 'rxjs';
+import { Observable, raceWith, repeatWhen } from 'rxjs';
 import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 import { RouterLinkWithHref } from '@angular/router';
 import * as Excel from 'exceljs';
@@ -60,9 +63,11 @@ import {
   getBorderExcelFromStyleElement,
   getFontExcelFromStyleElement,
   getStyleExcelFromStyleElement,
+  mergeCells,
 } from 'src/app/shared/utils/excel.method.ultil';
 import { ExcelFlexUtil } from 'src/app/shared/utils/excel.class.util';
-
+import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
+import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -99,7 +104,8 @@ export class ControlGridDataLayoutPanelComponent
     private _el: ElementRef,
     private _httpProductService: HttpProductService,
     private _httpLayoutService: HttpLayoutService,
-    private _ref: ChangeDetectorRef
+    private _ref: ChangeDetectorRef,
+    private _httpClient: HttpClient
   ) { }
 
   //**lifecycle hooks
@@ -114,6 +120,14 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
+    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+    flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
+      label: 'image for ${item.Image}',
+    });
+    flexGrid.getColumn('Image').cssClass = 'cell-img';
+    flexGrid.autoRowHeights = true;
+
     //properties:
     // flexGrid.allowDragging = 3;
     // flexGrid.allowSorting = 2;
@@ -458,70 +472,113 @@ export class ControlGridDataLayoutPanelComponent
   //**Handle action here
   public onAddNewColumn(): void { }
   public async onActionExportExcel(): Promise<void> {
+    //* Khởi tạo Excel
     const workBook = new Excel.Workbook();
     const workSheet = workBook.addWorksheet('My sheet');
-
+    //?? Demo add image successfully
+    // const bufferImage: ArrayBuffer = await this.getBase64FromUrl('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80');
+    // const imageId = workBook.addImage({ buffer: bufferImage, extension: 'png' });
+    // workSheet.getCell(1, 1).value = '123123';
+    // workSheet.addImage(imageId, {
+    //   tl: { col: 0, row: 0 },
+    //   ext: { height: 10, width: 10 },
+    // });
+    //* Get and declared styleSetup
+    const cellBaseElement = this.flex.hostElement.querySelector('.wj-cell:not(.wj-state-active)[role~="gridcell"]') as HTMLElement;
     let styleHeaderSetup: Partial<CSSStyleDeclaration> = {
       backgroundColor: '#dfe3e8',
-      color: '#333',
-      font: '16px',
-      borderBottomColor: 'rgba(0, 0, 0, .2)',
-      borderRightColor: 'rgba(0, 0, 0, .2)',
-      borderBottomWidth: '1px',
-      borderRightWidth: '1px',
-      borderRightStyle: 'solid',
-      borderBottomStyle: 'solid',
-
-      //   border- right: 1px solid rgba(0, 0, 0, .2),
-      // border - bottom: 1px solid rgba(0, 0, 0, .2),
+      fontFamily: 'time new roman',
+      fontSize: '11px',
     };
-    console.log(getStyleExcelFromStyleElement(styleHeaderSetup));
+    let styleCellAlternatingRowStep: Partial<CSSStyleDeclaration> = {
+      backgroundColor: '#b7c4cf',
+      fontFamily: 'time new roman',
+      fontSize: '11px',
+    };
+    let styleCellSetup: Partial<CSSStyleDeclaration> = {
+      backgroundColor: '#ffffff',
+      fontFamily: 'time new roman',
+      fontSize: '11px'
+    };
+    let styleOddSetup: Partial<CSSStyleDeclaration> = {
+      backgroundColor: '#82cd47',
+      fontFamily: 'time new roman',
+      fontSize: '11px'
+    };
+    let styleEvenSetup: Partial<CSSStyleDeclaration> = {
+      backgroundColor: '#ffddd2',
+      fontFamily: 'time new roman',
+      fontSize: '11px',
+    };
+    //*Set column
     let colsHeader = generateColumnsExcel(this.flex.columns);
     workSheet.columns = colsHeader;
     workSheet.eachRow((row: Excel.Row) => {
+      row.height = this.flex.columnHeaders.height;
       row.eachCell((cell: Excel.Cell) => {
-        cell.style = getStyleExcelFromStyleElement(styleHeaderSetup);
+        cell.style = getStyleExcelFromStyleElement(styleHeaderSetup, cellBaseElement);
       });
     });
-    // const cols: any[] = this.flex.columns.map(col => ({
-    //   header: col.header || col.binding,
-    //   key: col.binding,
-    //   width: col.width / 10,
-    // }));
-    // workSheet.columns = cols;
-    // workSheet.eachRow(row => row.eachCell(cell => {
-    //   cell.style = getStyleExcelFromStyleElement(this.flex.hostElement.querySelector('.wj-colheaders .wj-header:not(.wj-header.wj-state-multi-selected)') as HTMLElement);
-    //   console.log(cell.style);
-    // }));
+    //*set Row
     // let rows = workSheet.addRows(this.flex.collectionView.items);
-    // rows.forEach((row, index) => {
-    //   row.eachCell(cell => {
-    //     if (workSheet.getColumn(cell.fullAddress.col).key === 'Id') {
-    //       if ((cell.value as number) % 2 === 0) {
-    //         cell.style = getStyleExcelFromStyleElement(cellEvenBg, { numFmt: 'number' });
-    //       } else {
-    //         cell.style = getStyleExcelFromStyleElement(cellOddBg, { numFmt: 'number' });
-    //       }
-    //     }
-    //     if (index % 2 === 0) {
-    //       row.eachCell(cell => {
-    //         if (workSheet.getColumn(cell.fullAddress.col).key === 'Id') return;
-    //         cell.style = getStyleExcelFromStyleElement(cellAntBg);
-    //       });
-    //     }
-    //   });
-    // });
+    this.flex.collectionView.groups.forEach(g => {
+      //*row group;
+      const rowGroup = workSheet.addRow([`${(g as CollectionViewGroup).name}: ${(g as CollectionViewGroup).items.length} items`]);
+      rowGroup.height = 33;
+      rowGroup.outlineLevel = 0;
+      mergeCells(workSheet, rowGroup, 1, workSheet.columns.length);
+      rowGroup.eachCell(cell => {
+        cell.style = getStyleExcelFromStyleElement(styleCellAlternatingRowStep, cellBaseElement, { alignment: { horizontal: 'center', vertical: 'middle' }, fill: { pattern: 'solid', type: 'pattern', fgColor: 'e1e1e1' } as Excel.FillPattern });
+      });
+      rowGroup.commit();
+      //*
+      const rows = workSheet.addRows((g as CollectionViewGroup).items);
+      let step = 0;
+      rows.forEach((row: Excel.Row, index: number) => {
+        row.outlineLevel = 1;
+        row.height = this.flex.rows[index].renderHeight; // !!wrong: index not exactly same index
+        //add style for alternating rows step
+        if (this.flex.alternatingRowStep) {
+          if (index === step) {
+            row.eachCell({ includeEmpty: true }, cell => cell.style = getStyleExcelFromStyleElement(styleCellAlternatingRowStep, cellBaseElement));
+            step += this.flex.alternatingRowStep + 1;
+          } else {
+            row.eachCell({ includeEmpty: true }, cell => cell.style = getStyleExcelFromStyleElement(styleCellSetup, cellBaseElement));
+          }
+        }
+        //TODO: Add image(not complete)
+        row.eachCell({ includeEmpty: true }, async (cell) => {
+          if (workSheet.getColumn(cell.fullAddress.col).key === 'Image') {//!wong
+            console.log({ col: cell.fullAddress.col, row: cell.fullAddress.row });
+            const bufferImage: ArrayBuffer = await this.getBase64FromUrl(cell.value as string);
+            const imageId = workBook.addImage({ buffer: bufferImage, extension: 'png' });
+            workSheet.addImage(imageId, {
+              tl: { col: 1, row: 150 },
+              ext: { width: 200, height: 200 }
+            });
+          }
+        });
+
+      });
+    });
+    //*add Style for cell of column
+    workSheet.getColumnKey('Id').eachCell(cell => {
+      if (cell.value === workSheet.getColumnKey('Id').header) {
+        return;
+      }
+      if ((cell.value as number) % 2 === 0) {
+        cell.style = getStyleExcelFromStyleElement(styleEvenSetup, cellBaseElement);
+      } else {
+        cell.style = getStyleExcelFromStyleElement(styleOddSetup, cellBaseElement);
+      }
+    });
     const buf = await workBook.xlsx.writeBuffer();
     FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
-
-
-
-
-
-
-
-
-
-
   }
+
+  getBase64FromUrl = async (url: string) => {
+    const data = await fetch(url);
+    const blob = await data.blob();
+    return blob.arrayBuffer();
+  };
 }

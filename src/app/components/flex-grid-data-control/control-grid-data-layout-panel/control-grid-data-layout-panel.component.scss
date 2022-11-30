@@ -69,3 +69,17 @@
 ::ng-deep .wj-cell.wj-alt:not([class*="even"]) {
   background-color: #b7c4cf;
 }
+::ng-deep .wj-flexgrid .wj-cell.cell-img {
+  padding: 0;
+  text-align: center;
+  width: 100px;
+  height: 100px;
+}
+// ::ng-deep.wj-flexgrid .wj-cell.cell-img:hover {
+//   z-index: 1;
+//   overflow: visible;
+// }
+// ::ng-deep .wj-flexgrid .wj-cell.cell-img:hover img {
+//   transform: scale(3);
+//   transition: all 600ms;
+// }
