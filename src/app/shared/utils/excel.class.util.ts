@@ -1,29 +1,32 @@
 import { FlexGrid } from '@grapecity/wijmo.grid';
-import { Alignment, AddWorksheetOptions, Color, Font, Row, Style, Worksheet, Column, Workbook, Cell } from 'exceljs';
-import { Control, EventArgs, addClass, Binding, Event as wjEven, CollectionView, CollectionViewGroup, isDate, ObservableArray } from '@grapecity/wijmo';
-import { FormatItemEventArgs } from '@grapecity/wijmo.input';
+import { AddWorksheetOptions, Row, Style, Worksheet, Column, Workbook, Cell } from 'exceljs';
+import { Event as wjEven, CollectionViewGroup, ObservableArray } from '@grapecity/wijmo';
 import { generateColumnsExcel, getStyleExcelFromStyleElement } from './excel.method.ultil';
 import * as FileSaver from 'file-saver';
 
-// interface IExcelFlexUtil {
-//   flexGrid: FlexGrid;
-//   hostElement: HTMLElement;
-//   worksheet: Worksheet;
-//   workbook: Workbook;
-//   alternatingRowStep: number;
-//   selectorCellBase: string;
-//   cellBaseElement: HTMLElement | null;
-//   columnsHeader: ObservableArray<Partial<Column>>;
-//   columnsHeaderInserted: wjEven<Worksheet, DataPayload<Partial<Column>[]>>;
-//   onColumnsHeaderInserted: (ws: Worksheet, cols?: DataPayload<Partial<Column>[]>) => void;
-//   rowInserted: wjEven<Worksheet, DataPayload<Row>>;
-//   onRowInserted: (ws: Worksheet, payload: DataPayload<Row>) => void;
-//   exportExcelAction: () => Promise<void>;
-//   creatorWorkSheet: () => Worksheet;
-//   cleanEvent: () => void;
-//   getElement: (selector: string) => HTMLElement | null;
-// }
-
+export interface IExcelFlexUtil {
+  flexGrid: FlexGrid;
+  hostElement: HTMLElement;
+  worksheet: Worksheet;
+  workbook: Workbook;
+  alternatingRowStep: number;
+  selectorCellBase: string;
+  cellBaseElement: HTMLElement | null;
+  columnsHeader: ObservableArray<Partial<Column>>;
+  columnsHeaderInserted: wjEven<Worksheet, DataPayload<Partial<Column>[]>>;
+  idImgs: ObservableArray<number>;
+  defaultHeight: number;
+  maxGroupLevel: number;
+  onColumnsHeaderInserted: (ws: Worksheet, cols?: DataPayload<Partial<Column>[]>) => void;
+  rowInserted: wjEven<Worksheet, DataPayload<Row>>;
+  onRowInserted: (ws: Worksheet, payload: DataPayload<Row>) => void;
+  worksheetCommitting: wjEven<ExcelFlexUtil, Worksheet>;
+  onWorksheetCommitting: () => void;
+  exportExcelAction: () => Promise<void>;
+  creatorWorkSheet: () => Worksheet;
+  cleanEvent: () => void;
+  getElement: (selector: string) => HTMLElement | null;
+}
 
 export class DataPayload<T> {
   /**
@@ -44,7 +47,7 @@ export class DataPayload<T> {
     this.level = _level;
   }
 }
-export class ExcelFlexUtil {
+export class ExcelFlexUtil implements IExcelFlexUtil {
   //*declaration properties
   public flexGrid!: FlexGrid;
   public hostElement!: HTMLElement;
@@ -53,10 +56,6 @@ export class ExcelFlexUtil {
   public alternatingRowStep!: number;
   public cellBaseElement!: HTMLElement | null;
   public columnsHeader!: ObservableArray<Partial<Column>>;
-  public columnsHeaderInserted: wjEven<Worksheet, DataPayload<Partial<Column>[]>> = new wjEven<Worksheet, DataPayload<Partial<Column>[]>>();
-  public rowInserted: wjEven<Worksheet, DataPayload<Row>> = new wjEven<Worksheet, DataPayload<Row>>;
-  public rowGroupInserted: wjEven<Worksheet, DataPayload<Row>> = new wjEven<Worksheet, DataPayload<Row>>;
-  public worksheetCommitting: wjEven<ExcelFlexUtil, Worksheet> = new wjEven<ExcelFlexUtil, Worksheet>();
   public idImgs: ObservableArray<number> = new ObservableArray([]);
   public defaultHeight!: number;
   public maxGroupLevel!: number;
@@ -67,7 +66,12 @@ export class ExcelFlexUtil {
   }
   get selectorCellBase(): string {
     return this._selectorCellBase;
-  }
+  };
+  //*event
+  public columnsHeaderInserted: wjEven<Worksheet, DataPayload<Partial<Column>[]>> = new wjEven<Worksheet, DataPayload<Partial<Column>[]>>();
+  public rowInserted: wjEven<Worksheet, DataPayload<Row>> = new wjEven<Worksheet, DataPayload<Row>>;
+  public rowGroupInserted: wjEven<Worksheet, DataPayload<Row>> = new wjEven<Worksheet, DataPayload<Row>>;
+  public worksheetCommitting: wjEven<ExcelFlexUtil, Worksheet> = new wjEven<ExcelFlexUtil, Worksheet>();
   //*constructor
   constructor(_flexGrid: FlexGrid) {
     this.flexGrid = _flexGrid;
@@ -178,7 +182,7 @@ export class ExcelFlexUtil {
     });
   }
 
-  private cleanEvent() {
+  cleanEvent() {
     this.rowInserted.hasHandlers && this.rowInserted.removeAllHandlers();
     this.rowGroupInserted.hasHandlers && this.rowGroupInserted.removeAllHandlers();
     this.columnsHeaderInserted.hasHandlers && this.columnsHeaderInserted.removeAllHandlers();
