@@ -121,9 +121,9 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
-    flexGrid.alternatingRowStep = 3;
-    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
-    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
     });
@@ -471,7 +471,6 @@ export class ControlGridDataLayoutPanelComponent
     event.cancel = true; // cancel event
     // console.log('trigger when copying!');
   }
-
   //**Handle action here
   public styleHeaderSetup: Partial<CSSStyleDeclaration> = {
     backgroundColor: '#dfe3e8',
@@ -483,7 +482,7 @@ export class ControlGridDataLayoutPanelComponent
     fontFamily: 'time new roman',
     fontSize: '11px',
   };
-  public styleCellSetup: Partial<CSSStyleDeclaration> = {
+  public styleBaseSetup: Partial<CSSStyleDeclaration> = {
     backgroundColor: '#ffffff',
     fontFamily: 'time new roman',
     fontSize: '11px'
@@ -499,6 +498,11 @@ export class ControlGridDataLayoutPanelComponent
     fontFamily: 'time new roman',
     fontSize: '11px',
   };
+  public styleRowGroupSetup: Partial<CSSStyleDeclaration> = {
+    fontFamily: 'time new roman',
+    fontSize: '11px',
+    fontWeight: 'bold',
+  };
   public onAddNewColumn(): void { }
 
   public async onActionExportExcel(): Promise<void> {
@@ -511,55 +515,65 @@ export class ControlGridDataLayoutPanelComponent
         row.eachCell((cell: Excel.Cell) => {
           cell.style = getStyleExcelFromStyleElement(this.styleHeaderSetup, excelFlexUtil.cellBaseElement as HTMLElement);
         });
-        row.commit();
       });
-    });
+    }, this);
+    excelFlexUtil.rowGroupInserted.addHandler((ws: Excel.Worksheet, payload: DataPayload<Excel.Row>) => {
+      payload.data.eachCell(cell => {
+        if (payload.level === 0) {
+          ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
+            alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+              pattern: 'solid', type: 'pattern',
+              fgColor: { argb: 'C147E9' }
+            } as Excel.FillPattern
+          });
+        } else if (payload.level === 1) {
+          ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
+            alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+              pattern: 'solid', type: 'pattern', fgColor: {
+                argb: 'FB2576'
+              }
+            } as Excel.FillPattern
+          });
+        }
+      });
+    }, this);
     let step = 0;
-    let id;
     excelFlexUtil.rowInserted.addHandler((ws: Excel.Worksheet, payload: DataPayload<Excel.Row>) => {
-      payload.data.height = excelFlexUtil.flexGrid.rows[payload.index as number].renderHeight;
       if (payload.index === step) {
         step += excelFlexUtil.alternatingRowStep + 1;
         payload.data.eachCell({ includeEmpty: true }, async (cell: Excel.Cell) => {
           if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
             if ((cell.value) as number % 2 == 0) {
-              cell.style = getStyleExcelFromStyleElement(this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+              ExcelFlexUtil.addStyleForCell(cell, this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
             } else {
-              cell.style = getStyleExcelFromStyleElement(this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+              ExcelFlexUtil.addStyleForCell(cell, this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
             }
           } else {
-            cell.style = getStyleExcelFromStyleElement(this.styleCellAlternatingRowStep, excelFlexUtil.cellBaseElement as HTMLElement);
+            ExcelFlexUtil.addStyleForCell(cell, this.styleCellAlternatingRowStep, excelFlexUtil.cellBaseElement as HTMLElement);
           }
-          if (cell.fullAddress.col === ws.getColumnKey('Image').number) {
-            console.log(`${cell.address}:${cell.address}`);
-            const idImg = await excelFlexUtil.addImageIntoWorkBookByUrl(payload.item.Image, "png");
-            ws.addImage(idImg, {
-              tl: { col: cell.fullAddress.col, row: cell.fullAddress.row },
-              ext: { width: ws.getColumnKey('Image').width as number, height: payload.data.height }
-            });
-          }
+          // if (cell.fullAddress.col === ws.getColumnKey('Image').number) {
+          //   console.log(`${cell.address}:${cell.address}`);
+          //   const idImg = await excelFlexUtil.addImageIntoWorkBookByUrl(payload.item.Image, "png");
+          //   ws.addImage(idImg, {
+          //     tl: { col: cell.fullAddress.col, row: cell.fullAddress.row },
+          //     ext: { width: ws.getColumnKey('Image').width as number, height: payload.data.height }
+          //   });
+          // }
         });
       } else {
         payload.data.eachCell({ includeEmpty: true }, (cell: Excel.Cell) => {
           if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
             if ((cell.value) as number % 2 == 0) {
-              cell.style = getStyleExcelFromStyleElement(this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+              ExcelFlexUtil.addStyleForCell(cell, this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
             } else {
-              cell.style = getStyleExcelFromStyleElement(this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+              ExcelFlexUtil.addStyleForCell(cell, this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
             }
           } else {
-            cell.style = getStyleExcelFromStyleElement(this.styleCellSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+            ExcelFlexUtil.addStyleForCell(cell, this.styleBaseSetup, excelFlexUtil.cellBaseElement as HTMLElement);
           }
         });
       }
-    });
+    }, this);
     excelFlexUtil.exportExcelAction();
   }
-
-  async getArrayBufferFromUrl(url: string): Promise<ArrayBuffer> {
-    const data = await fetch(url);
-    const blob = await data.blob();
-    return blob.arrayBuffer();
-  };
-
 }

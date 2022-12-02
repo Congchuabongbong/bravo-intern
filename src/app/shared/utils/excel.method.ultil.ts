@@ -16,7 +16,9 @@ export function getStyleExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclar
   crawlStyle.border = getBorderExcelFromStyleElement(styleSetup, elementOverrideStyle);
   crawlStyle.fill = getFillExcelFromStyleElement(styleSetup, elementOverrideStyle) as FillPattern;
   crawlStyle.alignment = getAlignmentFromStyleElement(styleSetup, elementOverrideStyle);
-  if (styleExcelOps) return { ...crawlStyle, ...styleExcelOps };
+  if (styleExcelOps) {
+    return { ...crawlStyle, ...styleExcelOps };
+  };
   return crawlStyle;
 }
 //* Get and set Font Excel
