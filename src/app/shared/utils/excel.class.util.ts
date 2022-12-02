@@ -27,6 +27,7 @@ export interface IExcelFlexUtil {
   cleanEvent: () => void;
   getElement: (selector: string) => HTMLElement | null;
 }
+
 export class DataPayload<T> {
   public readonly index?: number;
   public readonly data!: T;
@@ -105,11 +106,7 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
         this.insertRowGroup(this.flexGrid.collectionView.groups);
       } else {
         this.flexGrid.collectionView.items.forEach((item: any, index: number) => {
-          const row = this.worksheet.addRow(item);
-          row.height = this.flexGrid.rows[index].renderHeight;
-          const payload = new DataPayload<Row>(row, item, index);
-          this.onRowInserted(this.worksheet, payload);
-          row.commit();
+          this.insertRow(item, index);
         });
       }
       this.onWorksheetCommitting();
@@ -163,16 +160,22 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
       }
       if (group.level === this.maxGroupLevel) {
         group.items.forEach((item: any, index: number) => {
-          const row = this.worksheet.addRow(item);
-          row.outlineLevel = this.maxGroupLevel + 1;
-          row.height = this.flexGrid.rows[index].renderHeight;
-          const payload = new DataPayload<Row>(row, item, this.flexGrid.collectionView.items.indexOf(item));
-          this.onRowInserted(this.worksheet, payload);
-          row.commit();
+          this.insertRow(item, index, true);
         });
       }
       rowGroup.commit();
     });
+  }
+
+  public insertRow(item: any, index: number, isOutlineLevel?: boolean) {
+    const row = this.worksheet.addRow(item);
+    if (isOutlineLevel) {
+      row.outlineLevel = this.maxGroupLevel + 1;
+    }
+    row.height = this.flexGrid.rows[index].renderHeight;
+    const payload = new DataPayload<Row>(row, item, this.flexGrid.collectionView.items.indexOf(item));
+    this.onRowInserted(this.worksheet, payload);
+    row.commit();
   }
 
   cleanEvent() {

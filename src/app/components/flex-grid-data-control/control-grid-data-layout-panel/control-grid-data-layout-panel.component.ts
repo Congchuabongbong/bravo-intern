@@ -123,6 +123,8 @@ export class ControlGridDataLayoutPanelComponent
     this.flex = flexGrid;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Code'));
 
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
