@@ -122,8 +122,7 @@ export class ControlGridDataLayoutPanelComponent
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemGroupCode'));
+    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
     });
@@ -519,29 +518,28 @@ export class ControlGridDataLayoutPanelComponent
     }, this);
     excelFlexUtil.rowGroupInserted.addHandler((ws: Excel.Worksheet, payload: DataPayload<Excel.Row>) => {
       payload.data.eachCell(cell => {
-        if (payload.level === 0) {
-          ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
-            alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
-              pattern: 'solid', type: 'pattern',
-              fgColor: { argb: 'C147E9' }
-            } as Excel.FillPattern
-          });
-        } else if (payload.level === 1) {
-          ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
-            alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
-              pattern: 'solid', type: 'pattern', fgColor: {
-                argb: 'BA94D1'
-              }
-            } as Excel.FillPattern
-          });
-        } else {
-          ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
-            alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
-              pattern: 'solid', type: 'pattern', fgColor: {
-                argb: '3B185F'
-              }
-            } as Excel.FillPattern
-          });
+        switch (payload.level) {
+          case 0:
+            ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
+              alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+                pattern: 'solid', type: 'pattern',
+                fgColor: { argb: 'C147E9' }
+              } as Excel.FillPattern
+            });
+            break;
+          case 1:
+            ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
+              alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+                pattern: 'solid', type: 'pattern', fgColor: {
+                  argb: 'BA94D1'
+                }
+              } as Excel.FillPattern
+            });
+            break;
+          case 2:
+            break;
+          default:
+            break;
         }
       });
     }, this);
@@ -583,5 +581,6 @@ export class ControlGridDataLayoutPanelComponent
       }
     }, this);
     excelFlexUtil.exportExcelAction();
+    excelFlexUtil.saveFile();
   }
 }

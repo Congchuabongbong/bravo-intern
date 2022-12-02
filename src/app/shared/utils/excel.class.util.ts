@@ -1,5 +1,5 @@
 import { FlexGrid } from '@grapecity/wijmo.grid';
-import { AddWorksheetOptions, Row, Style, Worksheet, Column, Workbook, Cell } from 'exceljs';
+import { AddWorksheetOptions, Row, Style, Worksheet, Column, Workbook, Cell, DataValidation } from 'exceljs';
 import { Event as wjEven, CollectionViewGroup, ObservableArray } from '@grapecity/wijmo';
 import { generateColumnsExcel, getStyleExcelFromStyleElement } from './excel.method.ultil';
 import * as FileSaver from 'file-saver';
@@ -46,15 +46,15 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
   //*declaration properties
   public flexGrid!: FlexGrid;
   public hostElement!: HTMLElement;
-  public workbook: Workbook = new Workbook();
-  public worksheet: Worksheet = this.workbook.addWorksheet();
+  public workbook: Workbook;
+  public worksheet: Worksheet;
   public alternatingRowStep!: number;
   public cellBaseElement!: HTMLElement | null;
   public columnsHeader!: ObservableArray<Partial<Column>>;
   public idImgs: ObservableArray<number> = new ObservableArray([]);
   public defaultHeight!: number;
   public maxGroupLevel!: number;
-  private _selectorCellBase: string = '.wj-cell:not(.wj-state-active)[role~="gridcell"]';
+  private _selectorCellBase!: string;
   set selectorCellBase(value: string) {
     this._selectorCellBase = value;
     this.cellBaseElement = this.getElement(this.selectorCellBase);
@@ -69,8 +69,12 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
   public worksheetCommitting: wjEven<ExcelFlexUtil, Worksheet> = new wjEven<ExcelFlexUtil, Worksheet>();
   //*constructor
   constructor(_flexGrid: FlexGrid) {
+    //TODO lazy initialize
+    this._selectorCellBase = '.wj-cell:not(.wj-state-active)[role~="gridcell"]';
+    this.workbook = new Workbook();
+    this.worksheet = this.workbook.addWorksheet('My Sheet', { views: [{ showGridLines: false }] });
+    //Todo initialize properties of class
     this.flexGrid = _flexGrid;
-    //initialize properties of class
     this.hostElement = this.flexGrid.hostElement;
     this.alternatingRowStep = this.flexGrid.alternatingRowStep;
     this.columnsHeader = generateColumnsExcel(this.flexGrid.columns);
@@ -117,9 +121,9 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
     }
   }
 
-  public async saveFile(): Promise<void> {
+  public async saveFile(fileName: string = 'myExcel'): Promise<void> {
     const buf = await this.workbook.xlsx.writeBuffer();
-    FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
+    FileSaver.saveAs(new Blob([buf]), `${fileName}.xlsx`);
   }
 
   public addImageIntoWorkBookByBuffer(buffer: ArrayBuffer, extension: 'png' | 'jpeg'): number {
@@ -136,6 +140,7 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
   public static addStyleForCell(cell: Cell, style: Partial<CSSStyleDeclaration>, baseElement?: HTMLElement, styleOps?: Partial<Style>): void {
     cell.style = getStyleExcelFromStyleElement(style, baseElement, styleOps);
   }
+
   public static async getArrayBufferFromUrl(url: string): Promise<ArrayBuffer> {
     const data = await fetch(url);
     const blob = await data.blob();
@@ -157,7 +162,7 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
       this.mergeCells(rowGroup, 1, this.worksheet.columns.length);
       const payload = new DataPayload<Row>(rowGroup, group.items, undefined, group.level);
       this.onRowGroupInserted(this.worksheet, payload);
-      if (group.groups.length > 0) {
+      if (!group.isBottomLevel) {
         this.insertRowGroup(group.groups);
       }
       if (group.level === this.maxGroupLevel) {

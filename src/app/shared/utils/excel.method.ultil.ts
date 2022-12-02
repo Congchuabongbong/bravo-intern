@@ -56,7 +56,7 @@ export function getAlignmentFromStyleElement(styleSetup: Partial<CSSStyleDeclara
   let crawlStyle: Partial<Alignment> = {};
   let computedStyle: CSSStyleDeclaration = elementOverrideStyle ? { ...window.getComputedStyle(elementOverrideStyle), ...styleSetup } as CSSStyleDeclaration : styleSetup as CSSStyleDeclaration;
   crawlStyle.horizontal = convertHorizontalExcel(computedStyle.textAlign) as Horizontal;
-  crawlStyle.wrapText = computedStyle.wordWrap === 'break-word';
+  crawlStyle.wrapText = true;
   crawlStyle.shrinkToFit = (computedStyle.flexShrink === '0');
   crawlStyle.vertical = 'top';
   if (alignmentOps) return { ...crawlStyle, ...alignmentOps };
