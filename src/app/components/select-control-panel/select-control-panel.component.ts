@@ -90,10 +90,10 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
   public formatItem = new wjEven<this, FormatItemEventArgs>();
   //**constructor */
   constructor(private _el: ElementRef, private _injector: Injector) {
-    super(_el.nativeElement, _injector) //-> call parent constructor
-    this.applyTemplate('wj-control', this.getTemplate(), { //->apply template for control 
+    super(_el.nativeElement, _injector); //-> call parent constructor
+    this.applyTemplate('wj-control', this.getTemplate(), { //->apply template for control
       _selectElement: 'select',
-    })
+    });
     addClass(this.hostElement, "br-comboBox"); // -> add class for hostElement
     addClass(this.selectElement, "br-select"); // -> add class for select
     this.addEventListener(this.selectElement, "change", this.onSelectedChange.bind(this), false); // -> add event listener!;
@@ -135,9 +135,9 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
         optionEL.value = this._selectedValueBinding && this._selectedValueBinding.getValue(item) || item;
         optionEL.text = this._headerPath && this._headerBinding.getValue(item) || item;
       }
-      const formatItemEventArgs = new FormatItemEventArgs(this.collectionView.items.indexOf(item), item, optionEL)
+      const formatItemEventArgs = new FormatItemEventArgs(this.collectionView.items.indexOf(item), item, optionEL);
       this.formatItem.hasHandlers && this.formatItem.raise(this, formatItemEventArgs);
-      this.formatItemNg.emit(formatItemEventArgs)
+      this.formatItemNg.emit(formatItemEventArgs);
       optionsEl.push(optionEL);
     });
     this.selectElement.append(...optionsEl);
@@ -171,7 +171,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     // setInterval(() => {
     //   this.isUpdating || this.invalidate();
     // }, 11);
-    this.isUpdating || this.invalidate()
+    this.isUpdating || this.invalidate();
   }
   /**
    * @desc: using to raise event when itemSource changed
@@ -241,7 +241,7 @@ export class SelectControlPanelComponent extends Control implements OnInit, Afte
     this.formatItem.removeAllHandlers();
     this.formatItemNg.unsubscribe();
   }
-  //**custom form 
+  //**custom form
   public onChange = (value: any) => value;
   public onTouched = () => { };
   public onChangeChecked(value: any) {

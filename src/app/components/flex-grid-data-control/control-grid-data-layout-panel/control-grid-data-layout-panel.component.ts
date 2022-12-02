@@ -24,7 +24,7 @@ import {
 } from '@grapecity/wijmo.grid';
 import {
   showPopup, PropertyGroupDescription,
-
+  Event as wjEven,
   getActiveElement,
   getElement,
   Point,
@@ -65,9 +65,10 @@ import {
   getStyleExcelFromStyleElement,
   mergeCells,
 } from 'src/app/shared/utils/excel.method.ultil';
-import { ExcelFlexUtil } from 'src/app/shared/utils/excel.class.util';
+import { ExcelFlexUtil, DataPayload } from 'src/app/shared/utils/excel.class.util';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { HttpClient } from '@angular/common/http';
+import { Worksheet, Cell } from 'exceljs';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -120,7 +121,8 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
+    flexGrid.alternatingRowStep = 3;
+    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
@@ -295,9 +297,9 @@ export class ControlGridDataLayoutPanelComponent
   ): void {
     // console.log('trigger when column auto size changed!');
     /**
-      @cellRangeEventArgs 
+      @cellRangeEventArgs
       @method : getColumn(), getRow()
-      @property : cancel, col, data, panel, range, row, empty,... 
+      @property : cancel, col, data, panel, range, row, empty,...
     */
   }
   private onHandleAutoSizedRow(
@@ -319,7 +321,7 @@ export class ControlGridDataLayoutPanelComponent
     flex: FlexGrid,
     event: CellRangeEventArgs
   ): void {
-    /** 
+    /**
     @trigger : Occurs after selection changes.
     */
   }
@@ -344,7 +346,7 @@ export class ControlGridDataLayoutPanelComponent
     flex: FlexGrid,
     event: CellRangeEventArgs
   ): void {
-    /** 
+    /**
     @trigger : Occurs before selection changes.
     */
     // console.log('trigger when selecting!');
@@ -394,7 +396,7 @@ export class ControlGridDataLayoutPanelComponent
   private onHandleUpdatedView(flex: FlexGrid, event: EventArgs): void {
     /**
     @trigger : Occurs when the grid finishes creating/updating the elements that make up the current view.
-    @actions 
+    @actions
     Refreshing the grid or its data source,
     Adding, removing, or changing rows or columns,
     Resizing or scrolling the grid,
@@ -405,7 +407,7 @@ export class ControlGridDataLayoutPanelComponent
   private onHandleUpdatingView(flex: FlexGrid, event: CancelEventArgs): void {
     /**
     @trigger : Occurs when the grid starts creating/updating the elements that make up the current view.
-    @actions 
+    @actions
     Refreshing the grid or its data source,
     Adding, removing, or changing rows or columns,
     Resizing or scrolling the grid,
@@ -419,7 +421,7 @@ export class ControlGridDataLayoutPanelComponent
   ): void {
     /**
     @trigger : Occurs before a cell enters edit mode; The event handler may cancel the edit operation.
-    
+
    */
   }
   //**cell Edit Ending and ended:
@@ -469,116 +471,95 @@ export class ControlGridDataLayoutPanelComponent
     event.cancel = true; // cancel event
     // console.log('trigger when copying!');
   }
+
   //**Handle action here
+  public styleHeaderSetup: Partial<CSSStyleDeclaration> = {
+    backgroundColor: '#dfe3e8',
+    fontFamily: 'time new roman',
+    fontSize: '11px',
+  };
+  public styleCellAlternatingRowStep: Partial<CSSStyleDeclaration> = {
+    backgroundColor: '#b7c4cf',
+    fontFamily: 'time new roman',
+    fontSize: '11px',
+  };
+  public styleCellSetup: Partial<CSSStyleDeclaration> = {
+    backgroundColor: '#ffffff',
+    fontFamily: 'time new roman',
+    fontSize: '11px'
+  };
+
+  public styleOddSetup: Partial<CSSStyleDeclaration> = {
+    backgroundColor: '#82cd47',
+    fontFamily: 'time new roman',
+    fontSize: '11px'
+  };
+  public styleEvenSetup: Partial<CSSStyleDeclaration> = {
+    backgroundColor: '#ffddd2',
+    fontFamily: 'time new roman',
+    fontSize: '11px',
+  };
   public onAddNewColumn(): void { }
+
   public async onActionExportExcel(): Promise<void> {
-    //* Khởi tạo Excel
-    const workBook = new Excel.Workbook();
-    const workSheet = workBook.addWorksheet('My sheet');
-    //?? Demo add image successfully
-    // const bufferImage: ArrayBuffer = await this.getBase64FromUrl('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80');
-    // const imageId = workBook.addImage({ buffer: bufferImage, extension: 'png' });
-    // workSheet.getCell(1, 1).value = '123123';
-    // workSheet.addImage(imageId, {
-    //   tl: { col: 0, row: 0 },
-    //   ext: { height: 10, width: 10 },
-    // });
-    //* Get and declared styleSetup
-    const cellBaseElement = this.flex.hostElement.querySelector('.wj-cell:not(.wj-state-active)[role~="gridcell"]') as HTMLElement;
-    let styleHeaderSetup: Partial<CSSStyleDeclaration> = {
-      backgroundColor: '#dfe3e8',
-      fontFamily: 'time new roman',
-      fontSize: '11px',
-    };
-    let styleCellAlternatingRowStep: Partial<CSSStyleDeclaration> = {
-      backgroundColor: '#b7c4cf',
-      fontFamily: 'time new roman',
-      fontSize: '11px',
-    };
-    let styleCellSetup: Partial<CSSStyleDeclaration> = {
-      backgroundColor: '#ffffff',
-      fontFamily: 'time new roman',
-      fontSize: '11px'
-    };
-    let styleOddSetup: Partial<CSSStyleDeclaration> = {
-      backgroundColor: '#82cd47',
-      fontFamily: 'time new roman',
-      fontSize: '11px'
-    };
-    let styleEvenSetup: Partial<CSSStyleDeclaration> = {
-      backgroundColor: '#ffddd2',
-      fontFamily: 'time new roman',
-      fontSize: '11px',
-    };
-    //*Set column
-    let colsHeader = generateColumnsExcel(this.flex.columns);
-    workSheet.columns = colsHeader;
-    workSheet.eachRow((row: Excel.Row) => {
-      row.height = this.flex.columnHeaders.height;
-      row.eachCell((cell: Excel.Cell) => {
-        cell.style = getStyleExcelFromStyleElement(styleHeaderSetup, cellBaseElement);
+    const excelFlexUtil = new ExcelFlexUtil(this.flex);
+    // const id = await excelFlexUtil.addImageIntoWorkBookByUrl('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80', 'png');
+    // excelFlexUtil.worksheet.addBackgroundImage(id);
+    excelFlexUtil.columnsHeaderInserted.addHandler((ws: Worksheet) => {
+      ws.eachRow((row: Excel.Row) => {
+        row.height = this.flex.columnHeaders.height;
+        row.eachCell((cell: Excel.Cell) => {
+          cell.style = getStyleExcelFromStyleElement(this.styleHeaderSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+        });
+        row.commit();
       });
     });
-    //*set Row
-    // let rows = workSheet.addRows(this.flex.collectionView.items);
-    this.flex.collectionView.groups.forEach(g => {
-      //*row group;
-      const rowGroup = workSheet.addRow([`${(g as CollectionViewGroup).name}: ${(g as CollectionViewGroup).items.length} items`]);
-      rowGroup.height = 33;
-      rowGroup.outlineLevel = 0;
-      mergeCells(workSheet, rowGroup, 1, workSheet.columns.length);
-      rowGroup.eachCell(cell => {
-        cell.style = getStyleExcelFromStyleElement(styleCellAlternatingRowStep, cellBaseElement, { alignment: { horizontal: 'center', vertical: 'middle' }, fill: { pattern: 'solid', type: 'pattern', fgColor: 'e1e1e1' } as Excel.FillPattern });
-      });
-      rowGroup.commit();
-      //*
-      const rows = workSheet.addRows((g as CollectionViewGroup).items);
-      let step = 0;
-      rows.forEach((row: Excel.Row, index: number) => {
-        row.outlineLevel = 1;
-        row.height = this.flex.rows[index].renderHeight; // !!wrong: index not exactly same index
-        //add style for alternating rows step
-        if (this.flex.alternatingRowStep) {
-          if (index === step) {
-            row.eachCell({ includeEmpty: true }, cell => cell.style = getStyleExcelFromStyleElement(styleCellAlternatingRowStep, cellBaseElement));
-            step += this.flex.alternatingRowStep + 1;
+    let step = 0;
+    let id;
+    excelFlexUtil.rowInserted.addHandler((ws: Excel.Worksheet, payload: DataPayload<Excel.Row>) => {
+      payload.data.height = excelFlexUtil.flexGrid.rows[payload.index as number].renderHeight;
+      if (payload.index === step) {
+        step += excelFlexUtil.alternatingRowStep + 1;
+        payload.data.eachCell({ includeEmpty: true }, async (cell: Excel.Cell) => {
+          if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
+            if ((cell.value) as number % 2 == 0) {
+              cell.style = getStyleExcelFromStyleElement(this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+            } else {
+              cell.style = getStyleExcelFromStyleElement(this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+            }
           } else {
-            row.eachCell({ includeEmpty: true }, cell => cell.style = getStyleExcelFromStyleElement(styleCellSetup, cellBaseElement));
+            cell.style = getStyleExcelFromStyleElement(this.styleCellAlternatingRowStep, excelFlexUtil.cellBaseElement as HTMLElement);
           }
-        }
-        //TODO: Add image(not complete)
-        row.eachCell({ includeEmpty: true }, async (cell) => {
-          if (workSheet.getColumn(cell.fullAddress.col).key === 'Image') {//!wong
-            console.log({ col: cell.fullAddress.col, row: cell.fullAddress.row });
-            const bufferImage: ArrayBuffer = await this.getBase64FromUrl(cell.value as string);
-            const imageId = workBook.addImage({ buffer: bufferImage, extension: 'png' });
-            workSheet.addImage(imageId, {
-              tl: { col: 1, row: 150 },
-              ext: { width: 200, height: 200 }
+          if (cell.fullAddress.col === ws.getColumnKey('Image').number) {
+            console.log(`${cell.address}:${cell.address}`);
+            const idImg = await excelFlexUtil.addImageIntoWorkBookByUrl(payload.item.Image, "png");
+            ws.addImage(idImg, {
+              tl: { col: cell.fullAddress.col, row: cell.fullAddress.row },
+              ext: { width: ws.getColumnKey('Image').width as number, height: payload.data.height }
             });
           }
         });
-
-      });
-    });
-    //*add Style for cell of column
-    workSheet.getColumnKey('Id').eachCell(cell => {
-      if (cell.value === workSheet.getColumnKey('Id').header) {
-        return;
-      }
-      if ((cell.value as number) % 2 === 0) {
-        cell.style = getStyleExcelFromStyleElement(styleEvenSetup, cellBaseElement);
       } else {
-        cell.style = getStyleExcelFromStyleElement(styleOddSetup, cellBaseElement);
+        payload.data.eachCell({ includeEmpty: true }, (cell: Excel.Cell) => {
+          if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
+            if ((cell.value) as number % 2 == 0) {
+              cell.style = getStyleExcelFromStyleElement(this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+            } else {
+              cell.style = getStyleExcelFromStyleElement(this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+            }
+          } else {
+            cell.style = getStyleExcelFromStyleElement(this.styleCellSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+          }
+        });
       }
     });
-    const buf = await workBook.xlsx.writeBuffer();
-    FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
+    excelFlexUtil.exportExcelAction();
   }
 
-  getBase64FromUrl = async (url: string) => {
+  async getArrayBufferFromUrl(url: string): Promise<ArrayBuffer> {
     const data = await fetch(url);
     const blob = await data.blob();
     return blob.arrayBuffer();
   };
+
 }
