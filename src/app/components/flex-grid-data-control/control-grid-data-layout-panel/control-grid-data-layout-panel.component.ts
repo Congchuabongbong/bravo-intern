@@ -123,15 +123,12 @@ export class ControlGridDataLayoutPanelComponent
     this.flex = flexGrid;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Code'));
-
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemGroupCode'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
     });
     flexGrid.getColumn('Image').cssClass = 'cell-img';
     flexGrid.autoRowHeights = true;
-
     //properties:
     // flexGrid.allowDragging = 3;
     // flexGrid.allowSorting = 2;
@@ -475,6 +472,7 @@ export class ControlGridDataLayoutPanelComponent
   }
   //**Handle action here
   public styleHeaderSetup: Partial<CSSStyleDeclaration> = {
+    fontWeight: 'bold',
     backgroundColor: '#dfe3e8',
     fontFamily: 'time new roman',
     fontSize: '11px',
@@ -532,7 +530,15 @@ export class ControlGridDataLayoutPanelComponent
           ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
             alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
               pattern: 'solid', type: 'pattern', fgColor: {
-                argb: 'FB2576'
+                argb: 'BA94D1'
+              }
+            } as Excel.FillPattern
+          });
+        } else {
+          ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
+            alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+              pattern: 'solid', type: 'pattern', fgColor: {
+                argb: '3B185F'
               }
             } as Excel.FillPattern
           });

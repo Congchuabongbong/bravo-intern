@@ -77,8 +77,6 @@ export function getFillExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclara
   return crawlStyle;
 }
 
-
-
 //* Get and set border excel
 export function getBorderExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclaration>, elementOverrideStyle?: HTMLElement, borderExcelOps?: Partial<Borders>): Partial<Borders> {
   let crawlStyle: Partial<Borders> = {};
@@ -182,13 +180,10 @@ export function convertBorderStyleExcel(borderStyle: string, borderWidth: number
       return 'thin';
   }
 }
-
 //*merge Cell
 export function mergeCells(ws: Worksheet, row: Row, from: number, to: number): void {
   ws.mergeCells(`${row.getCell(from).address}:${row.getCell(to).address}`);
 }
-//*add Rows
-function addRows() { }
 //*generate Column;
 export function generateColumnsExcel(cols: ColumnWj[], style?: Partial<Style>): ObservableArray<Partial<Column>> {
   let colsExcel: ObservableArray<Partial<Column>> = new ObservableArray([]);

@@ -1,24 +1,24 @@
 <app-control-grid-container-layout-panel *ngIf="wijFlexLayout$ | async as wijFlexLayout"
-    [layoutConfig]="wijFlexLayout.container" overflow="'hidden'">
-    <!--** main grid data **-->
-    <app-control-grid-item-layout-panel [position]="wijFlexLayout.mainGridData" [overflow]="'auto hidden'">
-        <wj-flex-grid #wjFlexMain [itemsSource]="viewCollection" (initialized)="flexMainInitialized(wjFlexMain)"
-            [showSelectedHeaders]="'3'" [allowPinning]="'SingleColumn'" [selectionMode]="'3'" [showMarquee]="true"
-            [headersVisibility]="'1'">
-        </wj-flex-grid>
-        <div style=" display:none">
-            <wj-list-box #columnPicker class="column-picker" (initialized)="listBoxInitialized(columnPicker)">
-            </wj-list-box>
-        </div>
+  [layoutConfig]="wijFlexLayout.container" overflow="'hidden'">
+  <!--** main grid data **-->
+  <app-control-grid-item-layout-panel [position]="wijFlexLayout.mainGridData" [overflow]="'auto hidden'">
+    <wj-flex-grid #wjFlexMain [itemsSource]="viewCollection" (initialized)="flexMainInitialized(wjFlexMain)"
+      [showSelectedHeaders]="'3'" [allowPinning]="'SingleColumn'" [selectionMode]="'3'" [showMarquee]="true"
+      [headersVisibility]="'1'">
+    </wj-flex-grid>
+    <div style=" display:none">
+      <wj-list-box #columnPicker class="column-picker" (initialized)="listBoxInitialized(columnPicker)">
+      </wj-list-box>
+    </div>
+  </app-control-grid-item-layout-panel>
+  <!--** Pagination **-->
+  <!--** Tab **-->
+  <ng-container *ngIf="wijFlexLayout.tabGridData">
+    <app-control-grid-item-layout-panel [position]="wijFlexLayout.tabGridData" [overflow]="'auto hidden'">
+      <app-control-grid-tab-data-layout-panel [dataSource]="dataTabSource" (actionDelete)="onDeleteRowSelected()"
+        (actionAdd)="onAddNewColumn()" (flexTabInitialized)="flexTabInitialized($event)"
+        (actionExportExcel)="onActionExportExcel()">
+      </app-control-grid-tab-data-layout-panel>
     </app-control-grid-item-layout-panel>
-    <!--** Pagination **-->
-    <!--** Tab **-->
-    <ng-container *ngIf="wijFlexLayout.tabGridData">
-        <app-control-grid-item-layout-panel [position]="wijFlexLayout.tabGridData" [overflow]="'auto hidden'">
-            <app-control-grid-tab-data-layout-panel [dataSource]="dataTabSource" (actionDelete)="onDeleteRowSelected()"
-                (actionAdd)="onAddNewColumn()" (flexTabInitialized)="flexTabInitialized($event)"
-                (actionExportExcel)="onActionExportExcel()">
-            </app-control-grid-tab-data-layout-panel>
-        </app-control-grid-item-layout-panel>
-    </ng-container>
+  </ng-container>
 </app-control-grid-container-layout-panel>

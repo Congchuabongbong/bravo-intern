@@ -17,13 +17,15 @@ export interface IExcelFlexUtil {
   idImgs: ObservableArray<number>;
   defaultHeight: number;
   maxGroupLevel: number;
-  onColumnsHeaderInserted: (ws: Worksheet, cols?: DataPayload<Partial<Column>[]>) => void;
   rowInserted: wjEven<Worksheet, DataPayload<Row>>;
-  onRowInserted: (ws: Worksheet, payload: DataPayload<Row>) => void;
+  rowGroupInserted: wjEven<Worksheet, DataPayload<Row>>;
   worksheetCommitting: wjEven<ExcelFlexUtil, Worksheet>;
+  onColumnsHeaderInserted: (ws: Worksheet, cols?: DataPayload<Partial<Column>[]>) => void;
+  onRowInserted: (ws: Worksheet, payload: DataPayload<Row>) => void;
   onWorksheetCommitting: () => void;
-  exportExcelAction: () => Promise<void>;
-  creatorWorkSheet: () => Worksheet;
+  onRowGroupInserted: (ws: Worksheet, payload: DataPayload<Row>) => void;
+  exportExcelAction: () => void;
+  creatorWorkSheet?: () => Worksheet;
   cleanEvent: () => void;
   getElement: (selector: string) => HTMLElement | null;
 }
@@ -92,11 +94,8 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
     this.worksheetCommitting.hasHandlers && this.worksheetCommitting.raise(this, this.worksheet);
   };
   //*method here
-  creatorWorkSheet(name?: string | undefined, options?: Partial<AddWorksheetOptions> | undefined): Worksheet {
-    this.worksheet = this.workbook.addWorksheet(name, options);
-    return this.worksheet;
-  };
-  public async exportExcelAction(): Promise<void> {
+
+  public exportExcelAction(): void {
     //add columns header
     try {
       const cols = this.worksheet.columns = this.columnsHeader;
@@ -111,13 +110,16 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
       }
       this.onWorksheetCommitting();
       this.worksheet.commit;
-      const buf = await this.workbook.xlsx.writeBuffer();
-      FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
     } catch (error) {
-      new Error('Error occurred when exported excel!!');
+      throw new Error('Error occurred when exported excel!!');
     } finally {
       this.cleanEvent();
     }
+  }
+
+  public async saveFile(): Promise<void> {
+    const buf = await this.workbook.xlsx.writeBuffer();
+    FileSaver.saveAs(new Blob([buf]), `demo.xlsx`);
   }
 
   public addImageIntoWorkBookByBuffer(buffer: ArrayBuffer, extension: 'png' | 'jpeg'): number {
