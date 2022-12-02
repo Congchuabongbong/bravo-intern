@@ -27,17 +27,9 @@ export interface IExcelFlexUtil {
   cleanEvent: () => void;
   getElement: (selector: string) => HTMLElement | null;
 }
-
 export class DataPayload<T> {
-  /**
-  * Gets the index of the data item in the list.
-  */
   public readonly index?: number;
-  /**
-   * Gets the data item being formatted.
-   */
   public readonly data!: T;
-
   public readonly item!: any;
   public readonly level?: number;
   constructor(_data: T, _item?: any, _index?: number, _level?: number) {
@@ -75,6 +67,7 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
   //*constructor
   constructor(_flexGrid: FlexGrid) {
     this.flexGrid = _flexGrid;
+    //initialize properties of class
     this.hostElement = this.flexGrid.hostElement;
     this.alternatingRowStep = this.flexGrid.alternatingRowStep;
     this.columnsHeader = generateColumnsExcel(this.flexGrid.columns);
