@@ -41,12 +41,15 @@ tr:nth-child(even) {
 }
 
 .container-loading {
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   height: calc(100vh - 5rem) !important;
   width: calc(100vw - 27rem);
   overflow: hidden;
+}
+.container-loading.active {
+  display: flex;
 }
 @-webkit-keyframes spin {
   0% {

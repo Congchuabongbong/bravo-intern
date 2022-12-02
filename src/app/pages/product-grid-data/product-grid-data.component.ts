@@ -13,6 +13,7 @@ import { CollectionView } from '@grapecity/wijmo';
 export class ProductGridDataComponent implements OnInit {
   public products$ = this.httpProductService.products$;
   public wijFlexColumnConfig$: Observable<IWjFlexColumnConfig> = this.httpLayoutService.wijFlexColumnConfig$;
+  public isLoading!: boolean;
   //**Constructor */
   constructor(private httpProductService: HttpProductService, private httpLayoutService: HttpLayoutService) {
   }
@@ -31,5 +32,7 @@ export class ProductGridDataComponent implements OnInit {
   public flexTabInitialized(flexGrid: wjcGrid.FlexGrid) {
     flexGrid.headersVisibility = wjcGrid.HeadersVisibility.Column; // -> headers visibility
   }
-
+  setLoading(isLoading: boolean) {
+    this.isLoading = isLoading;
+  }
 }
