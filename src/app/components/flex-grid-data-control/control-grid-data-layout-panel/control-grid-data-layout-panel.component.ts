@@ -122,7 +122,7 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
+    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
@@ -506,11 +506,10 @@ export class ControlGridDataLayoutPanelComponent
   public onAddNewColumn(): void { }
 
   public async onActionExportExcel(): Promise<void> {
+    const excelFlexUtil = new ExcelFlexUtil(this.flex);
     this.isLoading = true;
     this.setLoading.emit(this.isLoading);
     setTimeout(() => {
-      const excelFlexUtil = new ExcelFlexUtil(this.flex);
-
       // const id = await excelFlexUtil.addImageIntoWorkBookByUrl('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80', 'png');
       // excelFlexUtil.worksheet.addBackgroundImage(id);
       excelFlexUtil.columnsHeaderInserted.addHandler((ws: Worksheet) => {
@@ -588,6 +587,6 @@ export class ControlGridDataLayoutPanelComponent
       excelFlexUtil.exportExcelAction();
       this.setLoading.emit(this.isLoading = false);
       excelFlexUtil.saveFile();
-    });
+    }, 100);
   }
 }
