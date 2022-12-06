@@ -33,7 +33,7 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
       if (item.price > 1000) return 'High';
       else if (item.price > 500 || item.age < 1000) return 'Medium';
       return 'Low';
-    }))
+    }));
     this.arr.sortDescriptions.push(new SortDescription('price', false));
   }));
   public productWithSelectedAction$ = combineLatest([this.products$, this.selectedAction$]).pipe(takeUntil(this.notifierCompleted),
@@ -52,7 +52,7 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
           default:
             return item;
         }
-      }
+      };
       return this.arr;
     }),
     map(({ groups, ...rest }) => {
@@ -60,12 +60,12 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
         return {
           name: gr.name,
           products: gr.items.map(item => ({ id: item.id, title: item.title, price: item.price, rating: item.price, thumbnail: item.thumbnail }))
-        }
-      })
+        };
+      });
       return this.dataVw;
     }),
     tap(() => this.isLoading = false)
-  )
+  );
 
   private stopObs() {
     this.notifierCompleted.next(null);
@@ -102,8 +102,8 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
       return {
         header: colHeader && colHeader[index] || key,
         key: key
-      }
-    })
+      };
+    });
     return headers;
   }
 
@@ -120,13 +120,13 @@ export class DemoCollectionViewComponent implements OnInit, OnDestroy {
         cols.push({
           header: td.textContent,
           style: getComputedStyle(td)
-        })
+        });
         return cols;
       }),
       takeLast(1)
     ).subscribe(td => {
       this.workSheet.columns = td;
-    })
+    });
 
     let tdCell = this._el.nativeElement.querySelectorAll('tr') as HTMLTableRowElement[];
 

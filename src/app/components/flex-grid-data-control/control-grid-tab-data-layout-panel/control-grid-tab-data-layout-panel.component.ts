@@ -15,9 +15,10 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   @Input() layoutConfig!: GridLayoutData.IGridLayout;
   @Input() wjFlexColumnConfig!: IWjFlexColumnConfig;
   @Output() flexTabInitialized = new EventEmitter<wjcGrid.FlexGrid>();
-  @Output() actionDelete: EventEmitter<any> = new EventEmitter();
-  @Output() actionAdd: EventEmitter<any> = new EventEmitter();
-  @Output() actionExportExcel: EventEmitter<any> = new EventEmitter();
+  @Output() actionDelete: EventEmitter<any> = new EventEmitter<any>();
+  @Output() actionAdd: EventEmitter<any> = new EventEmitter<any>();
+  @Output() actionExportExcel: EventEmitter<any> = new EventEmitter<any>();
+  @Output() actionExportSVG: EventEmitter<any> = new EventEmitter<any>();
   //**Property declarations*/
   public productSelected$: Observable<any> = this._httpProductService.productSelectedWithTab$;
   public configLayout = {
@@ -31,7 +32,7 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
     column: {
       columnOfNumber: 1
     }
-  }
+  };
   constructor(private _httpProductService: HttpProductService) { }
 
 
@@ -40,6 +41,10 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   }
   ngOnDestroy(): void {
     this.flexTabInitialized.unsubscribe();
+    this.actionDelete.unsubscribe();
+    this.actionAdd.unsubscribe();
+    this.actionExportExcel.unsubscribe();
+    this.actionExportSVG.unsubscribe();
   }
   //** */
   public flexInitialized(flexGrid: wjcGrid.FlexGrid) {
@@ -58,5 +63,8 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
 
   public onExportExcel() {
     this.actionExportExcel.emit();
+  }
+  public onExportSVG() {
+    this.actionExportSVG.emit();
   }
 }

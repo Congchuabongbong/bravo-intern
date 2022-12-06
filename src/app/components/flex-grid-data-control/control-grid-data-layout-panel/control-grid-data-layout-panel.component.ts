@@ -1,4 +1,4 @@
-import { convertFormatColorToHex } from './../../../shared/utils/color.method.util';
+import { convertFormatColorToHex } from '../../../shared/libs/flexgrid-to-excel/color.method';
 import {
   Component,
   EventEmitter,
@@ -50,7 +50,7 @@ import {
   IWjFlexLayoutConfig,
 } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
-import { EditHighlighter } from 'src/app/shared/utils/edit-highlighter.class.util';
+
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
 import { Observable, raceWith, repeatWhen } from 'rxjs';
 import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
@@ -64,11 +64,20 @@ import {
   getFontExcelFromStyleElement,
   getStyleExcelFromStyleElement,
   mergeCells,
-} from 'src/app/shared/utils/excel.method.ultil';
-import { ExcelFlexUtil, DataPayload } from 'src/app/shared/utils/excel.class.util';
+} from 'src/app/shared/libs/flexgrid-to-excel/excel.method';
+import { ExcelFlexUtil, ExcelUtil } from 'src/app/shared/libs/flexgrid-to-excel/index';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { HttpClient } from '@angular/common/http';
 import { Worksheet, Cell } from 'exceljs';
+// import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
+import { EditHighlighter } from 'src/app/shared/utils/index.util';
+import { hasUniformBorder, isPositioned } from 'src/app/shared/libs/dom-to-svg/core/css';
+import { isElement, isTextNode } from 'src/app/shared/libs/dom-to-svg/core/dom';
+
+import { getAccessibilityAttributes } from 'src/app/shared/libs/dom-to-svg/core/accessibility';
+
+
+
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -503,90 +512,103 @@ export class ControlGridDataLayoutPanelComponent
     fontSize: '11px',
     fontWeight: 'bold',
   };
-  public onAddNewColumn(): void { }
+  public async onExportExcelAction(): Promise<void> {
+    // const excelFlexUtil = new ExcelFlexUtil(this.flex);
+    // this.isLoading = true;
+    // this.setLoading.emit(this.isLoading);
+    // setTimeout(() => {
+    //   // const id = await excelFlexUtil.addImageIntoWorkBookByUrl('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80', 'png');
+    //   // excelFlexUtil.worksheet.addBackgroundImage(id);
+    //   excelFlexUtil.columnsHeaderInserted.addHandler((ws: Worksheet) => {
+    //     ws.eachRow((row: Excel.Row) => {
+    //       row.height = this.flex.columnHeaders.height;
+    //       row.eachCell((cell: Excel.Cell) => {
+    //         cell.style = getStyleExcelFromStyleElement(this.styleHeaderSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+    //       });
+    //     });
+    //   }, this);
+    //   excelFlexUtil.rowGroupInserted.addHandler((ws: Excel.Worksheet, payload: ExcelUtil.DataPayload<Excel.Row>) => {
+    //     payload.data.eachCell(cell => {
+    //       switch (payload.level) {
+    //         case 0:
+    //           ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
+    //             alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+    //               pattern: 'solid', type: 'pattern',
+    //               fgColor: { argb: 'C147E9' }
+    //             } as Excel.FillPattern
+    //           });
+    //           break;
+    //         case 1:
+    //           ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
+    //             alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+    //               pattern: 'solid', type: 'pattern', fgColor: {
+    //                 argb: 'BA94D1'
+    //               }
+    //             } as Excel.FillPattern
+    //           });
+    //           break;
+    //         case 2:
+    //           break;
+    //         default:
+    //           break;
+    //       }
+    //     });
+    //   }, this);
+    //   let step = 0;
+    //   excelFlexUtil.rowInserted.addHandler((ws: Excel.Worksheet, payload: ExcelUtil.DataPayload<Excel.Row>) => {
+    //     if (payload.index === step) {
+    //       step += excelFlexUtil.alternatingRowStep + 1;
+    //       payload.data.eachCell({ includeEmpty: true }, async (cell: Excel.Cell) => {
+    //         if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
+    //           if ((cell.value) as number % 2 == 0) {
+    //             ExcelFlexUtil.addStyleForCell(cell, this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+    //           } else {
+    //             ExcelFlexUtil.addStyleForCell(cell, this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+    //           }
+    //         } else {
+    //           ExcelFlexUtil.addStyleForCell(cell, this.styleCellAlternatingRowStep, excelFlexUtil.cellBaseElement as HTMLElement);
+    //         }
+    //         if (cell.fullAddress.col === ws.getColumnKey('Image').number) {
+    //           const idImg = await excelFlexUtil.addImageIntoWorkBookByUrl(payload.item.Image, "png");
+    //           ws.addImage(idImg, {
+    //             tl: { col: cell.fullAddress.col, row: cell.fullAddress.row },
+    //             ext: { width: ws.getColumnKey('Image').width as number, height: payload.data.height }
+    //           });
+    //         }
+    //       });
+    //     } else {
+    //       payload.data.eachCell({ includeEmpty: true }, async (cell: Excel.Cell) => {
+    //         if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
+    //           if ((cell.value) as number % 2 == 0) {
+    //             ExcelFlexUtil.addStyleForCell(cell, this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+    //           } else {
+    //             ExcelFlexUtil.addStyleForCell(cell, this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+    //           }
+    //         } else {
+    //           ExcelFlexUtil.addStyleForCell(cell, this.styleBaseSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+    //         }
+    //       });
+    //     }
+    //   }, this);
+    //   excelFlexUtil.exportExcelAction();
+    //   this.setLoading.emit(this.isLoading = false);
+    //   excelFlexUtil.saveFileAction();
+    // }, 100);
+  }
 
-  public async onActionExportExcel(): Promise<void> {
-    const excelFlexUtil = new ExcelFlexUtil(this.flex);
-    this.isLoading = true;
-    this.setLoading.emit(this.isLoading);
-    setTimeout(() => {
-      // const id = await excelFlexUtil.addImageIntoWorkBookByUrl('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80', 'png');
-      // excelFlexUtil.worksheet.addBackgroundImage(id);
-      excelFlexUtil.columnsHeaderInserted.addHandler((ws: Worksheet) => {
-        ws.eachRow((row: Excel.Row) => {
-          row.height = this.flex.columnHeaders.height;
-          row.eachCell((cell: Excel.Cell) => {
-            cell.style = getStyleExcelFromStyleElement(this.styleHeaderSetup, excelFlexUtil.cellBaseElement as HTMLElement);
-          });
-        });
-      }, this);
-      excelFlexUtil.rowGroupInserted.addHandler((ws: Excel.Worksheet, payload: DataPayload<Excel.Row>) => {
-        payload.data.eachCell(cell => {
-          switch (payload.level) {
-            case 0:
-              ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
-                alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
-                  pattern: 'solid', type: 'pattern',
-                  fgColor: { argb: 'C147E9' }
-                } as Excel.FillPattern
-              });
-              break;
-            case 1:
-              ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
-                alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
-                  pattern: 'solid', type: 'pattern', fgColor: {
-                    argb: 'BA94D1'
-                  }
-                } as Excel.FillPattern
-              });
-              break;
-            case 2:
-              break;
-            default:
-              break;
-          }
-        });
-      }, this);
-      let step = 0;
-      excelFlexUtil.rowInserted.addHandler((ws: Excel.Worksheet, payload: DataPayload<Excel.Row>) => {
-        if (payload.index === step) {
-          step += excelFlexUtil.alternatingRowStep + 1;
-          payload.data.eachCell({ includeEmpty: true }, async (cell: Excel.Cell) => {
-            if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
-              if ((cell.value) as number % 2 == 0) {
-                ExcelFlexUtil.addStyleForCell(cell, this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
-              } else {
-                ExcelFlexUtil.addStyleForCell(cell, this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
-              }
-            } else {
-              ExcelFlexUtil.addStyleForCell(cell, this.styleCellAlternatingRowStep, excelFlexUtil.cellBaseElement as HTMLElement);
-            }
-            // if (cell.fullAddress.col === ws.getColumnKey('Image').number) {
-            //   console.log(`${cell.address}:${cell.address}`);
-            //   const idImg = await excelFlexUtil.addImageIntoWorkBookByUrl(payload.item.Image, "png");
-            //   ws.addImage(idImg, {
-            //     tl: { col: cell.fullAddress.col, row: cell.fullAddress.row },
-            //     ext: { width: ws.getColumnKey('Image').width as number, height: payload.data.height }
-            //   });
-            // }
-          });
+  public onExportSvgAction() {
+    // console.log(this.flex.hostElement.childNodes.forEach(node => console.log(node.childNodes)));
+    this.scanHostElement(this.flex.hostElement);
+  }
+  scanHostElement(element: HTMLElement) {
+    if (element.childElementCount) {
+      element.childNodes.forEach((node: Node) => {
+        if (isTextNode(node)) {
+          console.log(node.textContent);
         } else {
-          payload.data.eachCell({ includeEmpty: true }, (cell: Excel.Cell) => {
-            if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
-              if ((cell.value) as number % 2 == 0) {
-                ExcelFlexUtil.addStyleForCell(cell, this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
-              } else {
-                ExcelFlexUtil.addStyleForCell(cell, this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
-              }
-            } else {
-              ExcelFlexUtil.addStyleForCell(cell, this.styleBaseSetup, excelFlexUtil.cellBaseElement as HTMLElement);
-            }
-          });
+          this.scanHostElement(node as HTMLElement);
         }
-      }, this);
-      excelFlexUtil.exportExcelAction();
-      this.setLoading.emit(this.isLoading = false);
-      excelFlexUtil.saveFile();
-    }, 100);
+      });
+    }
   }
 }

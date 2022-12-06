@@ -11,7 +11,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { GridLayoutData, GridLayoutFormData } from 'src/app/shared/data-type';
-import GridLayout from 'src/app/shared/utils/grid-layout.class.util';
+import { GridLayout } from 'src/app/shared/utils/index.util';
 import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 import { IStyleOptions } from 'src/app/shared/data-type/grid-layout.data.type';
 
@@ -44,8 +44,8 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
   @Input('idIp') id!: string;
   @Input('classIp') class!: string;
   @Input() groupNameForm!: string;
-  @Input() displayName: string = 'grid'
-  @Input() overflow: string = 'visible'
+  @Input() displayName: string = 'grid';
+  @Input() overflow: string = 'visible';
   @Input() styleOptions!: IStyleOptions;
   // **Declare property class here:
   public gridLayout!: GridLayout;
@@ -82,7 +82,7 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
     this._gridLayoutService.setDisplay(this._element, this.displayName);
     this.overflow && this._gridLayoutService.setOverflow(this._element, this.overflow);
     this.rowGap && this._gridLayoutService.setRowGap(this._element, this.rowGap);
-    this.columnGap && this._gridLayoutService.setColumnGap(this._element, this.columnGap)
+    this.columnGap && this._gridLayoutService.setColumnGap(this._element, this.columnGap);
     //**width */
     this.width && this._gridLayoutService.setWidth(this._element, this.width);
     this.minWidth && this._gridLayoutService.setMinWidth(this._element, this.minWidth);
@@ -109,7 +109,7 @@ export class ControlGridLayoutPanelComponent implements OnInit, AfterViewInit {
         this.gridLayout.widthColumn = this.formFieldConfig.column.arrayUnitColumn;
       }
       if (this.formFieldConfig.row.arrayUnitRow !== undefined) {
-        this.gridLayout.heightRow = this.formFieldConfig.row.arrayUnitRow
+        this.gridLayout.heightRow = this.formFieldConfig.row.arrayUnitRow;
       }
       this.gridLayout.generateGridLayout();
     }

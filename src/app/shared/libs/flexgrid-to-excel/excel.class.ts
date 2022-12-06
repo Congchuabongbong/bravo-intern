@@ -1,34 +1,9 @@
 import { FlexGrid } from '@grapecity/wijmo.grid';
-import { AddWorksheetOptions, Row, Style, Worksheet, Column, Workbook, Cell, DataValidation } from 'exceljs';
+import { Row, Style, Worksheet, Column, Workbook, Cell } from 'exceljs';
 import { Event as wjEven, CollectionViewGroup, ObservableArray } from '@grapecity/wijmo';
-import { generateColumnsExcel, getStyleExcelFromStyleElement } from './excel.method.ultil';
+import { generateColumnsExcel, getStyleExcelFromStyleElement } from './excel.method';
 import * as FileSaver from 'file-saver';
-
-export interface IExcelFlexUtil {
-  flexGrid: FlexGrid;
-  hostElement: HTMLElement;
-  worksheet: Worksheet;
-  workbook: Workbook;
-  alternatingRowStep: number;
-  selectorCellBase: string;
-  cellBaseElement: HTMLElement | null;
-  columnsHeader: ObservableArray<Partial<Column>>;
-  columnsHeaderInserted: wjEven<Worksheet, DataPayload<Partial<Column>[]>>;
-  idImgs: ObservableArray<number>;
-  defaultHeight: number;
-  maxGroupLevel: number;
-  rowInserted: wjEven<Worksheet, DataPayload<Row>>;
-  rowGroupInserted: wjEven<Worksheet, DataPayload<Row>>;
-  worksheetCommitting: wjEven<ExcelFlexUtil, Worksheet>;
-  onColumnsHeaderInserted: (ws: Worksheet, cols?: DataPayload<Partial<Column>[]>) => void;
-  onRowInserted: (ws: Worksheet, payload: DataPayload<Row>) => void;
-  onWorksheetCommitting: () => void;
-  onRowGroupInserted: (ws: Worksheet, payload: DataPayload<Row>) => void;
-  exportExcelAction: () => void;
-  creatorWorkSheet?: () => Worksheet;
-  cleanEvent: () => void;
-  getElement: (selector: string) => HTMLElement | null;
-}
+import { IExcelFlexUtil } from './IExcelUtil.interface';
 
 export class DataPayload<T> {
   public readonly index?: number;
@@ -42,7 +17,7 @@ export class DataPayload<T> {
     this.level = _level;
   }
 }
-export class ExcelFlexUtil implements IExcelFlexUtil {
+export default class ExcelFlexUtil implements IExcelFlexUtil {
   //*declaration properties
   public flexGrid!: FlexGrid;
   public hostElement!: HTMLElement;
@@ -73,7 +48,7 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
     this._selectorCellBase = '.wj-cell:not(.wj-state-active)[role~="gridcell"]';
     this.workbook = new Workbook();
     this.worksheet = this.workbook.addWorksheet('My Sheet', { views: [{ showGridLines: false }] });
-    //Todo initialize properties of class
+    //TODO initialize properties of class
     this.flexGrid = _flexGrid;
     this.hostElement = this.flexGrid.hostElement;
     this.alternatingRowStep = this.flexGrid.alternatingRowStep;
@@ -83,22 +58,45 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
     this.maxGroupLevel = this.flexGrid.rows.maxGroupLevel;
   }
   //*raise event
+  /**
+  * @desc : raise event when row inserted
+  * @param ws worksheet parameter
+  * @param payload attached data
+  * @return void
+  */
   public onRowInserted(ws: Worksheet, payload: DataPayload<Row>): void {
     this.rowInserted.hasHandlers && this.rowInserted.raise(ws, payload);
   };
+  /**
+  * @desc : raise event when row group inserted
+  * @param ws worksheet parameter
+  * @param payload attached data
+  * @return void
+  */
   public onRowGroupInserted(ws: Worksheet, payload: DataPayload<Row>): void {
     this.rowGroupInserted.hasHandlers && this.rowGroupInserted.raise(ws, payload);
   };
-
+  /**
+   * @desc : raise event when column header inserted
+   * @param ws worksheet parameter
+   * @param cols attached data
+   * @return void
+   */
   public onColumnsHeaderInserted(ws: Worksheet, cols?: DataPayload<Partial<Column>[]>): void {
     this.columnsHeaderInserted.hasHandlers && this.columnsHeaderInserted.raise(ws, cols);
   };
-
+  /**
+   * @desc : raise event when column header inserted
+   * @return void
+   */
   public onWorksheetCommitting() {
     this.worksheetCommitting.hasHandlers && this.worksheetCommitting.raise(this, this.worksheet);
   };
   //*method here
-
+  /**
+    * @desc : export action use to generate excel
+    * @return void
+    */
   public exportExcelAction(): void {
     //add columns header
     try {
@@ -117,39 +115,78 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
     } catch (error) {
       throw new Error('Error occurred when exported excel!!');
     } finally {
-      this.cleanEvent();
+      this.cleanEvents();
     }
   }
-
-  public async saveFile(fileName: string = 'myExcel'): Promise<void> {
+  /**
+    * @desc used to save excel file after generating excel
+    * @param fileName name file default value = 'myExcel'
+    * @return Promise<void>
+    */
+  public async saveFileAction(fileName: string = 'myExcel'): Promise<void> {
     const buf = await this.workbook.xlsx.writeBuffer();
     FileSaver.saveAs(new Blob([buf]), `${fileName}.xlsx`);
   }
-
+  /**
+     * @desc used to save add image into workbook by buffer
+     * @param buffer : ArrayBuffer
+     * @param extension : extension of image
+     * @return number
+     */
   public addImageIntoWorkBookByBuffer(buffer: ArrayBuffer, extension: 'png' | 'jpeg'): number {
     let idImg = this.workbook.addImage({ buffer, extension });
     this.idImgs.push(idImg);
     return idImg;
   }
+  /**
+    * @desc used to save add image into workbook by url
+    * @param url : url of image
+    * @param extension : extension of image
+    * @return  Promise number
+    */
   public async addImageIntoWorkBookByUrl(url: string, extension: 'png' | 'jpeg'): Promise<number> {
     const bufferArr = await ExcelFlexUtil.getArrayBufferFromUrl(url);
     const idImg = this.addImageIntoWorkBookByBuffer(bufferArr, extension);
     this.idImgs.push(idImg);
     return idImg;
   }
+
+  /**
+   * @desc static method used to style for cell.
+   * @param cell cell object (cell of excelJs)
+   * @param style  Partial CSSStyleDeclaration
+   * @param baseElement HTMLElement object
+   * @param styleOps Partial Style object (style of excelJs)
+   * @return  void
+   */
   public static addStyleForCell(cell: Cell, style: Partial<CSSStyleDeclaration>, baseElement?: HTMLElement, styleOps?: Partial<Style>): void {
     cell.style = getStyleExcelFromStyleElement(style, baseElement, styleOps);
   }
-
+  /**
+    * @desc static method used to get array buffer from ulr.
+    * @param url url of image
+    * @return  Promise ArrayBuffer
+    */
   public static async getArrayBufferFromUrl(url: string): Promise<ArrayBuffer> {
     const data = await fetch(url);
     const blob = await data.blob();
     return blob.arrayBuffer();
   };
+  /**
+      * @desc use to merge cell
+      * @param row row object
+      * @param from from number
+      * @param to to number
+      * @return void
+      */
   public mergeCells(row: Row, from: number, to: number): void {
     this.worksheet.mergeCells(`${row.getCell(from).address}:${row.getCell(to).address}`);
   }
-
+  /**
+  * @desc use to get element in host element
+  * @param selector string
+  * @return HTMLElement | null
+  */
   public getElement(selector: string): HTMLElement | null {
     return this.hostElement.querySelector(selector);
   };
@@ -174,7 +211,7 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
     });
   }
 
-  public insertRow(item: any, index: number, isOutlineLevel?: boolean) {
+  public insertRow(item: any, index: number, isOutlineLevel?: boolean): void {
     const row = this.worksheet.addRow(item);
     if (isOutlineLevel) {
       row.outlineLevel = this.maxGroupLevel + 1;
@@ -184,8 +221,11 @@ export class ExcelFlexUtil implements IExcelFlexUtil {
     this.onRowInserted(this.worksheet, payload);
     row.commit();
   }
-
-  cleanEvent() {
+  /**
+  * @desc use to clean all event
+  * @return void
+  */
+  public cleanEvents(): void {
     this.rowInserted.hasHandlers && this.rowInserted.removeAllHandlers();
     this.rowGroupInserted.hasHandlers && this.rowGroupInserted.removeAllHandlers();
     this.columnsHeaderInserted.hasHandlers && this.columnsHeaderInserted.removeAllHandlers();

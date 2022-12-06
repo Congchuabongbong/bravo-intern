@@ -1,6 +1,6 @@
 import { Column as ColumnWj } from '@grapecity/wijmo.grid';
 import { Alignment, Borders, BorderStyle, Column, FillPattern, Font, Row, Style, Worksheet } from 'exceljs';
-import { convertFormatColorToHex } from './color.method.util';
+import { convertFormatColorToHex } from './color.method';
 export type VerticalExcelProp = 'superscript' | 'subscript';
 export type UnderlineExcelProp = boolean | 'none' | 'single' | 'double' | 'singleAccounting' | 'doubleAccounting';
 export type Horizontal = 'left' | 'center' | 'right' | 'fill' | 'justify' | 'centerContinuous' | 'distributed';
@@ -28,7 +28,7 @@ export function getFontExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclara
   //name
   if (computedStyle.fontFamily) crawlStyle.name = getNameOrFamilyExcel(computedStyle.fontFamily, 'name') as string;
   //size
-  if (computedStyle.fontSize) crawlStyle.size = convertFontSizeToNumber(computedStyle.fontSize);
+  if (computedStyle.fontSize) crawlStyle.size = +computedStyle.fontSize.replace('px', '') || 16;
   //bold
   if (computedStyle.fontWeight) crawlStyle.bold = computedStyle.fontWeight === '700' || computedStyle.fontWeight === 'bold';
   //family
@@ -84,7 +84,7 @@ export function getBorderExcelFromStyleElement(styleSetup: Partial<CSSStyleDecla
   //use case have border or properties border
   if (computedStyle.border) {
     crawlStyle.top = crawlStyle.left = crawlStyle.right = crawlStyle.bottom = {
-      style: convertBorderStyleExcel(computedStyle.borderStyle, convertFontSizeToNumber(computedStyle.borderWidth)),
+      style: convertBorderStyleExcel(computedStyle.borderStyle, +computedStyle.borderWidth.replace('px', '')),
       color: { argb: convertFormatColorToHex(computedStyle.borderColor) as string }
     };
     if (borderExcelOps) return { ...crawlStyle, ...borderExcelOps };
@@ -93,25 +93,25 @@ export function getBorderExcelFromStyleElement(styleSetup: Partial<CSSStyleDecla
   //use case have borderRight,left,bottom,top or properties border left,top,right,bottom
   if (computedStyle.borderTopStyle !== 'none' && computedStyle.borderTopColor && computedStyle.borderTopWidth) {
     crawlStyle.top = {
-      style: convertBorderStyleExcel(computedStyle.borderTopStyle, convertFontSizeToNumber(computedStyle.borderTopWidth, 'border')),
+      style: convertBorderStyleExcel(computedStyle.borderTopStyle, +computedStyle.borderTopWidth.replace('px', '')),
       color: { argb: convertFormatColorToHex(computedStyle.borderTopColor) as string }
     };
   }
   if (computedStyle.borderBottomStyle !== 'none' && computedStyle.borderBottomColor && computedStyle.borderBottomWidth) {
     crawlStyle.bottom = {
-      style: convertBorderStyleExcel(computedStyle.borderBottomStyle, convertFontSizeToNumber(computedStyle.borderBottomWidth, 'border')),
+      style: convertBorderStyleExcel(computedStyle.borderBottomStyle, +computedStyle.borderBottomWidth.replace('px', '')),
       color: { argb: convertFormatColorToHex(computedStyle.borderBottomColor) as string }
     };
   }
   if (computedStyle.borderLeftStyle !== 'none' && computedStyle.borderLeftColor && computedStyle.borderLeftWidth) {
     crawlStyle.left = {
-      style: convertBorderStyleExcel(computedStyle.borderLeftStyle, convertFontSizeToNumber(computedStyle.borderLeftWidth, 'border')),
+      style: convertBorderStyleExcel(computedStyle.borderLeftStyle, +computedStyle.borderLeftWidth.replace('px', '')),
       color: { argb: convertFormatColorToHex(computedStyle.borderLeftColor) as string }
     };
   }
   if (computedStyle.borderRightStyle !== 'none' && computedStyle.borderRightColor && computedStyle.borderRightWidth) {
     crawlStyle.right = {
-      style: convertBorderStyleExcel(computedStyle.borderRightStyle, convertFontSizeToNumber(computedStyle.borderRightWidth, 'border')),
+      style: convertBorderStyleExcel(computedStyle.borderRightStyle, +computedStyle.borderRightWidth.replace('px', '')),
       color: { argb: convertFormatColorToHex(computedStyle.borderRightColor) as string }
     };
   }
@@ -128,14 +128,14 @@ export function convertHorizontalExcel(textAlign: string): Horizontal {
   if (textAlign === 'initial') return 'left';
   return 'left';
 }
-export function convertFontSizeToNumber(fontsize: string, type?: string): number {
-  let sizeStrings: string[] | null = fontsize && fontsize.match(/\d+/) || null;
-  if (sizeStrings && sizeStrings.length > 0) {
-    return +sizeStrings[0] as number;
-  }
-  if (type === 'border') return 1;
-  return 16;
-}
+// export function convertFontSizeToNumber(fontsize: string, type?: string): number {
+//   let sizeStrings: string[] | null = fontsize && fontsize.match(/\d+/) || null;
+//   if (sizeStrings && sizeStrings.length > 0) {
+//     return +sizeStrings[0] as number;
+//   }
+//   if (type === 'border') return 1;
+//   return 16;
+// }
 
 export function getNameOrFamilyExcel(fontFamily: string, returnType: 'name' | 'family'): number | string {
   let fontFamilyTrim = fontFamily && fontFamily.split(',').map(font => font.trim());
