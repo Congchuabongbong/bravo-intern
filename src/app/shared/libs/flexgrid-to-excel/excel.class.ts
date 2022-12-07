@@ -1,9 +1,13 @@
+//*Import form libraries
 import { FlexGrid } from '@grapecity/wijmo.grid';
 import { Row, Style, Worksheet, Column, Workbook, Cell } from 'exceljs';
 import { Event as wjEven, CollectionViewGroup, ObservableArray } from '@grapecity/wijmo';
-import { generateColumnsExcel, getStyleExcelFromStyleElement } from './excel.method';
 import * as FileSaver from 'file-saver';
-import { IExcelFlexUtil } from './IExcelUtil.interface';
+import { Column as wjColumn } from '@grapecity/wijmo.grid';
+//*Import from src
+import { IExcelFlexUtil } from './core/IExcelUtil.interface';
+import { getStyleExcelFromStyleElement } from './core/excel.method';
+
 
 export class DataPayload<T> {
   public readonly index?: number;
@@ -52,7 +56,7 @@ export default class ExcelFlexUtil implements IExcelFlexUtil {
     this.flexGrid = _flexGrid;
     this.hostElement = this.flexGrid.hostElement;
     this.alternatingRowStep = this.flexGrid.alternatingRowStep;
-    this.columnsHeader = generateColumnsExcel(this.flexGrid.columns);
+    this.columnsHeader = this.generateColumnsExcel(this.flexGrid.columns);
     this.cellBaseElement = this.getElement(this._selectorCellBase);
     this.defaultHeight = this.flexGrid.rows.defaultSize;
     this.maxGroupLevel = this.flexGrid.rows.maxGroupLevel;
@@ -115,7 +119,7 @@ export default class ExcelFlexUtil implements IExcelFlexUtil {
     } catch (error) {
       throw new Error('Error occurred when exported excel!!');
     } finally {
-      this.cleanEvents();
+      this.cleanupEvents();
     }
   }
   /**
@@ -155,12 +159,14 @@ export default class ExcelFlexUtil implements IExcelFlexUtil {
    * @desc static method used to style for cell.
    * @param cell cell object (cell of excelJs)
    * @param style  Partial CSSStyleDeclaration
-   * @param baseElement HTMLElement object
-   * @param styleOps Partial Style object (style of excelJs)
+   * @param options includes baseElement and style options
    * @return  void
    */
-  public static addStyleForCell(cell: Cell, style: Partial<CSSStyleDeclaration>, baseElement?: HTMLElement, styleOps?: Partial<Style>): void {
-    cell.style = getStyleExcelFromStyleElement(style, baseElement, styleOps);
+  public addStyleForCell(cell: Cell, style: Partial<CSSStyleDeclaration>, options?: {
+    baseElement?: HTMLElement, styleOps?: Partial<Style>;
+  }): void {
+    const cellBaseElement = options?.baseElement || this.cellBaseElement;
+    cell.style = getStyleExcelFromStyleElement(style, cellBaseElement as HTMLElement, options?.styleOps);
   }
   /**
     * @desc static method used to get array buffer from ulr.
@@ -175,12 +181,11 @@ export default class ExcelFlexUtil implements IExcelFlexUtil {
   /**
       * @desc use to merge cell
       * @param row row object
-      * @param from from number
-      * @param to to number
+      * @param position include form and to
       * @return void
       */
-  public mergeCells(row: Row, from: number, to: number): void {
-    this.worksheet.mergeCells(`${row.getCell(from).address}:${row.getCell(to).address}`);
+  public mergeCells(row: Row, position: { from: number, to: number; }): void {
+    this.worksheet.mergeCells(`${row.getCell(position.from).address}:${row.getCell(position.to).address}`);
   }
   /**
   * @desc use to get element in host element
@@ -196,7 +201,7 @@ export default class ExcelFlexUtil implements IExcelFlexUtil {
       const rowGroup = this.worksheet.addRow([`${group.name}: ${group.items.length} items`]);
       rowGroup.outlineLevel = group.level;
       rowGroup.height = this.defaultHeight;
-      this.mergeCells(rowGroup, 1, this.worksheet.columns.length);
+      this.mergeCells(rowGroup, { from: 1, to: this.worksheet.columns.length });
       const payload = new DataPayload<Row>(rowGroup, group.items, undefined, group.level);
       this.onRowGroupInserted(this.worksheet, payload);
       if (!group.isBottomLevel) {
@@ -213,19 +218,36 @@ export default class ExcelFlexUtil implements IExcelFlexUtil {
 
   public insertRow(item: any, index: number, isOutlineLevel?: boolean): void {
     const row = this.worksheet.addRow(item);
+    row.height = this.flexGrid.rows[index].renderHeight | this.flexGrid.rows.defaultSize;
     if (isOutlineLevel) {
       row.outlineLevel = this.maxGroupLevel + 1;
     }
-    row.height = this.flexGrid.rows[index].renderHeight;
     const payload = new DataPayload<Row>(row, item, this.flexGrid.collectionView.items.indexOf(item));
     this.onRowInserted(this.worksheet, payload);
     row.commit();
   }
+
+  public generateColumnsExcel(cols: wjColumn[], style?: Partial<Style>): ObservableArray<Partial<Column>> {
+    let colsExcel: ObservableArray<Partial<Column>> = new ObservableArray([]);
+    cols.forEach(col => {
+      const colExcel: Partial<Column> = {
+        style: style,
+        header: (col.header || col.binding) as string,
+        key: col.binding as string,
+        width: (col.renderSize as number) / 10 || (col.grid.columns.defaultSize) / 10,
+      };
+      if (style) colExcel.style = style;
+      colsExcel.push(colExcel);
+    });
+    return colsExcel;
+  }
+
+
   /**
   * @desc use to clean all event
   * @return void
   */
-  public cleanEvents(): void {
+  public cleanupEvents(): void {
     this.rowInserted.hasHandlers && this.rowInserted.removeAllHandlers();
     this.rowGroupInserted.hasHandlers && this.rowGroupInserted.removeAllHandlers();
     this.columnsHeaderInserted.hasHandlers && this.columnsHeaderInserted.removeAllHandlers();

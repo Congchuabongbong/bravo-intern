@@ -36,10 +36,10 @@
   background: #b3ffae;
 }
 
-::ng-deep.wj-cell.even {
+::ng-deep.wj-cell[role*="gridcell"]:not(.wj-group).even {
   background-color: #ffddd2 !important;
 }
-::ng-deep.wj-cell.odd {
+::ng-deep.wj-cell[role*="gridcell"]:not(.wj-group).odd {
   background-color: #82cd47 !important;
 }
 

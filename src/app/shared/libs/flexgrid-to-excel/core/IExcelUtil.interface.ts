@@ -2,7 +2,7 @@
 import { FlexGrid } from '@grapecity/wijmo.grid';
 import { Row, Worksheet, Column, Workbook } from 'exceljs';
 import { Event as wjEven, ObservableArray } from '@grapecity/wijmo';
-import ExcelFlexUtil, { DataPayload } from './excel.class';
+import ExcelFlexUtil, { DataPayload } from '../excel.class';
 export interface IExcelFlexUtil {
   flexGrid: FlexGrid;
   hostElement: HTMLElement;
@@ -25,6 +25,6 @@ export interface IExcelFlexUtil {
   onRowGroupInserted: (ws: Worksheet, payload: DataPayload<Row>) => void;
   exportExcelAction: () => void;
   creatorWorkSheet?: () => Worksheet;
-  cleanEvents: () => void;
+  cleanupEvents: () => void;
   getElement: (selector: string) => HTMLElement | null;
 }

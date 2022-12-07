@@ -101,7 +101,6 @@ export const calculateOverlappingCurvesFactor = (styles: CSSStyleDeclaration, bo
   );
 
 export const isVisible = (styles: CSSStyleDeclaration): boolean =>
-
   styles.display !== 'none' &&
   styles.visibility !== 'hidden' &&
   styles.opacity !== '0';

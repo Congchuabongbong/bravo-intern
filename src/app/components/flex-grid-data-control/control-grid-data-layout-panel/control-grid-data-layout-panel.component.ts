@@ -1,4 +1,4 @@
-import { convertFormatColorToHex } from '../../../shared/libs/flexgrid-to-excel/color.method';
+import { convertFormatColorToHex } from '../../../shared/libs/flexgrid-to-excel/core/color.method';
 import {
   Component,
   EventEmitter,
@@ -24,25 +24,13 @@ import {
 } from '@grapecity/wijmo.grid';
 import {
   showPopup, PropertyGroupDescription,
-  Event as wjEven,
-  getActiveElement,
-  getElement,
-  Point,
-  Globalize,
-  IEventHandler,
-  INotifyCollectionChanged,
-  NotifyCollectionChangedEventArgs,
   hidePopup,
   hasClass,
   PopupPosition,
   EventArgs,
   CancelEventArgs,
   addClass,
-  Control,
-  CollectionView,
-  ICollectionView,
-  tryCast,
-  CollectionViewGroup
+  CollectionView, Point
 } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import {
@@ -50,34 +38,23 @@ import {
   IWjFlexLayoutConfig,
 } from 'src/app/shared/data-type/wijmo-data.type';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
-
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
-import { Observable, raceWith, repeatWhen } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
-import { RouterLinkWithHref } from '@angular/router';
 import * as Excel from 'exceljs';
-import * as FileSaver from 'file-saver';
 import {
-  generateColumnsExcel,
-  getAlignmentFromStyleElement,
-  getBorderExcelFromStyleElement,
-  getFontExcelFromStyleElement,
   getStyleExcelFromStyleElement,
-  mergeCells,
-} from 'src/app/shared/libs/flexgrid-to-excel/excel.method';
+} from 'src/app/shared/libs/flexgrid-to-excel/core/excel.method';
 import { ExcelFlexUtil, ExcelUtil } from 'src/app/shared/libs/flexgrid-to-excel/index';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { HttpClient } from '@angular/common/http';
 import { Worksheet, Cell } from 'exceljs';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import { EditHighlighter } from 'src/app/shared/utils/index.util';
-import { hasUniformBorder, isPositioned } from 'src/app/shared/libs/dom-to-svg/core/css';
 import { isElement, isTextNode } from 'src/app/shared/libs/dom-to-svg/core/dom';
-
-import { getAccessibilityAttributes } from 'src/app/shared/libs/dom-to-svg/core/accessibility';
-
-
-
+import { isHTMLImageElement } from '../../../shared/libs/dom-to-svg/core/dom';
+import { BravoSvgEngine } from 'src/app/shared/libs/dom-to-svg/bravo.svg.engine';
+import { isVisible } from 'src/app/shared/libs/dom-to-svg/core/css';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -111,12 +88,9 @@ export class ControlGridDataLayoutPanelComponent
   //**constructor
   constructor(
     private _wijFlexGridService: WijFlexGridService,
-    private _renderer: Renderer2,
-    private _el: ElementRef,
     private _httpProductService: HttpProductService,
     private _httpLayoutService: HttpLayoutService,
-    private _ref: ChangeDetectorRef,
-    private _httpClient: HttpClient
+    private _el: ElementRef
   ) { }
 
   //**lifecycle hooks
@@ -131,39 +105,16 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
-    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
-    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+    this.svgEngine = new BravoSvgEngine(this.flex.hostElement);
+
+
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
     });
     flexGrid.getColumn('Image').cssClass = 'cell-img';
     flexGrid.autoRowHeights = true;
-    //properties:
-    // flexGrid.allowDragging = 3;
-    // flexGrid.allowSorting = 2;
-    // flexGrid.allowAddNew = true;
-    // flexGrid.isReadOnly = false;
-    // flexGrid.alternatingRowStep = 1;
-    // flexGrid.anchorCursor = true;
-    // flexGrid.bigCheckboxes = true;
-    // flexGrid.autoScroll = true;
-    // flexGrid.keyActionTab = 4;
-    // flexGrid.showErrors = true;
-    // const hostElement: HTMLElement = flexGrid.hostElement;
-    // flexGrid.lazyRender = true;
-    // flexGrid.showSelectedHeaders = 3
-    // this.viewCollection.newItemCreator = (): { Id: number } => {
-    //   return { Id: 123123 }
-    // }
-    // flexGrid.rows.insert(0, new Row(this.viewCollection.newItemCreator()));
-
-    // flexGrid.itemValidator = (row: number, col: number, parsing?: boolean) => {
-    //   // console.log(parsing);
-    //   let item = flexGrid.rows[row].dataItem, prop = flexGrid.columns[col].binding;
-    //   if (prop == 'Id' && item.Id < 5000) return 'Id < 5000!'
-    //   return null;
-    // }
-
     new EditHighlighter(flexGrid, 'cell-changed');
     this.wijFlexMainInitialized.emit(flexGrid);
     //generate specify columns */
@@ -173,6 +124,9 @@ export class ControlGridDataLayoutPanelComponent
         this.wjFlexColumnConfig
       );
     }
+    this.flex.updatedLayout.addHandler(() => {
+      this.svgEngine.setViewportSize(this.flex.hostElement.offsetWidth, this.flex.hostElement.offsetHeight);
+    });
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
     //autoSizedColumn
@@ -516,9 +470,9 @@ export class ControlGridDataLayoutPanelComponent
     const excelFlexUtil = new ExcelFlexUtil(this.flex);
     this.isLoading = true;
     this.setLoading.emit(this.isLoading);
-    setTimeout(() => {
-      // const id = await excelFlexUtil.addImageIntoWorkBookByUrl('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80', 'png');
-      // excelFlexUtil.worksheet.addBackgroundImage(id);
+    const idTimeout = setTimeout(async () => {
+      const id = await excelFlexUtil.addImageIntoWorkBookByUrl('https://img.meta.com.vn/Data/image/2021/09/30/background-la-gi-anh-background-dep-5.jpg', 'jpeg');
+      excelFlexUtil.worksheet.addBackgroundImage(id);
       excelFlexUtil.columnsHeaderInserted.addHandler((ws: Worksheet) => {
         ws.eachRow((row: Excel.Row) => {
           row.height = this.flex.columnHeaders.height;
@@ -531,20 +485,24 @@ export class ControlGridDataLayoutPanelComponent
         payload.data.eachCell(cell => {
           switch (payload.level) {
             case 0:
-              ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
-                alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
-                  pattern: 'solid', type: 'pattern',
-                  fgColor: { argb: 'C147E9' }
-                } as Excel.FillPattern
+              excelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, {
+                styleOps: {
+                  alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+                    pattern: 'solid', type: 'pattern',
+                    fgColor: { argb: 'C147E9' }
+                  } as Excel.FillPattern
+                }
               });
               break;
             case 1:
-              ExcelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, excelFlexUtil.cellBaseElement as HTMLElement, {
-                alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
-                  pattern: 'solid', type: 'pattern', fgColor: {
-                    argb: 'BA94D1'
-                  }
-                } as Excel.FillPattern
+              excelFlexUtil.addStyleForCell(cell, this.styleRowGroupSetup, {
+                styleOps: {
+                  alignment: { horizontal: 'center', vertical: 'middle' }, fill: {
+                    pattern: 'solid', type: 'pattern', fgColor: {
+                      argb: 'BA94D1'
+                    }
+                  } as Excel.FillPattern
+                }
               });
               break;
             case 2:
@@ -561,12 +519,12 @@ export class ControlGridDataLayoutPanelComponent
           payload.data.eachCell({ includeEmpty: true }, async (cell: Excel.Cell) => {
             if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
               if ((cell.value) as number % 2 == 0) {
-                ExcelFlexUtil.addStyleForCell(cell, this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+                excelFlexUtil.addStyleForCell(cell, this.styleEvenSetup);
               } else {
-                ExcelFlexUtil.addStyleForCell(cell, this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+                excelFlexUtil.addStyleForCell(cell, this.styleOddSetup);
               }
             } else {
-              ExcelFlexUtil.addStyleForCell(cell, this.styleCellAlternatingRowStep, excelFlexUtil.cellBaseElement as HTMLElement);
+              excelFlexUtil.addStyleForCell(cell, this.styleCellAlternatingRowStep);
             }
             if (cell.fullAddress.col === ws.getColumnKey('Image').number) {
               const idImg = await excelFlexUtil.addImageIntoWorkBookByUrl(payload.item.Image, "png");
@@ -580,12 +538,12 @@ export class ControlGridDataLayoutPanelComponent
           payload.data.eachCell({ includeEmpty: true }, async (cell: Excel.Cell) => {
             if (cell.fullAddress.col === ws.getColumnKey('Id').number) {
               if ((cell.value) as number % 2 == 0) {
-                ExcelFlexUtil.addStyleForCell(cell, this.styleEvenSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+                excelFlexUtil.addStyleForCell(cell, this.styleEvenSetup);
               } else {
-                ExcelFlexUtil.addStyleForCell(cell, this.styleOddSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+                excelFlexUtil.addStyleForCell(cell, this.styleOddSetup);
               }
             } else {
-              ExcelFlexUtil.addStyleForCell(cell, this.styleBaseSetup, excelFlexUtil.cellBaseElement as HTMLElement);
+              excelFlexUtil.addStyleForCell(cell, this.styleBaseSetup);
             }
           });
         }
@@ -593,22 +551,22 @@ export class ControlGridDataLayoutPanelComponent
       excelFlexUtil.exportExcelAction();
       this.setLoading.emit(this.isLoading = false);
       excelFlexUtil.saveFileAction();
-    }, 100);
+      clearTimeout(idTimeout);;
+    }, 50);
   }
 
+
+  public svgEngine!: BravoSvgEngine;
+  @ViewChild('svgContainer', { static: true }) svgContainer!: ElementRef;
   public onExportSvgAction() {
-    // console.log(this.flex.hostElement.childNodes.forEach(node => console.log(node.childNodes)));
-    this.scanHostElement(this.flex.hostElement);
+    this.svgEngine.attach(this._el.nativeElement as HTMLElement);
+    this.scanHostElement(this.flex.hostElement as HTMLElement);
+    this.svgContainer.nativeElement.appendChild(this.svgEngine.element);
+
+    (this.svgContainer.nativeElement as HTMLElement).style.display = 'block';
+
   }
-  scanHostElement(element: HTMLElement) {
-    if (element.childElementCount) {
-      element.childNodes.forEach((node: Node) => {
-        if (isTextNode(node)) {
-          console.log(node.textContent);
-        } else {
-          this.scanHostElement(node as HTMLElement);
-        }
-      });
-    }
+  scanHostElement(element: HTMLElement | Node) {
+
   }
 }

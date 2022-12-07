@@ -1,3 +1,3 @@
-export * as ColorMethod from './color.method';
+export * as ColorMethod from './core/color.method';
 export { default as ExcelFlexUtil } from './excel.class';
 export * as ExcelUtil from './excel.class';

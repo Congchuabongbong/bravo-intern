@@ -181,8 +181,8 @@ export function convertBorderStyleExcel(borderStyle: string, borderWidth: number
   }
 }
 //*merge Cell
-export function mergeCells(ws: Worksheet, row: Row, from: number, to: number): void {
-  ws.mergeCells(`${row.getCell(from).address}:${row.getCell(to).address}`);
+export function mergeCells(ws: Worksheet, row: Row, position: { from: number, to: number; }): void {
+  ws.mergeCells(`${row.getCell(position.from).address}:${row.getCell(position.to).address}`);
 }
 //*generate Column;
 export function generateColumnsExcel(cols: ColumnWj[], style?: Partial<Style>): ObservableArray<Partial<Column>> {
@@ -192,7 +192,7 @@ export function generateColumnsExcel(cols: ColumnWj[], style?: Partial<Style>): 
       style: style,
       header: (col.header || col.binding) as string,
       key: col.binding as string,
-      width: (col.renderWidth as number) / 10,
+      width: (col.renderSize as number) / 10 || (col.grid.columns.defaultSize) / 10,
     };
     if (style) colExcel.style = style;
     colsExcel.push(colExcel);
