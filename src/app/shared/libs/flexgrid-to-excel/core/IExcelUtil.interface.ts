@@ -3,7 +3,7 @@ import { FlexGrid } from '@grapecity/wijmo.grid';
 import { Row, Worksheet, Column, Workbook } from 'exceljs';
 import { Event as wjEven, ObservableArray } from '@grapecity/wijmo';
 import ExcelFlexUtil, { DataPayload } from '../excel.class';
-export interface IExcelFlexUtil {
+export default interface IExcelFlexUtil {
   flexGrid: FlexGrid;
   hostElement: HTMLElement;
   worksheet: Worksheet;

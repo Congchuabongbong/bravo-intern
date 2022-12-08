@@ -5,8 +5,8 @@ import { Event as wjEven, CollectionViewGroup, ObservableArray } from '@grapecit
 import * as FileSaver from 'file-saver';
 import { Column as wjColumn } from '@grapecity/wijmo.grid';
 //*Import from src
-import { IExcelFlexUtil } from './core/IExcelUtil.interface';
 import { getStyleExcelFromStyleElement } from './core/excel.method';
+import { IExcelFlexUtil } from './core';
 
 
 export class DataPayload<T> {
@@ -96,7 +96,7 @@ export default class ExcelFlexUtil implements IExcelFlexUtil {
   public onWorksheetCommitting() {
     this.worksheetCommitting.hasHandlers && this.worksheetCommitting.raise(this, this.worksheet);
   };
-  //*method here
+  //*methods start here
   /**
     * @desc : export action use to generate excel
     * @return void

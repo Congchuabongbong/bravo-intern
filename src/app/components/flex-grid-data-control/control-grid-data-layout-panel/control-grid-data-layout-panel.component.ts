@@ -1,4 +1,3 @@
-import { convertFormatColorToHex } from '../../../shared/libs/flexgrid-to-excel/core/color.method';
 import {
   Component,
   EventEmitter,
@@ -6,11 +5,10 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  Renderer2,
   ElementRef,
   ViewChild,
   AfterViewInit,
-  ChangeDetectorRef,
+
 } from '@angular/core';
 import {
   FlexGrid,
@@ -18,9 +16,6 @@ import {
   CellType,
   CellRangeEventArgs,
   CellEditEndingEventArgs,
-  GridPanel,
-
-  Row,
 } from '@grapecity/wijmo.grid';
 import {
   showPopup, PropertyGroupDescription,
@@ -30,7 +25,7 @@ import {
   EventArgs,
   CancelEventArgs,
   addClass,
-  CollectionView, Point
+  CollectionView
 } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import {
@@ -47,14 +42,10 @@ import {
 } from 'src/app/shared/libs/flexgrid-to-excel/core/excel.method';
 import { ExcelFlexUtil, ExcelUtil } from 'src/app/shared/libs/flexgrid-to-excel/index';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
-import { HttpClient } from '@angular/common/http';
-import { Worksheet, Cell } from 'exceljs';
+import { Worksheet } from 'exceljs';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import { EditHighlighter } from 'src/app/shared/utils/index.util';
-import { isElement, isTextNode } from 'src/app/shared/libs/dom-to-svg/core/dom';
-import { isHTMLImageElement } from '../../../shared/libs/dom-to-svg/core/dom';
 import { BravoSvgEngine } from 'src/app/shared/libs/dom-to-svg/bravo.svg.engine';
-import { isVisible } from 'src/app/shared/libs/dom-to-svg/core/css';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -114,7 +105,6 @@ export class ControlGridDataLayoutPanelComponent
       label: 'image for ${item.Image}',
     });
     flexGrid.getColumn('Image').cssClass = 'cell-img';
-    flexGrid.autoRowHeights = true;
     new EditHighlighter(flexGrid, 'cell-changed');
     this.wijFlexMainInitialized.emit(flexGrid);
     //generate specify columns */

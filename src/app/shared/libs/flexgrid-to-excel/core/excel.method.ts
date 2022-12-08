@@ -1,15 +1,10 @@
-import { Column as ColumnWj } from '@grapecity/wijmo.grid';
-import { Alignment, Borders, BorderStyle, Column, FillPattern, Font, Row, Style, Worksheet } from 'exceljs';
+import { Alignment, Borders, BorderStyle, FillPattern, Font, Style } from 'exceljs';
 import { convertFormatColorToHex } from './color.method';
 export type VerticalExcelProp = 'superscript' | 'subscript';
 export type UnderlineExcelProp = boolean | 'none' | 'single' | 'double' | 'singleAccounting' | 'doubleAccounting';
 export type Horizontal = 'left' | 'center' | 'right' | 'fill' | 'justify' | 'centerContinuous' | 'distributed';
 export type Vertical = 'top' | 'middle' | 'bottom' | 'distributed' | 'justify';
-import {
-  ObservableArray
-} from '@grapecity/wijmo';
 //*Get and set Style excel
-
 export function getStyleExcelFromStyleElement(styleSetup: Partial<CSSStyleDeclaration>, elementOverrideStyle?: HTMLElement, styleExcelOps?: Partial<Style>): Partial<Style> {
   let crawlStyle: Partial<Style> = {};
   crawlStyle.font = getFontExcelFromStyleElement(styleSetup, elementOverrideStyle);
@@ -179,23 +174,4 @@ export function convertBorderStyleExcel(borderStyle: string, borderWidth: number
     default:
       return 'thin';
   }
-}
-//*merge Cell
-export function mergeCells(ws: Worksheet, row: Row, position: { from: number, to: number; }): void {
-  ws.mergeCells(`${row.getCell(position.from).address}:${row.getCell(position.to).address}`);
-}
-//*generate Column;
-export function generateColumnsExcel(cols: ColumnWj[], style?: Partial<Style>): ObservableArray<Partial<Column>> {
-  let colsExcel: ObservableArray<Partial<Column>> = new ObservableArray([]);
-  cols.forEach(col => {
-    const colExcel: Partial<Column> = {
-      style: style,
-      header: (col.header || col.binding) as string,
-      key: col.binding as string,
-      width: (col.renderSize as number) / 10 || (col.grid.columns.defaultSize) / 10,
-    };
-    if (style) colExcel.style = style;
-    colsExcel.push(colExcel);
-  });
-  return colsExcel;
 }
