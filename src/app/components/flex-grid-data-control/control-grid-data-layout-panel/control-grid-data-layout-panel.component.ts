@@ -8,7 +8,6 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
-
 } from '@angular/core';
 import {
   FlexGrid,
@@ -16,6 +15,7 @@ import {
   CellType,
   CellRangeEventArgs,
   CellEditEndingEventArgs,
+  GridPanel, CellRange
 } from '@grapecity/wijmo.grid';
 import {
   showPopup, PropertyGroupDescription,
@@ -25,7 +25,7 @@ import {
   EventArgs,
   CancelEventArgs,
   addClass,
-  CollectionView
+  CollectionView, Point
 } from '@grapecity/wijmo';
 import { ListBox } from '@grapecity/wijmo.input';
 import {
@@ -76,6 +76,7 @@ export class ControlGridDataLayoutPanelComponent
     this._httpLayoutService.wijFlexLayout$;
   public viewCollection!: CollectionView<any>;
   public isLoading: boolean = false;
+
   //**constructor
   constructor(
     private _wijFlexGridService: WijFlexGridService,
@@ -96,9 +97,7 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
-    this.svgEngine = new BravoSvgEngine(this.flex.hostElement);
-
-
+    this.flex.columnFooters;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
@@ -115,7 +114,7 @@ export class ControlGridDataLayoutPanelComponent
       );
     }
     this.flex.updatedLayout.addHandler(() => {
-      this.svgEngine.setViewportSize(this.flex.hostElement.offsetWidth, this.flex.hostElement.offsetHeight);
+      BravoSvgEngine.onResizeViewPortAction({ width: this.flex.hostElement.offsetWidth, height: this.flex.hostElement.offsetHeight });
     });
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
@@ -541,22 +540,37 @@ export class ControlGridDataLayoutPanelComponent
       excelFlexUtil.exportExcelAction();
       this.setLoading.emit(this.isLoading = false);
       excelFlexUtil.saveFileAction();
-      clearTimeout(idTimeout);;
+      clearTimeout(idTimeout);
     }, 50);
   }
 
 
-  public svgEngine!: BravoSvgEngine;
   @ViewChild('svgContainer', { static: true }) svgContainer!: ElementRef;
+  public svgEngine!: BravoSvgEngine;
+  public gridPanel!: GridPanel;
   public onExportSvgAction() {
-    this.svgEngine.attach(this._el.nativeElement as HTMLElement);
-    this.scanHostElement(this.flex.hostElement as HTMLElement);
-    this.svgContainer.nativeElement.appendChild(this.svgEngine.element);
-
-    (this.svgContainer.nativeElement as HTMLElement).style.display = 'block';
-
+    // this.svgEngine = new BravoSvgEngine(this.svgContainer.nativeElement, this.flex.hostElement);
+    // const colHeaderPanel = this.flex.columnHeaders;
+    // const cellPanel = this.flex.cells;
+    // this.drawCellPanel(colHeaderPanel);
+    // this.drawCellPanel(cellPanel);
+    // this.svgContainer.nativeElement.style.display = 'block';
   }
-  scanHostElement(element: HTMLElement | Node) {
+  public drawCellPanel(panel: GridPanel) {
+    // const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = panel.viewRange;
+    // console.log(panel.getCellBoundingRect(rowStart, colStart, true));
+    // console.log(panel.getCellData(rowStart, colStart, false));
+    // for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
+    //   for (let colIndex = colStart; colIndex < colEnd; colIndex++) {
+    //     let { top, left, height, width } = panel.getCellBoundingRect(rowIndex, colIndex, true);
+    //     console.log(panel.getCellElement(rowIndex, colIndex));
+    //     this.svgEngine.startGroup();
+    //     const svg = this.svgEngine.drawRect(left, top, width, height);
+    //     svg.setAttribute('stroke-width', '1px');
+    //     svg.setAttribute('stroke', 'red');
+    //     this.svgEngine.endGroup();
+    //   }
+    // }
 
   }
 }

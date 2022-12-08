@@ -17,7 +17,7 @@ export class TestExcelJsComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.svgEngine = new BravoSvgEngine(this.container.nativeElement);
+
   }
   public onDrawSvg() {
 
