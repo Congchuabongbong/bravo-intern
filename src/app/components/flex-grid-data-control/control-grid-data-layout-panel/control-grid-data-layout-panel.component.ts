@@ -549,16 +549,16 @@ export class ControlGridDataLayoutPanelComponent
   public svgEngine!: BravoSvgEngine;
   public gridPanel!: GridPanel;
   public onExportSvgAction() {
-    // this.svgEngine = new BravoSvgEngine(this.svgContainer.nativeElement, this.flex.hostElement);
-    // const colHeaderPanel = this.flex.columnHeaders;
-    // const cellPanel = this.flex.cells;
-    // this.drawCellPanel(colHeaderPanel);
-    // this.drawCellPanel(cellPanel);
+    this.svgEngine = new BravoSvgEngine(this.svgContainer.nativeElement, this.flex.hostElement);
+    const colHeaderPanel = this.flex.columnHeaders;
+    const cellPanel = this.flex.cells;
+    this.drawCellPanel(colHeaderPanel);
+    this.drawCellPanel(cellPanel);
     // this.svgContainer.nativeElement.style.display = 'block';
   }
   public drawCellPanel(panel: GridPanel) {
-    // const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = panel.viewRange;
-    // console.log(panel.getCellBoundingRect(rowStart, colStart, true));
+    const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = panel.viewRange;
+    console.log(panel.getCellBoundingRect(rowStart, colStart, false));
     // console.log(panel.getCellData(rowStart, colStart, false));
     // for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
     //   for (let colIndex = colStart; colIndex < colEnd; colIndex++) {
