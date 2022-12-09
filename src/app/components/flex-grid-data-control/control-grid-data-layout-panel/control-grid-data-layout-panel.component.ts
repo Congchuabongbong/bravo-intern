@@ -46,6 +46,7 @@ import { Worksheet } from 'exceljs';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import { EditHighlighter } from 'src/app/shared/utils/index.util';
 import { BravoSvgEngine } from 'src/app/shared/libs/dom-to-svg/bravo.svg.engine';
+import { isTextNode } from '../../../shared/libs/dom-to-svg/core/dom';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -98,8 +99,9 @@ export class ControlGridDataLayoutPanelComponent
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
     this.flex.columnFooters;
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
+    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+    this.flex.autoRowHeights = true;
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
     });
@@ -113,6 +115,7 @@ export class ControlGridDataLayoutPanelComponent
         this.wjFlexColumnConfig
       );
     }
+
     this.flex.updatedLayout.addHandler(() => {
       BravoSvgEngine.onResizeViewPortAction({ width: this.flex.hostElement.offsetWidth, height: this.flex.hostElement.offsetHeight });
     });
@@ -550,27 +553,63 @@ export class ControlGridDataLayoutPanelComponent
   public gridPanel!: GridPanel;
   public onExportSvgAction() {
     this.svgEngine = new BravoSvgEngine(this.svgContainer.nativeElement, this.flex.hostElement);
+    this.flex.beginUpdate();
     const colHeaderPanel = this.flex.columnHeaders;
     const cellPanel = this.flex.cells;
-    this.drawCellPanel(colHeaderPanel);
     this.drawCellPanel(cellPanel);
-    // this.svgContainer.nativeElement.style.display = 'block';
+    this.drawCellPanel(colHeaderPanel);
+    this.svgContainer.nativeElement.style.display = 'block';
   }
   public drawCellPanel(panel: GridPanel) {
     const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = panel.viewRange;
-    console.log(panel.getCellBoundingRect(rowStart, colStart, false));
-    // console.log(panel.getCellData(rowStart, colStart, false));
-    // for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
-    //   for (let colIndex = colStart; colIndex < colEnd; colIndex++) {
-    //     let { top, left, height, width } = panel.getCellBoundingRect(rowIndex, colIndex, true);
-    //     console.log(panel.getCellElement(rowIndex, colIndex));
-    //     this.svgEngine.startGroup();
-    //     const svg = this.svgEngine.drawRect(left, top, width, height);
-    //     svg.setAttribute('stroke-width', '1px');
-    //     svg.setAttribute('stroke', 'red');
-    //     this.svgEngine.endGroup();
-    //   }
-    // }
+    for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
+      for (let colIndex = colStart; colIndex <= colEnd; colIndex++) {
+        let el = panel.getCellElement(rowIndex, colIndex);
+        let { top, left, height, width } = panel.getCellBoundingRect(rowIndex, colIndex);
+        let computed = window.getComputedStyle(el);
+        this.svgEngine.startGroup();
+        const svg = this.svgEngine.drawRect(left - this.svgEngine.captureElementCoordinates!.x, top - this.svgEngine.captureElementCoordinates!.y, width, height);
+        BravoSvgEngine.setAttributeFromCssForSvgEl(svg, computed);
 
+        this.scanCell(el);
+        this.svgEngine.endGroup();
+      }
+    }
   }
+
+  public scanCell(el: Element) {
+    if (el.childNodes.length > 0) {
+      el.childNodes.forEach((node: Node) => {
+        if (isTextNode(node)) {
+          debugger;
+          let computedStyleParent = window.getComputedStyle(el);
+          let { x: xParent, y: yParent } = el.getBoundingClientRect();
+          let xText = xParent - this.svgEngine.captureElementCoordinates!.x + (+computedStyleParent.paddingLeft.replace('px', ''));
+          let yText = yParent - this.svgEngine.captureElementCoordinates!.y + (+computedStyleParent.paddingTop.replace('px', ''));
+          console.log(computedStyleParent.paddingTop, computedStyleParent.paddingLeft);
+          let textNodePoint = new Point(xText, yText / 2);
+          let textSvg = this.svgEngine.drawString(node.textContent as string, textNodePoint);
+          BravoSvgEngine.applyTextStyles(textSvg, computedStyleParent);
+          textSvg.setAttribute('dominant-baseline', 'hanging');
+        }
+        this.scanCell(node as Element);
+      });
+    }
+  }
+
+  public drawTextCell(node: Text) {
+    let parentNode = node.parentElement;
+  }
+
+  public calculatePositionTextNode(node: Text): Point | null {
+    try {
+      const parentNode = node.parentElement;
+      const computedStyle = window.getComputedStyle(parentNode as HTMLElement);
+      let pointNode = new Point(1, 1);
+      return pointNode;
+    } catch (error) {
+      return null;
+    }
+  }
+
 }

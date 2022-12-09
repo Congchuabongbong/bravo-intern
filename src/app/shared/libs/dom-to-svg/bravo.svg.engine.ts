@@ -3,6 +3,8 @@ import {
   Point
 } from '@grapecity/wijmo';
 import { Subscription, BehaviorSubject } from 'rxjs';
+import { textAttributes } from './core/text';
+import { hasUniformBorder } from './core/css';
 type Align = 'LeftTop' |
   'LeftCenter' |
   'LeftBottom' |
@@ -55,7 +57,8 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     BravoSvgEngine.reSizeViewPortSubject.next(size);
   }
 
-  public calculatePositionInsideRect(pnWidth: number, pnHeight: number, pzAlign: Align, pnPercent?: number) {
+
+  public calculatePositionInsideRect(pnWidth: number, pnHeight: number, pzAlign: Align) {
     let _nX1 = 0, _nX2 = 0, _nY1 = 0, _nY2 = 0;
     let _rectParent = this.element.getBoundingClientRect();
     if (_rectParent.width < pnWidth) pnWidth = _rectParent.width;
@@ -181,10 +184,30 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     return _attribute;
   }
 
-  public applyAttribute(pElement: Element, pAttribute: Record<string, any>) {
-    for (const key in pAttribute) {
+  public static setAttributeFromCssForSvgEl(pElement: SVGElement, styles: CSSStyleDeclaration) {
+    styles.backgroundColor && pElement.setAttribute('fill', styles.backgroundColor || styles.background || '');
+    !hasUniformBorder(styles) && pElement.setAttribute('stroke', styles.borderTopColor || styles.borderBottomColor || styles.borderLeftColor || styles.borderRightColor || 'rgb(0,0,0)');
+    let strokeWidth = +styles.borderTopWidth.replace('px', '') || +styles.borderBottomWidth.replace('px', '') || +styles.borderLeftWidth.replace('px', '') || +styles.borderRightWidth.replace('px', '');
+    strokeWidth ? pElement.setAttribute('stroke-width', `${strokeWidth}px`) : pElement.setAttribute('stroke-width', '1px');
+  }
+
+
+  public static applyAttribute(pElement: Element, pAttribute: Record<string, any>) {
+    console.log(pAttribute);
+    Object.keys(pAttribute).forEach(key => {
       pElement.setAttribute(key, pAttribute[key]);
+    });
+  }
+
+
+  public static applyTextStyles(svgElement: SVGElement, styles: CSSStyleDeclaration): void {
+    for (const textProperty of textAttributes) {
+      const value = styles.getPropertyValue(textProperty);
+      if (value) {
+        svgElement.setAttribute(textProperty, value);
+      }
     }
+    svgElement.setAttribute('fill', styles.color);
   }
 
 
