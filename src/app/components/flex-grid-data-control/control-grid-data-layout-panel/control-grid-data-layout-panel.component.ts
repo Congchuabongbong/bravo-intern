@@ -581,7 +581,6 @@ export class ControlGridDataLayoutPanelComponent
     if (el.childNodes.length > 0) {
       el.childNodes.forEach((node: Node) => {
         if (isTextNode(node)) {
-          debugger;
           let computedStyleParent = window.getComputedStyle(el);
           let { x: xParent, y: yParent } = el.getBoundingClientRect();
           let xText = xParent - this.svgEngine.captureElementCoordinates!.x + (+computedStyleParent.paddingLeft.replace('px', ''));
