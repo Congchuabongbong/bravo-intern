@@ -1,6 +1,6 @@
 // Namespaces
 export const svgNamespace = 'http://www.w3.org/2000/svg';
-export const xlinkNamespace = 'http://www.w3.org/1999/xlink';
+export const xLinkNamespace = 'http://www.w3.org/1999/xlink';
 export const xhtmlNamespace = 'http://www.w3.org/1999/xhtml';
 // DOM
 export const isElement = (node: Node): node is Element => node.nodeType === Node.ELEMENT_NODE;
@@ -18,8 +18,6 @@ export const isHTMLInputElement = (element: Element): element is HTMLInputElemen
   element.tagName === 'INPUT' && isHTMLElement(element);
 export const hasLabels = (element: HTMLElement): element is HTMLElement & Pick<HTMLInputElement, 'labels'> =>
   'labels' in element;
-
-
 // SVG
 export const isSVGElement = (element: Element): element is SVGElement => element.namespaceURI === svgNamespace;
 export const isSVGSVGElement = (element: Element): element is SVGSVGElement =>

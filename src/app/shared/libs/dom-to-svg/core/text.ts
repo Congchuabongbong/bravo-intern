@@ -1,3 +1,4 @@
+import { Point } from '@grapecity/wijmo';
 export const textAttributes = new Set([
   'color',
   'dominant-baseline',
@@ -19,7 +20,21 @@ export const textAttributes = new Set([
   'writing-mode',
   'user-select',
 ] as const);
-export function copyTextStyles(styles: CSSStyleDeclaration, svgElement: SVGElement): void {
+export enum TextAlign {
+  Left = 'left',
+  Center = 'center',
+  Right = 'right',
+  Start = 'start',
+  End = 'end',
+}
+export type BehaviorText = {
+  point: Point;
+  dominantBaseline: DominantBaseline,
+  textAnchor: TextAnchor;
+};
+export type DominantBaseline = 'auto' | 'middle' | 'hanging';
+export type TextAnchor = 'start' | 'middle' | 'end';
+export function copyTextStyles(svgElement: SVGElement, styles: CSSStyleDeclaration): void {
   for (const textProperty of textAttributes) {
     const value = styles.getPropertyValue(textProperty);
     if (value) {
