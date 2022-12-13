@@ -1,7 +1,6 @@
 import { Point } from '@grapecity/wijmo';
 export const textAttributes = new Set([
   'color',
-  'dominant-baseline',
   'font-family',
   'font-size',
   'font-size-adjust',
@@ -12,7 +11,6 @@ export const textAttributes = new Set([
   'direction',
   'letter-spacing',
   'text-decoration',
-  'text-anchor',
   'text-decoration',
   'text-rendering',
   'unicode-bidi',
@@ -31,6 +29,7 @@ export type BehaviorText = {
   point: Point;
   dominantBaseline: DominantBaseline,
   textAnchor: TextAnchor;
+  isTextFitWidthCell?: boolean;
 };
 export type DominantBaseline = 'auto' | 'middle' | 'hanging';
 export type TextAnchor = 'start' | 'middle' | 'end';

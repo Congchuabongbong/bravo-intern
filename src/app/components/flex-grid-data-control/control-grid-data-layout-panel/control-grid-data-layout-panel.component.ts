@@ -50,10 +50,11 @@ import { isTextNode, isHTMLImageElement, isElement } from '../../../shared/libs/
 import { DominantBaseline, TextAlign, TextAnchor, BehaviorText } from '../../../shared/libs/dom-to-svg/core/text';
 import { isInline } from 'src/app/shared/libs/dom-to-svg/core/css';
 import { NgIf } from '@angular/common';
-import { creatorSVG } from 'src/app/shared/libs/dom-to-svg/core/svg.engine.util';
+import { creatorSVG, drawText } from 'src/app/shared/libs/dom-to-svg/core/svg.engine.util';
 import { BravoGraphicsRenderer } from 'src/app/shared/libs/dom-to-svg/bravo-graphics/bravo.graphics.renderer';
 import { Font } from '../../../shared/libs/dom-to-svg/bravo-graphics/font';
 import { isFloatRight } from '../../../shared/libs/dom-to-svg/core/css';
+import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -108,7 +109,7 @@ export class ControlGridDataLayoutPanelComponent
     this.flex.columnFooters;
     // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
-
+    this.flex.autoRowHeights = true;
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
     });
@@ -124,7 +125,7 @@ export class ControlGridDataLayoutPanelComponent
     }
 
     this.flex.updatedLayout.addHandler(() => {
-      BravoSvgEngine.onResizeViewPortAction({ width: this.flex.hostElement.offsetWidth, height: this.flex.hostElement.offsetHeight });
+      FlexGridSvgEngine.onResizeViewPortAction({ width: this.flex.hostElement.offsetWidth, height: this.flex.hostElement.offsetHeight });
     });
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
@@ -556,14 +557,17 @@ export class ControlGridDataLayoutPanelComponent
 
 
   @ViewChild('svgContainer', { static: true }) svgContainer!: ElementRef;
-  public svgEngine!: BravoSvgEngine;
+  public svgEngine!: FlexGridSvgEngine;
   public gridPanel!: GridPanel;
   public onExportSvgAction() {
-    this.svgEngine = new BravoSvgEngine(this.svgContainer.nativeElement, this.flex.hostElement);
+
+    this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
+    this.svgEngine.beginRender();
     const colHeaderPanel = this.flex.columnHeaders;
     const cellPanel = this.flex.cells;
-    this.drawCellPanel(cellPanel);
-    this.drawCellPanel(colHeaderPanel);
+    cellPanel && this.drawCellPanel(cellPanel);
+    colHeaderPanel && this.drawCellPanel(colHeaderPanel);
+    this.svgEngine.endRender();
     this.svgContainer.nativeElement.style.display = 'block';
   }
   public drawCellPanel(panel: GridPanel) {
@@ -573,38 +577,30 @@ export class ControlGridDataLayoutPanelComponent
         let el = panel.getCellElement(rowIndex, colIndex);
         let { top, left, height, width } = panel.getCellBoundingRect(rowIndex, colIndex);
         let computed = window.getComputedStyle(el);
-        this.svgEngine.startGroup();
+        // this.svgEngine.startGroup();
         const svg = this.svgEngine.drawRect(left - this.svgEngine.captureElementCoordinates!.x, top - this.svgEngine.captureElementCoordinates!.y, width, height);
-        BravoSvgEngine.setAttributeFromCssForSvgEl(svg, computed);
+        FlexGridSvgEngine.setAttributeFromCssForSvgEl(svg, computed);
         this.scanCell(el);
-        this.svgEngine.endGroup();
+        // this.svgEngine.endGroup();
       }
     }
   }
 
   public scanCell(el: Element) {
-    if (el.childNodes.length > 0) {
+    if (el.hasChildNodes()) {
       el.childNodes.forEach((node: Node) => {
         if (isTextNode(node)) {
-          const pos = this.svgEngine.calculateBehaviorTextNode(node);
-          let computedStyleParent = window.getComputedStyle(el);
-          let { width } = node.parentElement!.getBoundingClientRect();
-          let textSvg = this.svgEngine.drawString(node.textContent as string, pos!.point);
-          BravoSvgEngine.applyTextStyles(textSvg, computedStyleParent);
-          textSvg.setAttribute('dominant-baseline', pos!.dominantBaseline);
-          textSvg.setAttribute('text-anchor', pos!.textAnchor);
+          this.svgEngine.drawTextInCell(node, el);
         }
-        if (isHTMLImageElement(node as Element)) {
-
+        if (isHTMLImageElement(node as HTMLElement)) {
+          this.svgEngine.drawImageInCell(node as HTMLImageElement, el);
         }
         this.scanCell(node as Element);
       });
     }
   }
 
-  public drawTextCell(node: Text) {
-    let parentNode = node.parentElement;
-  }
+
 
 
 
