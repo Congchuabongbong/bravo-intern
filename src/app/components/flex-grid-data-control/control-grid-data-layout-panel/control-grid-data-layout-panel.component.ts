@@ -15,7 +15,7 @@ import {
   CellType,
   CellRangeEventArgs,
   CellEditEndingEventArgs,
-  GridPanel, CellRange
+  GridPanel
 } from '@grapecity/wijmo.grid';
 import {
   showPopup, PropertyGroupDescription,
@@ -46,14 +46,14 @@ import { Worksheet } from 'exceljs';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import { EditHighlighter } from 'src/app/shared/utils/index.util';
 import { BravoSvgEngine } from 'src/app/shared/libs/dom-to-svg/bravo.svg.engine';
-import { isTextNode, isHTMLImageElement, isElement } from '../../../shared/libs/dom-to-svg/core/dom';
+import { isTextNode, isHTMLImageElement, isElement, isHTMLInputElement } from '../../../shared/libs/dom-to-svg/core/dom';
 import { DominantBaseline, TextAlign, TextAnchor, BehaviorText } from '../../../shared/libs/dom-to-svg/core/text';
-import { isInline } from 'src/app/shared/libs/dom-to-svg/core/css';
+import { hasBorderBottom, hasBorderTop, hasUniformBorder, isInline } from 'src/app/shared/libs/dom-to-svg/core/css';
 import { NgIf } from '@angular/common';
-import { creatorSVG, drawText } from 'src/app/shared/libs/dom-to-svg/core/svg.engine.util';
+import { creatorSVG, declareNamespaceSvg, drawImage, drawText } from 'src/app/shared/libs/dom-to-svg/core/svg.engine.util';
 import { BravoGraphicsRenderer } from 'src/app/shared/libs/dom-to-svg/bravo-graphics/bravo.graphics.renderer';
 import { Font } from '../../../shared/libs/dom-to-svg/bravo-graphics/font';
-import { isFloatRight } from '../../../shared/libs/dom-to-svg/core/css';
+import { isFloatRight, hasBorderLeft } from '../../../shared/libs/dom-to-svg/core/css';
 import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
@@ -106,15 +106,15 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
-    this.flex.columnFooters;
-    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
-    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
-    this.flex.autoRowHeights = true;
+    // this.flex.columnFooters;
+    // this.flex.allowPinning = true;
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
     });
     flexGrid.getColumn('Image').cssClass = 'cell-img';
-    new EditHighlighter(flexGrid, 'cell-changed');
+
     this.wijFlexMainInitialized.emit(flexGrid);
     //generate specify columns */
     if (this.wjFlexColumnConfig) {
@@ -294,7 +294,6 @@ export class ControlGridDataLayoutPanelComponent
       );
     // this.selectedItems = this.flex.selectedItems;  get selected items
     this.selectedItem = this.flex.collectionView.currentItem; //-> get selected item
-    console.log(this.flex.collectionView.currentItem);
   }
   public onDeleteRowSelected(): void {
     this.flex &&
@@ -558,50 +557,67 @@ export class ControlGridDataLayoutPanelComponent
 
   @ViewChild('svgContainer', { static: true }) svgContainer!: ElementRef;
   public svgEngine!: FlexGridSvgEngine;
-  public gridPanel!: GridPanel;
   public onExportSvgAction() {
-
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
     this.svgEngine.beginRender();
     const colHeaderPanel = this.flex.columnHeaders;
     const cellPanel = this.flex.cells;
-    cellPanel && this.drawCellPanel(cellPanel);
-    colHeaderPanel && this.drawCellPanel(colHeaderPanel);
+    //!case pin columns
+    cellPanel.viewRange.row !== -1 && cellPanel.viewRange.col !== -1 && this.drawCellPanel(cellPanel);
+    colHeaderPanel.viewRange.row !== -1 && colHeaderPanel.viewRange.col !== -1 && this.drawCellPanel(colHeaderPanel);
     this.svgEngine.endRender();
+    // declareNamespaceSvg(this.svgEngine.element as SVGElement);
     this.svgContainer.nativeElement.style.display = 'block';
   }
+
   public drawCellPanel(panel: GridPanel) {
     const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = panel.viewRange;
-    for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
-      for (let colIndex = colStart; colIndex <= colEnd; colIndex++) {
+    for (let colIndex = colStart; colIndex <= colEnd; colIndex++) {
+      for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
         let el = panel.getCellElement(rowIndex, colIndex);
-        let { top, left, height, width } = panel.getCellBoundingRect(rowIndex, colIndex);
+        let { x: xCell, y: yCell, width, height } = this.svgEngine.changeOriginCoordinates(el.getBoundingClientRect());
         let computed = window.getComputedStyle(el);
-        // this.svgEngine.startGroup();
-        const svg = this.svgEngine.drawRect(left - this.svgEngine.captureElementCoordinates!.x, top - this.svgEngine.captureElementCoordinates!.y, width, height);
+        const groupSvgEl = this.svgEngine.startGroup(el.className);
+        const svg = this.svgEngine.drawRect(xCell, yCell, width, height);
         FlexGridSvgEngine.setAttributeFromCssForSvgEl(svg, computed);
-        this.scanCell(el);
-        // this.svgEngine.endGroup();
+        this.svgEngine._drawBorderCell(el);
+        this.scanCell(el, groupSvgEl);
+        this.svgEngine.endGroup();
       }
     }
   }
 
-  public scanCell(el: Element) {
+  public scanCell(el: Element, group: SVGElement) {
     if (el.hasChildNodes()) {
       el.childNodes.forEach((node: Node) => {
+        // text node;
         if (isTextNode(node)) {
-          this.svgEngine.drawTextInCell(node, el);
+          const svgEl = this.svgEngine.drawTextInCell(node, el);
+          svgEl && group.appendChild(svgEl as Node);
         }
+        // case image;
         if (isHTMLImageElement(node as HTMLElement)) {
-          this.svgEngine.drawImageInCell(node as HTMLImageElement, el);
+          const svgEl = this.svgEngine.drawImageInCell(node as HTMLImageElement, el);
+          svgEl && group.appendChild(svgEl as Node);
         }
-        this.scanCell(node as Element);
+        //case input
+        if (isHTMLInputElement(node as Element)) { // case input checkbox
+          const inputNode = node as HTMLInputElement;
+          const { x, y, width, height } = inputNode.getBoundingClientRect();
+          const computedStyle = window.getComputedStyle(node as Element);
+          const svgInput = this.svgEngine.drawRect(x - this.svgEngine.captureElementCoordinates.x, y - this.svgEngine.captureElementCoordinates.y, width, height);
+          svgInput.setAttribute('rx', '2');
+          svgInput.setAttribute('fill', '#fff');
+          svgInput.setAttribute('stroke', '#767676');
+          svgInput.setAttribute('stroke-width', '1.2');
+          if (inputNode.checked) {
+            svgInput.setAttribute('fill', '#1da1f2');
+          }
+        };
+        this.scanCell(node as Element, group);
       });
     }
+
   }
-
-
-
-
 
 }

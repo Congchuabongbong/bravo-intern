@@ -32,7 +32,7 @@ import { SelectControlPanelComponent } from './components/select-control-panel/s
 import { DemoCollectionViewComponent } from './pages/demo-collection-view/demo-collection-view.component';
 import { DemoTrackingChangesComponent } from './pages/demo-tracking-changes/demo-tracking-changes.component';
 import { CustomPipePipe } from './shared/pipes/custom-pipe.pipe';
-import { TestExcelJsComponent } from './pages/test-excel-js/test-excel-js.component';
+
 
 @NgModule({
   declarations: [
@@ -60,9 +60,7 @@ import { TestExcelJsComponent } from './pages/test-excel-js/test-excel-js.compon
     SelectControlPanelComponent,
     DemoCollectionViewComponent,
     DemoTrackingChangesComponent,
-    CustomPipePipe,
-    TestExcelJsComponent,
-
+    CustomPipePipe
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, HttpClientModule, WjGridModule, WjInputModule, WjGridFilterModule],
   providers: [{

@@ -1,12 +1,12 @@
-import { Point, Size as wjSize, Rect } from '@grapecity/wijmo';
+import { Size as wjSize } from '@grapecity/wijmo';
 import { svgNamespace, xLinkNamespace } from './dom';
 import { BehaviorText, copyTextStyles } from './text';
-interface Size extends Pick<wjSize, 'height' | 'width'> { };
-export function setViewportSizeSVG(svg: SVGElement, size: Size) {
+export interface ISize extends Pick<wjSize, 'height' | 'width'> { };
+export function setViewportSizeSVG(svg: SVGElement, size: ISize) {
     svg.setAttribute('width', size.width.toString());
     svg.setAttribute('height', size.height.toString());
 }
-export function drawRect(x: number, y: number, size: Size, className?: string, style?: CSSStyleDeclaration, clipPath?: string) {
+export function drawRect(x: number, y: number, size: ISize, className?: string, style?: CSSStyleDeclaration, clipPath?: string): SVGElement {
     var rect = document.createElementNS(svgNamespace, 'rect') as SVGElement;
     rect.setAttribute('x', x.toFixed(1));
     rect.setAttribute('y', y.toFixed(1));
@@ -22,13 +22,14 @@ export function applyStyle(el: SVGElement, style: CSSStyleDeclaration) {
         el.setAttribute(deCase(key), style[key]);
     }
 }
-export function creatorSVG(rect?: Partial<DOMRect>) {
+export function creatorSVG(rect?: Partial<DOMRect>, isDeclareNamespaceSvg?: boolean) {
     const svg = document.createElementNS(svgNamespace, 'svg') as SVGElement;
     if (rect) {
         rect.width && rect.height && setViewportSize(svg, rect.width, rect.height);
         rect.x && svg.setAttribute('x', rect.x.toString());
         rect.y && svg.setAttribute('y', rect.y.toString());
     }
+    isDeclareNamespaceSvg && declareNamespaceSvg(svg);
     return svg;
 }
 export function setViewportSize(svg: SVGElement, w: number, h: number) {
@@ -55,12 +56,24 @@ export function drawText(textContent: string, behavior: BehaviorText, style?: CS
     return textEl;
 }
 
-export function drawImage(imageHref: string, x: number, y: number, w: number, h: number): SVGElement {
+export function drawImage(imageHref: string, x: number, y: number, w: number, h: number, clipPath?: string): SVGElement {
     var img = document.createElementNS(svgNamespace, 'image') as SVGElement;
     img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imageHref);
     img.setAttribute('x', x.toFixed(1));
     img.setAttribute('y', y.toFixed(1));
     img.setAttribute('width', w.toFixed(1));
     img.setAttribute('height', h.toFixed(1));
+    if (clipPath) {
+        img.setAttribute('clip-path', 'url(#' + clipPath + ')');
+    }
     return img;
 }
+export function declareNamespaceSvg(svg: SVGElement) {
+    svg.setAttribute('xmlns', svgNamespace);
+    svg.setAttribute('xmlns:xlink', xLinkNamespace);
+}
+// export function drawInputCheckBoxUnchecked() {
+//     const pathEl = document.createElementNS(svgNamespace, 'path') as SVGElement;
+//     pathEl.setAttribute('d', d);
+//     return pathEl;
+// }
