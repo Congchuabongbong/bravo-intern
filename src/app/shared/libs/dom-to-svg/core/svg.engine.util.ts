@@ -1,6 +1,6 @@
 import { Size as wjSize } from '@grapecity/wijmo';
-import { svgNamespace, xLinkNamespace } from './dom';
-import { BehaviorText, copyTextStyles } from './text';
+import { svgNamespace, xLinkNamespace } from './dom.util';
+import { BehaviorText, copyTextStyles } from './text.type';
 export interface ISize extends Pick<wjSize, 'height' | 'width'> { };
 export function setViewportSizeSVG(svg: SVGElement, size: ISize) {
   svg.setAttribute('width', size.width.toString());

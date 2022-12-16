@@ -1,16 +1,16 @@
-import { FlexGrid } from '@grapecity/wijmo.grid';
+import { FlexGrid, GridPanel } from '@grapecity/wijmo.grid';
 import {
   Point
 } from '@grapecity/wijmo';
 import { Subscription, BehaviorSubject, Observable } from 'rxjs';
-import { BehaviorText, TextAlign } from './core/text';
-import { isTransparent, hasBorderBottom, hasBorderTop, hasBorderRight, hasBorderLeft, isInline } from './core/css';
+import { BehaviorText, TextAlign } from './core/text.type';
+import { isTransparent, hasBorderBottom, hasBorderTop, hasBorderRight, hasBorderLeft, isInline } from './core/css.util';
 import { Font } from './bravo-graphics/font';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
 import { BravoSvgEngine } from './bravo.svg.engine';
 import { creatorSVG, drawImage, drawText, ISize } from './core/svg.engine.util';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
-import { isTextNode, isElement } from './core/dom';
+import { isTextNode, isElement, isHTMLImageElement, isHTMLInputElement } from './core/dom.util';
 
 export interface ISiblings {
   leftSideCurrentNode: ChildNode[], rightSideCurrentNode: ChildNode[];
@@ -83,15 +83,67 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
 
-  //scan cell
-  private _scanCell(cell: Element) { };
 
-  //Draw action here...
+  public drawCellPanel(panel: GridPanel) {
+    //!case pin columns not complete
+    //!case expand and collapse rows not complete
+    const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = panel.viewRange;
+    for (let colIndex = colStart; colIndex <= colEnd; colIndex++) {
+      for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
+        let cellEl = panel.getCellElement(rowIndex, colIndex);
+        if (!cellEl) continue;
+        let cellBoundingRect = this.changeOriginCoordinates(cellEl.getBoundingClientRect());
+        let cellStyles = window.getComputedStyle(cellEl);
+        const groupSvgEl = this.startGroup(cellEl.className);
+        const svg = this.drawRect(cellBoundingRect.x, cellBoundingRect.y, cellBoundingRect.width, cellBoundingRect.height);
+        FlexGridSvgEngine.setAttributeFromCssForSvgEl(svg, cellStyles);
+        this._drawBorderCell(cellBoundingRect, cellStyles);
+        this._scanCell(cellEl, groupSvgEl);
+        this.endGroup();
+      }
+    }
+  }
+  //TODO: Not complete!!!
+  //scan cell
+  private _scanCell(el: Element, group: SVGElement) {
+    if (el.hasChildNodes()) {
+      el.childNodes.forEach((node: Node) => {
+        //?text node;
+        if (isTextNode(node)) {
+          const svgEl = this.drawTextInCell(node, el);
+          svgEl && group.appendChild(svgEl as Node);
+        }
+        //?case image;
+        if (isHTMLImageElement(node as HTMLElement)) {
+          const svgEl = this.drawImageInCell(node as HTMLImageElement, el);
+          svgEl && group.appendChild(svgEl as Node);
+        }
+        //?case input
+        if (isHTMLInputElement(node as Element)) { // case input checkbox
+          const inputNode = node as HTMLInputElement;
+          const inputBoundingRect = inputNode.getBoundingClientRect();
+          const computedStyle = window.getComputedStyle(node as Element);
+          const { x: xInputNode, y: yInputNode, width: widthInputNode, height: heightInputNode } = this.changeOriginCoordinates(inputBoundingRect);
+          const svgInput = this.drawRect(xInputNode, yInputNode, widthInputNode, heightInputNode);
+          svgInput.setAttribute('rx', '2');
+          svgInput.setAttribute('fill', '#fff');
+          svgInput.setAttribute('stroke', '#767676');
+          svgInput.setAttribute('stroke-width', '1.2');
+          if (inputNode.checked) {
+            svgInput.setAttribute('fill', '#1da1f2');
+          }
+        };
+        this._scanCell(node as Element, group);
+      });
+    }
+
+  }
+
   private _drawRectCellPanel() {
 
   }
 
-  //*Handle Text Here
+  //*Handle and draw Text Here:
   //? Calculate Behavior Of TextNode Here
   private _calculateBehaviorTextNode(textNode: Text): BehaviorText | null {
     try {

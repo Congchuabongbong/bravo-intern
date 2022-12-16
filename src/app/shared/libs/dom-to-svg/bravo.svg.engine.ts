@@ -1,6 +1,6 @@
 import * as wjChart from '@grapecity/wijmo.chart';
-import { isFlexDirectionRow, isFloatLeft, isFloatRight, isInFlow, isInline } from './core/css';
-import { textAttributes } from './core/text';
+import { isFlexDirectionRow, isFloatLeft, isFloatRight, isInFlow, isInline } from './core/css.util';
+import { textAttributes } from './core/text.type';
 import { ISiblings } from './bravo.flexGrid.svg.engine';
 type Align = 'LeftTop' |
   'LeftCenter' |
