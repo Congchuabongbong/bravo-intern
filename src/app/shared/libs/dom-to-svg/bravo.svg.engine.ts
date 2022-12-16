@@ -1,6 +1,7 @@
 import * as wjChart from '@grapecity/wijmo.chart';
 import { isFlexDirectionRow, isFloatLeft, isFloatRight, isInFlow, isInline } from './core/css';
 import { textAttributes } from './core/text';
+import { ISiblings } from './bravo.flexGrid.svg.engine';
 type Align = 'LeftTop' |
   'LeftCenter' |
   'LeftBottom' |
@@ -170,32 +171,10 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     svgElement.setAttribute('fill', styles.color);
   }
 
-  public getPaddingParentNode(node: Node) {
-    let parentEl = node.parentElement;
-    let dimensionOfPadding = {
-      paddingLeft: 0,
-      paddingRight: 0,
-      paddingBottom: 0,
-      paddingTop: 0
-    };
-    if (!parentEl) return dimensionOfPadding;
-    let computedStyle = window.getComputedStyle(parentEl);
-    while (isInline(computedStyle)) {
-      parentEl = (parentEl as HTMLElement).parentElement as HTMLElement;
-      if (!parentEl) return dimensionOfPadding;
-      computedStyle = window.getComputedStyle(parentEl);
-    }
-    dimensionOfPadding.paddingTop = +computedStyle.paddingTop.replace('px', '');
-    dimensionOfPadding.paddingBottom = +computedStyle.paddingBottom.replace('px', '');
-    dimensionOfPadding.paddingLeft = +computedStyle.paddingLeft.replace('px', '');
-    dimensionOfPadding.paddingRight = +computedStyle.paddingRight.replace('px', '');
-    return dimensionOfPadding;
-  }
-
-  public scanSiblingsNode(node: Node): { leftSideCurrentNode: ChildNode[], rightSideCurrentNode: ChildNode[]; } {
+  //*scan sibling node nếu nó là inline hoặc flex direction rows hoặc float
+  public scanSiblingsNode(node: Node): ISiblings {
     const leftSideCurrentNode: ChildNode[] = [];
     const rightSideCurrentNode: ChildNode[] = [];
-    //nếu không có cha thì không có ae
     if (!node.parentNode) return { leftSideCurrentNode, rightSideCurrentNode };
     const computedStyleParent = getComputedStyle(node.parentNode as Element);
     let nextSibling = node.nextSibling;
@@ -244,5 +223,16 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     }
     return { leftSideCurrentNode, rightSideCurrentNode };
   }
+
+  public isFirstNode(node: Node, type: number): boolean {
+    const parentNode = node.parentNode;
+    if (!parentNode) return false;
+    let firstChild = parentNode.firstChild || node;
+    while (firstChild.nodeType !== type) {
+      if (!firstChild.nextSibling) return false;
+      firstChild = firstChild.nextSibling;
+    }
+    return firstChild === node;
+  };
 
 }

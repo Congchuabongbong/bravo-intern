@@ -574,14 +574,14 @@ export class ControlGridDataLayoutPanelComponent
     const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = panel.viewRange;
     for (let colIndex = colStart; colIndex <= colEnd; colIndex++) {
       for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
-        let el = panel.getCellElement(rowIndex, colIndex);
-        let { x: xCell, y: yCell, width, height } = this.svgEngine.changeOriginCoordinates(el.getBoundingClientRect());
-        let computed = window.getComputedStyle(el);
-        const groupSvgEl = this.svgEngine.startGroup(el.className);
-        const svg = this.svgEngine.drawRect(xCell, yCell, width, height);
-        FlexGridSvgEngine.setAttributeFromCssForSvgEl(svg, computed);
-        this.svgEngine._drawBorderCell(el);
-        this.scanCell(el, groupSvgEl);
+        let cellEl = panel.getCellElement(rowIndex, colIndex);
+        let cellBoundingRect = this.svgEngine.changeOriginCoordinates(cellEl.getBoundingClientRect());
+        let cellStyles = window.getComputedStyle(cellEl);
+        const groupSvgEl = this.svgEngine.startGroup(cellEl.className);
+        const svg = this.svgEngine.drawRect(cellBoundingRect.x, cellBoundingRect.y, cellBoundingRect.width, cellBoundingRect.height);
+        FlexGridSvgEngine.setAttributeFromCssForSvgEl(svg, cellStyles);
+        this.svgEngine._drawBorderCell(cellBoundingRect, cellStyles);
+        this.scanCell(cellEl, groupSvgEl);
         this.svgEngine.endGroup();
       }
     }

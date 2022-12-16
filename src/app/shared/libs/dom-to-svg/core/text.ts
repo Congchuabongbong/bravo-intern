@@ -16,7 +16,7 @@ export const textAttributes = new Set([
   'unicode-bidi',
   'word-spacing',
   'writing-mode',
-  'user-select',
+  'user-select', 'white-space'
 ] as const);
 export enum TextAlign {
   Left = 'left',
