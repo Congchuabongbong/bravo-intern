@@ -3,8 +3,8 @@ import {
   Point
 } from '@grapecity/wijmo';
 import { Subscription, BehaviorSubject, Observable } from 'rxjs';
-import { BehaviorText, TextAlign, textAttributes } from './core/text';
-import { isTransparent, hasBorderBottom, hasBorderTop, hasBorderRight, hasBorderLeft } from './core/css';
+import { BehaviorText, TextAlign } from './core/text';
+import { isTransparent, hasBorderBottom, hasBorderTop, hasBorderRight, hasBorderLeft, isInline } from './core/css';
 import { Font } from './bravo-graphics/font';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
 import { BravoSvgEngine } from './bravo.svg.engine';
@@ -94,21 +94,23 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Handle Text Here
   //? Calculate Behavior Of TextNode Here
   private _calculateBehaviorTextNode(textNode: Text): BehaviorText | null {
-    // if (textNode.nodeValue === ' (3 items)') {
-    //   debugger;
-    // }
     try {
       const parentEl = textNode.parentElement;
       const parentBoundingRect = parentEl!.getBoundingClientRect();
       const parentComputedStyle = window.getComputedStyle(parentEl as HTMLElement);
       const alginText = parentComputedStyle.textAlign;
       const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
+      let deviationHeight = 0;
+      if (isInline(parentComputedStyle)) {
+        let heightOfText = this._measureTextNode(textNode)?.height || 0;
+        deviationHeight = parentBoundingRect.height - heightOfText;
+      }
       const { width: parentWidth, x: xParent, y: yParent } = this.changeOriginCoordinates(parentBoundingRect);
       let paddingLeft: number = +parentComputedStyle.paddingLeft.replace('px', '');
       let paddingTop: number = +parentComputedStyle.paddingTop.replace('px', '');
       let paddingRight: number = +parentComputedStyle.paddingRight.replace('px', '');
       let xTextDefault: number = xParent + paddingLeft;
-      let yTextDefault: number = (yParent + paddingTop) / 2;
+      let yTextDefault: number = (yParent + paddingTop + (deviationHeight / 2)) / 2;
       //default behavior text
       let behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(xTextDefault, yTextDefault), textAnchor: 'start' };
       switch (alginText) {
@@ -153,11 +155,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       let paddingLeft: number = +window.getComputedStyle(textNode.parentElement as HTMLElement).paddingLeft.replace('px', '');
       let paddingRight: number = +window.getComputedStyle(textNode.parentElement as HTMLElement).paddingRight.replace('px', '');
       const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
-      const dimensionOfText = this._measureTextNode(textNode);
-      if (dimensionOfText) {
-        return dimensionOfText.width <= (parentWidth - leftTotalSiblingsWidth - rightTotalSiblingsWidth - paddingLeft - paddingRight);
-      }
-      return false;
+      const textWidth = this._measureTextNode(textNode)?.width || 0;
+      return textWidth <= (parentWidth - leftTotalSiblingsWidth - rightTotalSiblingsWidth - paddingLeft - paddingRight);
     } catch (error) {
       new Error('Occurs when check the width of the text content to see if it fits the width of the parent!');
       return false;
@@ -165,13 +164,18 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
   private _measureTextNode(textNode: Text, pBreakWords: boolean = false): BravoTextMetrics | undefined {
-    const parentNode = textNode.parentElement;
-    if (!parentNode) return undefined;
-    const computedStyleParent = window.getComputedStyle(parentNode as HTMLElement);
-    let font = new Font(computedStyleParent.fontFamily.toString(), computedStyleParent.fontSize, computedStyleParent.fontWeight);
-    const { width: parentWidth } = parentNode.getBoundingClientRect();
-    const dimensionOfText = BravoGraphicsRenderer.measureString(textNode.textContent as string, font, parentWidth, pBreakWords);
-    return dimensionOfText;
+    try {
+      const parentNode = textNode.parentElement;
+      if (!parentNode) return undefined;
+      const computedStyleParent = window.getComputedStyle(parentNode as HTMLElement);
+      let font = new Font(computedStyleParent.fontFamily.toString(), computedStyleParent.fontSize, computedStyleParent.fontWeight);
+      const { width: parentWidth } = parentNode.getBoundingClientRect();
+      const dimensionOfText = BravoGraphicsRenderer.measureString(textNode.textContent as string, font, parentWidth, pBreakWords);
+      return dimensionOfText;
+    } catch (error) {
+      new Error('Occurs when calculate  width of the text content!');
+      return undefined;
+    }
   }
   public drawTextInCell(textNode: Text, parentNode: Element): SVGElement | null {
     try {
@@ -246,7 +250,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       leftTotalSiblingsWidth
     };
   }
-
 
   //*Handle and draw image
   public drawImageInCell(imageNode: HTMLImageElement, parentNode: Element): SVGElement {
