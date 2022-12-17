@@ -567,7 +567,7 @@ export class ControlGridDataLayoutPanelComponent
     cellPanel.viewRange.row !== -1 && cellPanel.viewRange.col !== -1 && this.svgEngine.drawCellPanel(cellPanel);
     colHeaderPanel.viewRange.row !== -1 && colHeaderPanel.viewRange.col !== -1 && this.svgEngine.drawCellPanel(colHeaderPanel);
     this.svgEngine.endRender();
-    // declareNamespaceSvg(this.svgEngine.element as SVGElement);
+    declareNamespaceSvg(this.svgEngine.element as SVGElement);
     this.svgContainer.nativeElement.style.display = 'block';
   }
 }

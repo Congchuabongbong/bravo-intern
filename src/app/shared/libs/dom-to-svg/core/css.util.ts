@@ -36,26 +36,6 @@ export function isFloatLeft(style: CSSStyleDeclaration): boolean {
 export function isFloatRight(style: CSSStyleDeclaration): boolean {
   return style.float === 'right';
 }
-
-
-/** A side of a box. */
-export type Side = 'top' | 'bottom' | 'right' | 'left';
-
-/** The 4 sides of a box. */
-const SIDES: Side[] = ['top', 'bottom', 'right', 'left'];
-
-/** Whether the given side is a horizontal side. */
-export const isHorizontal = (side: Side): boolean => side === 'bottom' || side === 'top';
-
-/**
- * The two corners for each side, in order of lower coordinate to higher coordinate.
- */
-const CORNERS: Record<Side, [Side, Side]> = {
-  top: ['left', 'right'],
-  bottom: ['left', 'right'],
-  left: ['top', 'bottom'],
-  right: ['top', 'bottom'],
-};
 export const isVisible = (styles: CSSStyleDeclaration): boolean =>
   styles.display !== 'none' &&
   styles.visibility !== 'hidden' &&

@@ -49,7 +49,7 @@ export function drawText(textContent: string, behavior: BehaviorText, style?: CS
   const textEl = document.createElementNS(svgNamespace, 'text') as SVGElement;
   textEl.textContent = textContent;
   textEl.setAttribute('x', behavior.point.x.toString());
-  textEl.setAttribute('y', (behavior.point.y * 2).toString());
+  textEl.setAttribute('y', (behavior.point.y).toString());
   style && copyTextStyles(textEl, style);
   textEl.setAttribute('dominant-baseline', behavior.dominantBaseline.toString());
   textEl.setAttribute('text-anchor', behavior.textAnchor.toString());

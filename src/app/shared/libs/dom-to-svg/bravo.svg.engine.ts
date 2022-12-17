@@ -161,7 +161,7 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     });
   }
 
-  public static applyTextStyles(svgElement: SVGElement, styles: CSSStyleDeclaration): void {
+  public applyTextStyles(svgElement: SVGElement, styles: CSSStyleDeclaration): void {
     for (const textProperty of textAttributes) {
       const value = styles.getPropertyValue(textProperty);
       if (value) {
