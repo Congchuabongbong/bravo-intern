@@ -176,7 +176,7 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     const leftSideCurrentNode: ChildNode[] = [];
     const rightSideCurrentNode: ChildNode[] = [];
     if (!node.parentNode) return { leftSideCurrentNode, rightSideCurrentNode };
-    const computedStyleParent = getComputedStyle(node.parentNode as Element);
+    const parentStyles = getComputedStyle(node.parentNode as Element);
     let nextSibling = node.nextSibling;
     let previousSibling = node.previousSibling;
     //case next sibling node
@@ -190,7 +190,7 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
             break;
           case Node.ELEMENT_NODE:
             const computedNode = getComputedStyle(nextSibling as Element);
-            if (isInFlow(computedNode) || isFlexDirectionRow(computedStyleParent) || isInline(computedNode)) {
+            if (isInFlow(computedNode) || isFlexDirectionRow(parentStyles) || isInline(computedNode)) {
               isFloatLeft(computedNode) ? leftSideCurrentNode.push(nextSibling) : rightSideCurrentNode.push(nextSibling);
             }
             break;
@@ -211,7 +211,7 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
             break;
           case Node.ELEMENT_NODE:
             const computedNode = getComputedStyle(previousSibling as Element);
-            if (isInFlow(computedNode) || isFlexDirectionRow(computedStyleParent) || isInline(computedNode)) {
+            if (isInFlow(computedNode) || isFlexDirectionRow(parentStyles) || isInline(computedNode)) {
               isFloatRight(computedNode) ? rightSideCurrentNode.push(previousSibling) : leftSideCurrentNode.push(previousSibling);
             }
             break;

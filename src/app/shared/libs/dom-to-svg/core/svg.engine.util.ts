@@ -71,9 +71,10 @@ export function drawImage(imageHref: string, x: number, y: number, w: number, h:
   }
   return img;
 }
-export function declareNamespaceSvg(svg: SVGElement) {
+export function declareNamespaceSvg(svg: SVGElement): SVGElement {
   svg.setAttribute('xmlns', svgNamespace);
   svg.setAttribute('xmlns:xlink', xLinkNamespace);
+  return svg;
 }
 // export function drawInputCheckBoxUnchecked() {
 //     const pathEl = document.createElementNS(svgNamespace, 'path') as SVGElement;
