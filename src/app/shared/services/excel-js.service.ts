@@ -1,8 +1,5 @@
 import { FlexGrid } from '@grapecity/wijmo.grid';
-import { merge } from 'rxjs';
-import { Injectable } from '@angular/core';
 import * as Excel from 'exceljs';
-import * as FileSaver from 'file-saver';
 
 
 
@@ -18,7 +15,7 @@ export class ExcelJsService {
   private flexGrid!: FlexGrid;
   private hostElement!: HTMLElement;
   constructor(flexGrid: FlexGrid) {
-    this.flexGrid = flexGrid
+    this.flexGrid = flexGrid;
   }
 
   convertFontExcel(hostElement: HTMLElement, typeSelector: TYPE_SELECTOR, selector: string): Partial<Excel.Font> | null {
@@ -31,7 +28,7 @@ export class ExcelJsService {
         if (computedStyle == null) return null;
         const styleExcel: Partial<Excel.Font> = {
 
-        }
+        };
         return styleExcel;
       case TYPE_SELECTOR.CLASS:
         return null;

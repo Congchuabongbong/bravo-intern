@@ -21,12 +21,12 @@ export class DynamicFormService {
     const formGroupPrepareObject: Record<string, any> = {};
     controlGridLayoutFormData.formField.forEach(field => {
       formGroupPrepareObject[field.attribute.formControlName] = [field.attribute.value || null, field.attribute.validators ? this.generateValidators(field.attribute.validators) : null];
-    })
+    });
     //**Nested grid layout */
     if (controlGridLayoutFormData.subControlGridLayoutFormData) {
       controlGridLayoutFormData.subControlGridLayoutFormData.subGridItemForm.formField.forEach(field => {
         formGroupPrepareObject[field.attribute.formControlName] = [field.attribute.value || null, field.attribute.validators ? this.generateValidators(field.attribute.validators) : null];
-      })
+      });
     }
     return this._fb.group(formGroupPrepareObject);
   }
@@ -36,12 +36,12 @@ export class DynamicFormService {
     let messageError: string = '';
     validators.forEach(validator => {
       if (validator.key === keyError) {
-        messageError = validator.messageError
+        messageError = validator.messageError;
       }
-    })
+    });
     return messageError;
   }
-  //** generate validation form 
+  //** generate validation form
   private generateValidators(validatorsString: Array<FormFieldData.IValidator>): Array<ValidatorFn> {
     let validators: Array<ValidatorFn> = [];
     validatorsString.forEach(validator => {
@@ -71,7 +71,7 @@ export class DynamicFormService {
           validators.push(Validators.required);
           break;
       }
-    })
+    });
     return validators;
   }
 }

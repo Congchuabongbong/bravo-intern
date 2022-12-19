@@ -1,50 +1,35 @@
 import {
-  Component,
-  EventEmitter,
+  AfterViewInit, Component, ElementRef, EventEmitter,
   Input,
   OnDestroy,
   OnInit,
-  Output,
-  ElementRef,
-  ViewChild,
-  AfterViewInit,
+  Output, ViewChild
 } from '@angular/core';
 import {
-  FlexGrid,
-  FormatItemEventArgs,
-  CellType,
-  CellRangeEventArgs,
-  CellEditEndingEventArgs,
-} from '@grapecity/wijmo.grid';
-import {
-  showPopup, PropertyGroupDescription,
-  hidePopup,
-  hasClass,
-  PopupPosition,
-  EventArgs,
-  CancelEventArgs,
-  addClass,
-  CollectionView
+  addClass, CancelEventArgs, CollectionView, EventArgs, hasClass, hidePopup, PopupPosition, PropertyGroupDescription, showPopup
 } from '@grapecity/wijmo';
+import {
+  CellEditEndingEventArgs, CellRangeEventArgs, CellType, FlexGrid,
+  FormatItemEventArgs
+} from '@grapecity/wijmo.grid';
+import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { ListBox } from '@grapecity/wijmo.input';
+import * as Excel from 'exceljs';
+import { Worksheet } from 'exceljs';
+import { Observable } from 'rxjs';
 import {
   IWjFlexColumnConfig,
-  IWjFlexLayoutConfig,
+  IWjFlexLayoutConfig
 } from 'src/app/shared/data-type/wijmo-data.type';
-import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
-import { HttpProductService } from 'src/app/shared/services/http-product.service';
-import { Observable } from 'rxjs';
-import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
-import * as Excel from 'exceljs';
 import {
-  getStyleExcelFromStyleElement,
+  getStyleExcelFromStyleElement
 } from 'src/app/shared/libs/flexgrid-to-excel/core/excel.method';
 import { ExcelFlexUtil, ExcelUtil } from 'src/app/shared/libs/flexgrid-to-excel/index';
-import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
-import { Worksheet } from 'exceljs';
+import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
+import { HttpProductService } from 'src/app/shared/services/http-product.service';
+import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
-import * as FileSaver from 'file-saver';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -99,7 +84,7 @@ export class ControlGridDataLayoutPanelComponent
     // this.flex.columnFooters;
     // this.flex.allowPinning = true;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
-    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
 
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
@@ -550,11 +535,17 @@ export class ControlGridDataLayoutPanelComponent
   public onExportSvgAction() {
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
     const svg = this.svgEngine.renderFlexSvgVisible();
-    const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    const alink = document.createElement('a');
-    const event = new MouseEvent('click');
-    alink.download = 'download.svg';
-    alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    alink.dispatchEvent(event);
+    this.svgContainer.nativeElement.style.display = 'block';
+    // setTimeout(() => {
+    //   this.svgContainer.nativeElement.removeChild(svg);
+    //   this.svgContainer.nativeElement.style.display = 'none';
+    // }, 3000);
+
+    // const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    // const alink = document.createElement('a');
+    // const event = new MouseEvent('click');
+    // alink.download = 'download.svg';
+    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    // alink.dispatchEvent(event);
   }
 }

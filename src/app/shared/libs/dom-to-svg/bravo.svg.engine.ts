@@ -2,6 +2,7 @@ import * as wjChart from '@grapecity/wijmo.chart';
 import { isFlexDirectionRow, isFloatLeft, isFloatRight, isInFlow, isInline } from './core/css.util';
 import { textAttributes } from './core/text.type';
 import { ISiblings } from './bravo.flexGrid.svg.engine';
+import { creatorSVG } from './core/svg.engine.util';
 type Align = 'LeftTop' |
   'LeftCenter' |
   'LeftBottom' |
@@ -22,9 +23,15 @@ export function roundNumber(num: number) {
   return Math.round(num);
 }
 export class BravoSvgEngine extends wjChart._SvgRenderEngine {
+  //**TODO */
+
+
+
+
   constructor(_anchorElement: HTMLElement) {
     super(_anchorElement);
   }
+
 
 
   public calculatePositionInsideRect(pnWidth: number, pnHeight: number, pzAlign: Align) {
@@ -225,6 +232,7 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
   }
 
   public isFirstNode(node: Node, type: number): boolean {
+
     const parentNode = node.parentNode;
     if (!parentNode) return false;
     let firstChild = parentNode.firstChild || node;
@@ -234,5 +242,20 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     }
     return firstChild === node;
   };
+  public isLastNode(node: Node, type: number): boolean {
+    const parentNode = node.parentNode;
+    if (!parentNode) return false;
+    let lastChild = parentNode.lastChild || node;
+    while (lastChild.nodeType !== type) {
+      if (!lastChild.nextSibling) return false;
+      lastChild = lastChild.nextSibling;
+    }
+    return lastChild === node;
+  };
+
+
+
+
+
 
 }

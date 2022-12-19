@@ -1,16 +1,16 @@
-import { FlexGrid, GridPanel } from '@grapecity/wijmo.grid';
 import {
   Point
 } from '@grapecity/wijmo';
-import { Subscription, BehaviorSubject, Observable } from 'rxjs';
-import { BehaviorText, TextAlign } from './core/text.type';
-import { isTransparent, hasBorderBottom, hasBorderTop, hasBorderRight, hasBorderLeft, isInline } from './core/css.util';
-import { Font } from './bravo-graphics/font';
+import { FlexGrid, GridPanel, CellRange } from '@grapecity/wijmo.grid';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
-import { BravoSvgEngine } from './bravo.svg.engine';
-import { creatorSVG, declareNamespaceSvg, drawImage, drawText, ISize } from './core/svg.engine.util';
+import { Font } from './bravo-graphics/font';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
-import { isTextNode, isElement, isHTMLImageElement, isHTMLInputElement } from './core/dom.util';
+import { BravoSvgEngine } from './bravo.svg.engine';
+import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
+import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
+import { creatorSVG, declareNamespaceSvg, drawImage, drawText, ISize } from './core/svg.engine.util';
+import { BehaviorText, TextAlign } from './core/text.type';
 
 export interface ISiblings {
   leftSideCurrentNode: ChildNode[], rightSideCurrentNode: ChildNode[];
@@ -26,6 +26,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   private static reSizeViewPortSubject: BehaviorSubject<ISize> = new BehaviorSubject<ISize>({ width: 0, height: 0 });
   private _reSizeViewPortSubscription: Subscription = new Subscription();
   public reSizeViewPortAction$: Observable<ISize> = FlexGridSvgEngine.reSizeViewPortSubject.asObservable();
+  public _svgWrapper!: Element | null;
+
   //*constructor
   constructor(_anchorElement: HTMLElement, _flex: FlexGrid) {
     super(_anchorElement);
@@ -63,12 +65,18 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public renderFlexSvgVisible(): SVGElement {
     try {
       this.beginRender();
-      const colHeadersPanel = this.flexGrid.columnHeaders;
-      const cellPanel = this.flexGrid.cells;
+      const colsHeaderPanel = this.flexGrid.columnHeaders;
+      const cellsPanel = this.flexGrid.cells;
       const rowHeadersPanel = this.flexGrid.rowHeaders;
-      this._drawCellPanel(cellPanel);
-      this._drawCellPanel(colHeadersPanel);
-      this._drawCellPanel(rowHeadersPanel);
+      //draw cells panel and cells frozen
+      this._drawCellPanel(cellsPanel);
+      const viewRangeCellsFrozen = this._getRangeCellsFrozen(cellsPanel);
+      viewRangeCellsFrozen && this._drawCellPanel(cellsPanel, viewRangeCellsFrozen);
+      //draw cells panel and cells frozen
+      this._drawCellPanel(colsHeaderPanel);
+      const viewRangeColsHeaderFrozen = this._getRangeCellsFrozen(colsHeaderPanel);
+      viewRangeColsHeaderFrozen && this._drawCellPanel(colsHeaderPanel, viewRangeColsHeaderFrozen);
+      // this._drawCellPanel(rowHeadersPanel);
       const svgEl = declareNamespaceSvg(this.element as SVGElement);
       return svgEl;
     } catch (error) {
@@ -76,6 +84,15 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       return this.element as SVGElement;
     } finally { this.endRender(); }
   }
+
+  //** */
+  private _getRangeCellsFrozen(gridPanel: GridPanel): CellRange | null {
+    const { row2, row } = gridPanel.viewRange;
+    if (!this.flexGrid.columns.frozen) return null;
+    const viewRange = new CellRange(row, 0, row2, this.flexGrid.columns.frozen - 1);
+    return viewRange;
+  }
+
   //*handle and draw cell
   private _drawBorderCell(boundingRect: DOMRect, styles: CSSStyleDeclaration) {
     const { x, y, bottom, right } = boundingRect;
@@ -102,9 +119,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
 
-  private _drawCellPanel(panel: GridPanel) {
+  private _drawCellPanel(panel: GridPanel, viewRange?: CellRange) {
     //!case pin columns not complete
-    const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = panel.viewRange;
+    const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = viewRange || panel.viewRange;
     for (let colIndex = colStart; colIndex <= colEnd; colIndex++) {
       for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
         let cellEl = panel.getCellElement(rowIndex, colIndex);
@@ -152,19 +169,38 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   private _drawRectCellPanel(cellEl: Element) {
     let cellBoundingRect = this.changeOriginCoordinates(cellEl.getBoundingClientRect());
     let cellStyles = window.getComputedStyle(cellEl);
-    const groupSvgEl = this.startGroup();
+    const groupSvgEl = this.startGroup(cellEl.className);
     const svg = this.drawRect(cellBoundingRect.x, cellBoundingRect.y, cellBoundingRect.width, cellBoundingRect.height);
     cellStyles.backgroundColor && !isTransparent(cellStyles.backgroundColor) && svg.setAttribute('fill', cellStyles.backgroundColor || 'rgba(0, 0, 0, 0)');
     this._drawBorderCell(cellBoundingRect, cellStyles);
     this._scanCell(cellEl, groupSvgEl);
     this.endGroup();
   }
-
+  // public startWrapSvg(wrappedElement: DOMRect) {
+  //   const svgWrapper = creatorSVG(wrappedElement);
+  //   this.element.appendChild(svgWrapper);
+  //   this._svgWrapper = svgWrapper;
+  //   return svgWrapper;
+  // }
+  // public endWrapSvg() {
+  //   if (this._svgWrapper) {
+  //     var parent = this._svgWrapper.parentNode as Element;
+  //     if (parent == this.element) {
+  //       this._svgWrapper = null;
+  //     } else {
+  //       this._svgWrapper = parent;
+  //     }
+  //   }
+  // }
   //*Handle and draw Text Here:
   //? Calculate Behavior Of TextNode Here
   private _calculateBehaviorTextNode(textNode: Text): BehaviorText | null {
     try {
       const parentEl = textNode.parentElement;
+      // if (this.isFirstNode(textNode, Node.TEXT_NODE) && this.isLastNode(textNode, Node.TEXT_NODE)) {
+      //   console.log(textNode.textContent);
+      // }
+
       const parentBoundingRect = parentEl!.getBoundingClientRect();
       const parentComputedStyle = window.getComputedStyle(parentEl as HTMLElement);
       const alginText = parentComputedStyle.textAlign;
@@ -270,8 +306,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     //draw svg
     const rectSvg: Partial<DOMRect> = {};
     const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
-    const paddingLeft = +parentStyle.paddingLeft.replace('px', '');
-    const paddingRight = +parentStyle.paddingRight.replace('px', '');
+    const paddingLeft = +parentStyle.paddingLeft.replace('px', '') || 0;
+    const paddingRight = +parentStyle.paddingRight.replace('px', '') || 0;
     rectSvg.width = (parentNode as HTMLElement).offsetWidth - leftTotalSiblingsWidth - rightTotalSiblingsWidth - paddingLeft - paddingRight;
     rectSvg.x = behaviorText.point.x;
     rectSvg.y = behaviorText.point.y;

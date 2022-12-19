@@ -1,10 +1,10 @@
 import { Injectable, isDevMode } from '@angular/core';
-import { getRxStorageDexie } from 'rxdb/plugins/dexie';
 import { createRxDatabase, RxStorage } from 'rxdb';
+import { getRxStorageDexie } from 'rxdb/plugins/dexie';
 import { wrappedValidateAjvStorage } from 'rxdb/plugins/validate-ajv';
-import { GRID_LAYOUT_FORM_SCHEMA, RxGridLayoutFormDocType } from '../schema/grid-layout-form.schema';
 import { DATABASE_NAME, GRID_LAYOUT_FORM_COLLECTION_NAME, PASSWORD } from '../config/rxDb.config';
-import { RxGridLayoutFormCollections, RxDb, RxGridLayoutFormDocument } from '../schema/rxDB.schema';
+import { GRID_LAYOUT_FORM_SCHEMA, RxGridLayoutFormDocType } from '../schema/grid-layout-form.schema';
+import { RxDb, RxGridLayoutFormCollections, RxGridLayoutFormDocument } from '../schema/rxDB.schema';
 
 //**Collections */
 let collectionSettings = {
@@ -13,7 +13,7 @@ let collectionSettings = {
     sync: true
   },
 
-}
+};
 
 //**Create Db
 async function createDb(): Promise<RxDb> {
@@ -51,7 +51,7 @@ async function createDb(): Promise<RxDb> {
         }
         return db;
       });
-  }, false)
+  }, false);
   console.log('DatabaseService: created database');
   return db;
 }
