@@ -10,12 +10,12 @@ import {
 } from '@grapecity/wijmo';
 import {
   CellEditEndingEventArgs, CellRangeEventArgs, CellType, FlexGrid,
-  FormatItemEventArgs
+  FormatItemEventArgs, Row
 } from '@grapecity/wijmo.grid';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { ListBox } from '@grapecity/wijmo.input';
 import * as Excel from 'exceljs';
-import { Worksheet } from 'exceljs';
+import { Worksheet, } from 'exceljs';
 import { Observable } from 'rxjs';
 import {
   IWjFlexColumnConfig,
@@ -30,6 +30,7 @@ import { HttpProductService } from 'src/app/shared/services/http-product.service
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
+import { Payload } from '../../../shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -81,10 +82,43 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
+
+
+    // var extraRow = new Row();
+    // extraRow.allowMerging = true;
+    // //
+    // // add extra header row to the grid
+    // var panel = flexGrid.columnHeaders;
+    // panel.rows.splice(0, 0, extraRow);
+    // //
+    // // populate the extra header row
+    // for (let colIndex = 1; colIndex <= 2; colIndex++) {
+    //   panel.setCellData(0, colIndex, 'Amounts');
+    // }
+    // //
+    // // merge "Country" and "Active" headers vertically
+    // ['Id', 'Name'].forEach(function (binding) {
+    //   let col = flexGrid.getColumn(binding);
+    //   col.allowMerging = true;
+    //   panel.setCellData(0, col.index, col.header);
+    // });
+    // //
+    // // center-align merged header cells
+    // flexGrid.formatItem.addHandler(function (s: FlexGrid, e: FormatItemEventArgs) {
+    //   if (e.panel == s.columnHeaders && e.range.rowSpan > 1) {
+    //     var html = e.cell.innerHTML;
+    //     e.cell.innerHTML = '<div class="v-center">' + html + '</div>';
+    //   }
+    // });
+
+
+    this.flex.allowMerging = 7;
+    this.flex.getColumn(6).allowMerging = true;
     // this.flex.columnFooters;
+
     // this.flex.allowPinning = true;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
-    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
+    this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
 
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
@@ -100,9 +134,9 @@ export class ControlGridDataLayoutPanelComponent
       );
     }
 
-    this.flex.updatedLayout.addHandler(() => {
-      FlexGridSvgEngine.onResizeViewPortAction({ width: this.flex.hostElement.offsetWidth, height: this.flex.hostElement.offsetHeight });
-    });
+    // this.flex.updatedLayout.addHandler(() => {
+    //   FlexGridSvgEngine.onResizeViewPortAction({ width: this.flex.hostElement.offsetWidth, height: this.flex.hostElement.offsetHeight });
+    // });
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
     //autoSizedColumn
@@ -534,6 +568,7 @@ export class ControlGridDataLayoutPanelComponent
   public svgEngine!: FlexGridSvgEngine;
   public onExportSvgAction() {
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
+
     const svg = this.svgEngine.renderFlexSvgVisible();
     this.svgContainer.nativeElement.style.display = 'block';
     // setTimeout(() => {
