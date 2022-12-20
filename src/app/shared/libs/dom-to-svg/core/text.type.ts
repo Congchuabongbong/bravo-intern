@@ -1,4 +1,5 @@
 import { Point } from '@grapecity/wijmo';
+import { BravoTextMetrics } from '../bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
 export const textAttributes = new Set([
   'color',
   'font-family',
@@ -29,7 +30,8 @@ export type BehaviorText = {
   point: Point;
   dominantBaseline: DominantBaseline,
   textAnchor: TextAnchor;
-  isTextFitWidthCell?: boolean;
+
+  isTextFitWidthCell: boolean;
 };
 export type DominantBaseline = 'auto' | 'middle' | 'hanging';
 export type TextAnchor = 'start' | 'middle' | 'end';
