@@ -294,7 +294,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       }
       //?case swap text by svg
       if (!payload.behaviorText.isTextFitWidthCell) {
-        //case wrapper svg text
         const svgWrap = this._wrapTextIntoSvg(textNode, payload);
         return svgWrap;
       }
