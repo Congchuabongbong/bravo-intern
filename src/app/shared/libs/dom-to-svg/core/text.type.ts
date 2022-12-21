@@ -1,5 +1,4 @@
 import { Point } from '@grapecity/wijmo';
-import { BravoTextMetrics } from '../bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
 export const textAttributes = new Set([
   'color',
   'font-family',

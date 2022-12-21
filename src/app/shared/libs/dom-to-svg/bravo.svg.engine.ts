@@ -1,8 +1,7 @@
 import * as wjChart from '@grapecity/wijmo.chart';
+import { ISiblings } from './bravo.flexGrid.svg.engine';
 import { isFlexDirectionRow, isFloatLeft, isFloatRight, isInFlow, isInline } from './core/css.util';
 import { textAttributes } from './core/text.type';
-import { ISiblings } from './bravo.flexGrid.svg.engine';
-import { creatorSVG } from './core/svg.engine.util';
 type Align = 'LeftTop' |
   'LeftCenter' |
   'LeftBottom' |
@@ -13,26 +12,14 @@ type Align = 'LeftTop' |
   'RightBottom'
   | 'Other';
 
-interface IDimensionOfPadding {
-  paddingLeft: number;
-  paddingRight: number;
-  paddingBottom: number;
-  paddingTop: number;
-}
 export function roundNumber(num: number) {
   return Math.round(num);
 }
 export class BravoSvgEngine extends wjChart._SvgRenderEngine {
   //**TODO */
-
-
-
-
   constructor(_anchorElement: HTMLElement) {
     super(_anchorElement);
   }
-
-
 
   public calculatePositionInsideRect(pnWidth: number, pnHeight: number, pzAlign: Align) {
     let _nX1 = 0, _nX2 = 0, _nY1 = 0, _nY2 = 0;

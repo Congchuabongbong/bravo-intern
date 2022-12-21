@@ -1,6 +1,4 @@
-import {
-  Point, Event as wjEven
-} from '@grapecity/wijmo';
+import { Event as wjEven, Point, Rect } from '@grapecity/wijmo';
 import { CellRange, FlexGrid, GridPanel } from '@grapecity/wijmo.grid';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
 import { Font } from './bravo-graphics/font';
@@ -20,7 +18,7 @@ export type Payload = {
   col: number;
   cellElement: HTMLElement;
   cellStyles: CSSStyleDeclaration;
-  cellBoundingRect: DOMRect;
+  cellBoundingRect: Rect;
   group: Element;
   dimensionText: BravoTextMetrics | undefined,
   behaviorText: BehaviorText;
@@ -55,11 +53,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
   }
 
-  public changeOriginCoordinates(elDOMRect: DOMRect): DOMRect {
+  public changeOriginCoordinates(elDOMRect: DOMRect): Rect {
     //! Note: mutable object! This is impure function
-    elDOMRect.x -= this.captureElementCoordinates.x;
-    elDOMRect.y -= this.captureElementCoordinates.y;
-    return elDOMRect;
+    const boundingRect = Rect.fromBoundingRect(elDOMRect);
+    boundingRect.left -= this.captureElementCoordinates.x;
+    boundingRect.top -= this.captureElementCoordinates.y;
+    return boundingRect;
   }
 
   //*method raise event here::
@@ -123,24 +122,24 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   //*handle and draw cell
   private _drawBorderCell(payload: Payload) {
-    const { x, y, bottom, right } = payload.cellBoundingRect;
+    const { left, top, bottom, right } = payload.cellBoundingRect;
     if (hasBorderBottom(payload.cellStyles)) {
-      const lineSvgEl = this.drawLine(x, bottom, right, bottom);
+      const lineSvgEl = this.drawLine(left, bottom, right, bottom);
       lineSvgEl.setAttribute('stroke-width', payload.cellStyles.borderBottomWidth);
       lineSvgEl.setAttribute('stroke', payload.cellStyles.borderBottomColor);
     }
     if (hasBorderTop(payload.cellStyles)) {
-      const lineSvgEl = this.drawLine(x, y, right, y);
+      const lineSvgEl = this.drawLine(left, top, right, top);
       lineSvgEl.setAttribute('stroke-width', payload.cellStyles.borderTopWidth);
       lineSvgEl.setAttribute('stroke', payload.cellStyles.borderTopColor);
     }
     if (hasBorderRight(payload.cellStyles)) {
-      const lineSvgEl = this.drawLine(right, y, right, bottom);
+      const lineSvgEl = this.drawLine(right, top, right, bottom);
       lineSvgEl.setAttribute('stroke-width', payload.cellStyles.borderRightWidth);
       lineSvgEl.setAttribute('stroke', payload.cellStyles.borderRightColor);
     }
     if (hasBorderLeft(payload.cellStyles)) {
-      const lineSvgEl = this.drawLine(x, y, x, bottom);
+      const lineSvgEl = this.drawLine(left, top, left, bottom);
       lineSvgEl.setAttribute('stroke-width', payload.cellStyles.borderLeftWidth);
       lineSvgEl.setAttribute('stroke', payload.cellStyles.borderLeftColor);
     }
@@ -163,12 +162,10 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
   private _drawRectCell(payload: Payload): void {
-    //TODO: tối ứu code ở đây not complete!
-    //!clean code here
     const cellBoundingRect = this.changeOriginCoordinates(payload.cellElement.getBoundingClientRect());
     const cellStyles = window.getComputedStyle(payload.cellElement);
     const groupSvgEl = this.startGroup(payload.cellElement.className);
-    const rectSvgEl = this.drawRect(cellBoundingRect.x, cellBoundingRect.y, cellBoundingRect.width, cellBoundingRect.height);
+    const rectSvgEl = this.drawRect(cellBoundingRect.left, cellBoundingRect.top, cellBoundingRect.width, cellBoundingRect.height);
     cellStyles.backgroundColor && !isTransparent(cellStyles.backgroundColor) && rectSvgEl.setAttribute('fill', cellStyles.backgroundColor || 'rgba(0, 0, 0, 0)');
     //?cache payload data and send payload
     payload.cellStyles = cellStyles;
@@ -196,7 +193,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         if (isHTMLInputElement(node as Element)) { // case input checkbox
           const inputNode = node as HTMLInputElement;
           const inputBoundingRect = this.changeOriginCoordinates(inputNode.getBoundingClientRect());
-          const svgInput = this.drawRect(inputBoundingRect.x, inputBoundingRect.y, inputBoundingRect.width, inputBoundingRect.height);
+          const svgInput = this.drawRect(inputBoundingRect.left, inputBoundingRect.top, inputBoundingRect.width, inputBoundingRect.height);
           svgInput.setAttribute('rx', '2');
           svgInput.setAttribute('fill', '#fff');
           svgInput.setAttribute('stroke', '#767676');
@@ -215,6 +212,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     try {
       let { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode, payload);
       let deviationHeight = 0;
+      //?catch payload data
       payload.dimensionText = this._measureTextNode(textNode, payload);
       //?kiểm tra trường hợp nếu là inline element tính độ chênh lệch chiều cao nội dung bên trong và thẻ chứa nội dung
       if (isInline(parentStyles)) {
@@ -227,8 +225,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       let paddingLeft: number = +parentStyles.paddingLeft.replace('px', '');
       let paddingTop: number = +parentStyles.paddingTop.replace('px', '');
       let paddingRight: number = +parentStyles.paddingRight.replace('px', '');
-      let xTextDefault: number = parentBoundingRect.x + paddingLeft;
-      let yTextDefault: number = Math.floor(parentBoundingRect.y + paddingTop + deviationHeight);
+      let xTextDefault: number = parentBoundingRect.left + paddingLeft;
+      let yTextDefault: number = Math.floor(parentBoundingRect.top + paddingTop + deviationHeight);
       /*
         ?tạo default behavior text base.
         ?default text alignment left and dominant baseline 'hanging', textAnchor: 'start'
@@ -277,12 +275,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       let paddingRight: number = +parentStyles.paddingRight.replace('px', '');
       const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode, payload);
       const textWidth = payload.dimensionText?.width || 0;
-      let innerWidthContent = leftTotalSiblingsWidth + rightTotalSiblingsWidth + paddingLeft + paddingRight + textWidth;
-      if (parentBoundingRect.width > innerWidthContent) {
-        return textWidth <= (parentBoundingRect.width - leftTotalSiblingsWidth - rightTotalSiblingsWidth - paddingLeft - paddingRight);
-      } else {
-        return textWidth <= parentBoundingRect.width - leftTotalSiblingsWidth - paddingLeft;
-      }
+      return textWidth <= (parentBoundingRect.width - leftTotalSiblingsWidth - rightTotalSiblingsWidth - paddingLeft - paddingRight);
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when check the width of the text content to see if it fits the width of the parent!');
@@ -316,7 +309,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       if (!this.isOnlyNode(textNode, Node.TEXT_NODE) || isInline(parentStyles)) {
         if (payload.cellBoundingRect.width < payload.behaviorText.point.x) {
           return null;
-        } else if (payload.cellBoundingRect.width >= payload.behaviorText.point.x && payload.cellElement.offsetWidth < payload.behaviorText.point.x + widthTextNode) {
+        } else if (payload.cellBoundingRect.width >= payload.behaviorText.point.x && payload.cellElement.offsetWidth <= payload.behaviorText.point.x + widthTextNode) {
           payload.behaviorText.isTextFitWidthCell = false;
         }
       }
@@ -411,7 +404,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   private _getInformationParentNode(node: Node, payload: Payload) {
     let parentNode: Element;
-    let parentBoundingRect: DOMRect;
+    let parentBoundingRect: Rect;
     let parentStyles: CSSStyleDeclaration;
     if (node.parentElement === payload.cellElement) {
       parentNode = payload.cellElement;
@@ -437,17 +430,17 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       const svgWrap = this._wrapImageIntoSvg(imageNode, parentNode);
       return svgWrap;
     }
-    const imageSvgEl = this.drawImage(imageNode.src, imageBoundingRect.x, imageBoundingRect.y, imageBoundingRect.width, imageBoundingRect.height);
+    const imageSvgEl = this.drawImage(imageNode.src, imageBoundingRect.left, imageBoundingRect.top, imageBoundingRect.width, imageBoundingRect.height);
     return imageSvgEl;
   }
 
   private _wrapImageIntoSvg(imageEl: HTMLImageElement, parentNode: Element): SVGElement {
-    const rectSvgEl: Partial<DOMRect> = {};
+    const rectSvgEl: Partial<Rect> = {};
     const parentBoundingRect = this.changeOriginCoordinates(parentNode.getBoundingClientRect());
     rectSvgEl.width = parentBoundingRect.width;
     rectSvgEl.height = parentBoundingRect.height;
-    rectSvgEl.x = parentBoundingRect.x;
-    rectSvgEl.y = parentBoundingRect.y;
+    rectSvgEl.left = parentBoundingRect.left;
+    rectSvgEl.top = parentBoundingRect.top;
     const svgWrapImage = creatorSVG(rectSvgEl);
     const imageSvgEl = drawImage(imageEl.src, 0, 0, imageEl.width, imageEl.height);
     svgWrapImage.appendChild(imageSvgEl);
