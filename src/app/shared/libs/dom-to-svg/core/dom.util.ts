@@ -2,6 +2,8 @@
 export const svgNamespace = 'http://www.w3.org/2000/svg';
 export const xLinkNamespace = 'http://www.w3.org/1999/xlink';
 export const xhtmlNamespace = 'http://www.w3.org/1999/xhtml';
+export const xmlNamespace = 'http://www.w3.org/XML/1998/namespace';
+
 // DOM
 export const isElement = (node: Node): node is Element => node.nodeType === Node.ELEMENT_NODE;
 export const isTextNode = (node: Node): node is Text => node.nodeType === Node.TEXT_NODE;

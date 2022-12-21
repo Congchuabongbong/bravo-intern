@@ -7,27 +7,7 @@ import { BravoSvgEngine } from './bravo.svg.engine';
 import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
 import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
 import { creatorSVG, declareNamespaceSvg, drawImage, drawText } from './core/svg.engine.util';
-import { BehaviorText, TextAlign } from './core/text.type';
-
-export interface ISiblings {
-  leftSideCurrentNode: ChildNode[], rightSideCurrentNode: ChildNode[];
-}
-export type Payload = {
-  panel: GridPanel;
-  row: number;
-  col: number;
-  cellElement: HTMLElement;
-  cellStyles: CSSStyleDeclaration;
-  cellBoundingRect: Rect;
-  group: Element;
-  dimensionText: BravoTextMetrics | undefined,
-  behaviorText: BehaviorText;
-};
-
-export interface IPayloadEvent extends Pick<Payload, 'panel' | 'row' | 'col'> {
-  contentDraw: Node | string; // nội dung được vẽ
-  svgDrew?: Element; // svg được vẽ,
-}
+import { BehaviorText, IPayloadEvent, ISiblings, Payload, TextAlign } from './core/type';
 export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Declaration here...
   public anchorElement!: Element;
@@ -54,7 +34,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
   public changeOriginCoordinates(elDOMRect: DOMRect): Rect {
-    //! Note: mutable object! This is impure function
     const boundingRect = Rect.fromBoundingRect(elDOMRect);
     boundingRect.left -= this.captureElementCoordinates.x;
     boundingRect.top -= this.captureElementCoordinates.y;
@@ -340,7 +319,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       /*
       ?case 1 inline wrap text: width svg = phần còn lại của width trừ đi tổng left siblings và padding left và right
       ?case 2 nếu là text node duy nhất thì trừ đi cả right siblings! còn không thì không
-      ?case 3 nếu là ko là text node duy nhất thì không trừ đi right siblings
+      ?case 3 nếu là ko là text node duy nhất thì không trừ đi right siblings (trừ sẽ bị âm)
       */
       if (isInline(parentStyles)) {
         let { leftTotalSiblingsWidth } = this._getTotalWidthSiblingNode(parentNode, payload);

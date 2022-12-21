@@ -1,6 +1,7 @@
 import { Size as wjSize } from '@grapecity/wijmo';
-import { svgNamespace, xLinkNamespace } from './dom.util';
-import { BehaviorText, copyTextStyles } from './text.type';
+import { svgNamespace, xLinkNamespace, xmlNamespace } from './dom.util';
+import { copyTextStyles } from './text.util';
+import { BehaviorText } from './type';
 export interface ISize extends Pick<wjSize, 'height' | 'width'> { };
 export function setViewportSizeSVG(svg: SVGElement, size: ISize) {
   svg.setAttribute('width', size.width.toString());
@@ -54,14 +55,14 @@ export function drawText(textContent: string, behavior: BehaviorText, style?: CS
   textEl.setAttribute('dominant-baseline', behavior.dominantBaseline.toString());
   textEl.setAttribute('text-anchor', behavior.textAnchor.toString());
   if (whiteSpace === 'preserve') {
-    textEl.setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:space", "preserve");
+    textEl.setAttributeNS(xmlNamespace, "xml:space", "preserve");
   }
   return textEl;
 }
 
 export function drawImage(imageHref: string, x: number, y: number, w: number, h: number, clipPath?: string): SVGElement {
   var img = document.createElementNS(svgNamespace, 'image') as SVGElement;
-  img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imageHref);
+  img.setAttributeNS(xLinkNamespace, 'href', imageHref);
   img.setAttribute('x', x.toFixed(1));
   img.setAttribute('y', y.toFixed(1));
   img.setAttribute('width', w.toFixed(1));
@@ -76,8 +77,3 @@ export function declareNamespaceSvg(svg: SVGElement): SVGElement {
   svg.setAttribute('xmlns:xlink', xLinkNamespace);
   return svg;
 }
-// export function drawInputCheckBoxUnchecked() {
-//     const pathEl = document.createElementNS(svgNamespace, 'path') as SVGElement;
-//     pathEl.setAttribute('d', d);
-//     return pathEl;
-// }

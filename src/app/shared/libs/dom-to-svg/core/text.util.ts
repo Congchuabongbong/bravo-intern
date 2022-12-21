@@ -1,4 +1,3 @@
-import { Point } from '@grapecity/wijmo';
 export const textAttributes = new Set([
   'color',
   'font-family',
@@ -18,21 +17,7 @@ export const textAttributes = new Set([
   'writing-mode',
   'user-select', 'white-space'
 ] as const);
-export enum TextAlign {
-  Left = 'left',
-  Center = 'center',
-  Right = 'right',
-  Start = 'start',
-  End = 'end',
-}
-export type BehaviorText = {
-  point: Point;
-  dominantBaseline: DominantBaseline,
-  textAnchor: TextAnchor;
-  isTextFitWidthCell: boolean;
-};
-export type DominantBaseline = 'auto' | 'middle' | 'hanging';
-export type TextAnchor = 'start' | 'middle' | 'end';
+
 export function copyTextStyles(svgElement: SVGElement, styles: CSSStyleDeclaration): void {
   for (const textProperty of textAttributes) {
     const value = styles.getPropertyValue(textProperty);

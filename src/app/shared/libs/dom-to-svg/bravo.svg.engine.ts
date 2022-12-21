@@ -1,7 +1,7 @@
 import * as wjChart from '@grapecity/wijmo.chart';
-import { ISiblings } from './bravo.flexGrid.svg.engine';
 import { isFlexDirectionRow, isFloatLeft, isFloatRight, isInFlow, isInline } from './core/css.util';
-import { textAttributes } from './core/text.type';
+import { textAttributes } from './core/text.util';
+import { ISiblings } from './core/type';
 type Align = 'LeftTop' |
   'LeftCenter' |
   'LeftBottom' |
@@ -228,6 +228,7 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     }
     return firstChild === node;
   };
+
   public isLastNode(node: Node, type: number): boolean {
     const parentNode = node.parentNode;
     if (!parentNode) return false;

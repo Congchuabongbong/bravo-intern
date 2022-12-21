@@ -10,12 +10,12 @@ import {
 } from '@grapecity/wijmo';
 import {
   CellEditEndingEventArgs, CellRangeEventArgs, CellType, FlexGrid,
-  FormatItemEventArgs, Row
+  FormatItemEventArgs
 } from '@grapecity/wijmo.grid';
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { ListBox } from '@grapecity/wijmo.input';
 import * as Excel from 'exceljs';
-import { Worksheet, } from 'exceljs';
+import { Worksheet } from 'exceljs';
 import { Observable } from 'rxjs';
 import {
   IWjFlexColumnConfig,
@@ -30,7 +30,6 @@ import { HttpProductService } from 'src/app/shared/services/http-product.service
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
-import { Payload } from '../../../shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
