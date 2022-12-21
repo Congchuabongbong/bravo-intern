@@ -232,7 +232,6 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
   }
 
   public isFirstNode(node: Node, type: number): boolean {
-
     const parentNode = node.parentNode;
     if (!parentNode) return false;
     let firstChild = parentNode.firstChild || node;
@@ -247,13 +246,15 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     if (!parentNode) return false;
     let lastChild = parentNode.lastChild || node;
     while (lastChild.nodeType !== type) {
-      if (!lastChild.nextSibling) return false;
-      lastChild = lastChild.nextSibling;
+      if (!lastChild.previousSibling) return false;
+      lastChild = lastChild.previousSibling;
     }
     return lastChild === node;
   };
 
-
+  public isOnlyNode(node: Node, type: number): boolean {
+    return this.isFirstNode(node, type) && this.isLastNode(node, type);
+  }
 
 
 

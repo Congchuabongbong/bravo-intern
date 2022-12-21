@@ -30,7 +30,6 @@ export type BehaviorText = {
   point: Point;
   dominantBaseline: DominantBaseline,
   textAnchor: TextAnchor;
-
   isTextFitWidthCell: boolean;
 };
 export type DominantBaseline = 'auto' | 'middle' | 'hanging';

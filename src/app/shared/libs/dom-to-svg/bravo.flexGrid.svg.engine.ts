@@ -23,6 +23,7 @@ export type Payload = {
   cellBoundingRect: DOMRect;
   group: Element;
   dimensionText: BravoTextMetrics | undefined,
+  behaviorText: BehaviorText;
 };
 
 export interface IPayloadEvent extends Pick<Payload, 'panel' | 'row' | 'col'> {
@@ -97,7 +98,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       const viewRangeColsHeaderFrozen = this._getRangeCellsFrozen(colsHeaderPanel);
       viewRangeColsHeaderFrozen && this._drawCellPanel(colsHeaderPanel, viewRangeColsHeaderFrozen);
       //draw cells columns footer and cells columns footer frozen
-      this._drawCellPanel(colsHeaderPanel);
+      this._drawCellPanel(colsFooterPanel);
       const viewRangeColsFooterFrozen = this._getRangeCellsFrozen(colsFooterPanel);
       viewRangeColsFooterFrozen && this._drawCellPanel(colsFooterPanel, viewRangeColsFooterFrozen);
       //draw cells rows header and cells row header frozen
@@ -151,6 +152,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
         let cellEl = panel.getCellElement(rowIndex, colIndex);
         if (!cellEl || (colIndex > colStart && cellEl.className.includes('wj-group'))) continue;
+        //?Cache payload data and send payload
         let payload: Partial<Payload> = {};
         payload.col = colIndex;
         payload.row = rowIndex;
@@ -168,6 +170,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const groupSvgEl = this.startGroup(payload.cellElement.className);
     const rectSvgEl = this.drawRect(cellBoundingRect.x, cellBoundingRect.y, cellBoundingRect.width, cellBoundingRect.height);
     cellStyles.backgroundColor && !isTransparent(cellStyles.backgroundColor) && rectSvgEl.setAttribute('fill', cellStyles.backgroundColor || 'rgba(0, 0, 0, 0)');
+    //?cache payload data and send payload
     payload.cellStyles = cellStyles;
     payload.cellBoundingRect = cellBoundingRect;
     payload.group = groupSvgEl;
@@ -176,7 +179,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.endGroup();
   }
 
-  //scan cell
   private _scanCell(elementScanned: Element, payload: Payload) {
     if (elementScanned.hasChildNodes()) {
       elementScanned.childNodes.forEach((node: Node) => {
@@ -194,7 +196,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         if (isHTMLInputElement(node as Element)) { // case input checkbox
           const inputNode = node as HTMLInputElement;
           const inputBoundingRect = this.changeOriginCoordinates(inputNode.getBoundingClientRect());
-          // const computedStyle = window.getComputedStyle(node as Element);
           const svgInput = this.drawRect(inputBoundingRect.x, inputBoundingRect.y, inputBoundingRect.width, inputBoundingRect.height);
           svgInput.setAttribute('rx', '2');
           svgInput.setAttribute('fill', '#fff');
@@ -212,25 +213,27 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Handle and draw Text Here:
   private _calculateBehaviorTextNode(textNode: Text, payload: Payload): BehaviorText {
     try {
-      let { parentBoundingRect, parentNode, parentStyles } = this._getInformationParentNode(textNode, payload);
-      //?case inline b tag or i tag wrap text node in cell etc...
+      let { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode, payload);
       let deviationHeight = 0;
+      payload.dimensionText = this._measureTextNode(textNode, payload);
+      //?kiểm tra trường hợp nếu là inline element tính độ chênh lệch chiều cao nội dung bên trong và thẻ chứa nội dung
       if (isInline(parentStyles)) {
-        let heightOfText = this._measureTextNode(textNode)?.height || 0;
-        let paddingTop = parentNode.parentElement && +getComputedStyle(parentNode?.parentElement).paddingTop.replace('px', '') || 0;
+        let heightOfText = payload.dimensionText?.height || 0;
+        let paddingTop = +payload.cellStyles.paddingTop.replace('px', '') || 0;
         deviationHeight = (parentBoundingRect.height - heightOfText + paddingTop) / 4;
       }
       const alginText = parentStyles.textAlign;
-      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
+      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode, payload);
       let paddingLeft: number = +parentStyles.paddingLeft.replace('px', '');
       let paddingTop: number = +parentStyles.paddingTop.replace('px', '');
       let paddingRight: number = +parentStyles.paddingRight.replace('px', '');
       let xTextDefault: number = parentBoundingRect.x + paddingLeft;
       let yTextDefault: number = Math.floor(parentBoundingRect.y + paddingTop + deviationHeight);
-      //default behavior text
+      /*
+        ?tạo default behavior text base.
+        ?default text alignment left and dominant baseline 'hanging', textAnchor: 'start'
+      */
       let behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(xTextDefault, yTextDefault), textAnchor: 'start' };
-
-      payload.dimensionText = this._measureTextNode(textNode);
       let isFitContent: boolean = this._isTextFitWidthCell(textNode, payload);
       switch (alginText) {
         case TextAlign.Left:
@@ -241,8 +244,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           return (behaviorTextBase as BehaviorText);
         case TextAlign.Center:
           if (isFitContent) {
-            behaviorTextBase.point!.x += (parentBoundingRect.width / 2) - leftTotalSiblingsWidth - rightTotalSiblingsWidth;
-            if (leftTotalSiblingsWidth && rightTotalSiblingsWidth) behaviorTextBase.point!.x - paddingLeft;
+            behaviorTextBase.point!.x += (parentBoundingRect.width - leftTotalSiblingsWidth - rightTotalSiblingsWidth) / 2 - paddingRight;
             behaviorTextBase.textAnchor = 'middle';
             behaviorTextBase.isTextFitWidthCell = true;
             return (behaviorTextBase as BehaviorText);
@@ -259,7 +261,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           }
           behaviorTextBase.isTextFitWidthCell = false;
           return (behaviorTextBase as BehaviorText);
-        default: //? default text alignment left and dominant baseline 'hanging', textAnchor: 'start
+        default:
           behaviorTextBase.isTextFitWidthCell = true;
           return (behaviorTextBase as BehaviorText);
       }
@@ -271,34 +273,28 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   private _isTextFitWidthCell(textNode: Text, payload: Payload, pBreakWords: boolean = false): boolean {
     try {
       const { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode, payload);
-      let alignText = parentStyles.textAlign;
       let paddingLeft: number = +parentStyles.paddingLeft.replace('px', '');
       let paddingRight: number = +parentStyles.paddingRight.replace('px', '');
-      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
+      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode, payload);
       const textWidth = payload.dimensionText?.width || 0;
-      /*
-        kiểm tra trường hợp nếu text nằm bên trái hay bên phải hay giữa để trừ đi độ rộng sibling tương ứng
-      */
-      if (parentBoundingRect.width >= leftTotalSiblingsWidth + rightTotalSiblingsWidth + paddingLeft + paddingRight + textWidth) {
+      let innerWidthContent = leftTotalSiblingsWidth + rightTotalSiblingsWidth + paddingLeft + paddingRight + textWidth;
+      if (parentBoundingRect.width > innerWidthContent) {
         return textWidth <= (parentBoundingRect.width - leftTotalSiblingsWidth - rightTotalSiblingsWidth - paddingLeft - paddingRight);
       } else {
         return textWidth <= parentBoundingRect.width - leftTotalSiblingsWidth - paddingLeft;
       }
-
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when check the width of the text content to see if it fits the width of the parent!');
     }
   }
 
-  private _measureTextNode(textNode: Text, pBreakWords: boolean = false): BravoTextMetrics | undefined {
+  private _measureTextNode(textNode: Text, payload: Payload, pBreakWords: boolean = false): BravoTextMetrics | undefined {
     try {
-      const parentNode = textNode.parentElement;
+      const { parentNode, parentStyles, parentBoundingRect } = this._getInformationParentNode(textNode, payload);
       if (!parentNode) return undefined;
-      const computedStyleParent = window.getComputedStyle(parentNode as HTMLElement);
-      let font = new Font(computedStyleParent.fontFamily, computedStyleParent.fontSize, computedStyleParent.fontWeight);
-      const { width: parentWidth } = parentNode.getBoundingClientRect();
-      const dimensionOfText = BravoGraphicsRenderer.measureString(textNode.textContent as string, font, parentWidth, pBreakWords);
+      let font = new Font(parentStyles.fontFamily, parentStyles.fontSize, parentStyles.fontWeight);
+      const dimensionOfText = BravoGraphicsRenderer.measureString(textNode.textContent as string, font, parentBoundingRect.width, pBreakWords);
       return dimensionOfText;
     } catch (error) {
       console.error(error);
@@ -307,58 +303,71 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
   private _drawTextInCell(textNode: Text, payload: Payload): SVGElement | null {
     try {
-      const { parentStyles, parentNode } = this._getInformationParentNode(textNode, payload);
+      const { parentStyles } = this._getInformationParentNode(textNode, payload);
       let behaviorText: BehaviorText = this._calculateBehaviorTextNode(textNode, payload) as BehaviorText;
-      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
-      const paddingLeft = +parentStyles.paddingLeft.replace('px', '');
-      if (parentNode.clientWidth < leftTotalSiblingsWidth + paddingLeft) {
-        return null;
+      //?catch payload behavior Text
+      payload.behaviorText = behaviorText;
+      let widthTextNode = payload.dimensionText?.width || 0;
+      /*
+      ? Trường hợp không phải text node duy nhất hoặc là thẻ inline wrap text node
+      ?Nếu width của cell nhỏ hơn tọa độ x của text return null ko draw
+      ?Nếu width của cell nằm trong tọa độ x đến right thì thay đổi isTextFitWidthCell = false và switch case wrap svg
+      */
+      if (!this.isOnlyNode(textNode, Node.TEXT_NODE) || isInline(parentStyles)) {
+        if (payload.cellBoundingRect.width < payload.behaviorText.point.x) {
+          return null;
+        } else if (payload.cellBoundingRect.width >= payload.behaviorText.point.x && payload.cellElement.offsetWidth < payload.behaviorText.point.x + widthTextNode) {
+          payload.behaviorText.isTextFitWidthCell = false;
+        }
       }
-      if (!behaviorText.isTextFitWidthCell && behaviorText.textAnchor === 'start') {
+      //?case swap text by svg
+      if (!payload.behaviorText.isTextFitWidthCell) {
         //case wrapper svg text
-        const svgWrap = this._wrapTextIntoSvg(textNode, behaviorText, payload);
+        const svgWrap = this._wrapTextIntoSvg(textNode, payload);
         return svgWrap;
       }
       let textContent = textNode.textContent || '';
       if (!this.isFirstNode(textNode, Node.TEXT_NODE)) {
         textContent = ' '.concat(textContent);
       }
-      const textSvgEl = drawText((textContent as string), behaviorText as BehaviorText, parentStyles, 'preserve');
+      const textSvgEl = drawText((textContent as string), payload.behaviorText, parentStyles, 'preserve');
       return textSvgEl;
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when draw text in cell!!');
     }
   }
-  private _wrapTextIntoSvg(textNode: Text, behaviorText: BehaviorText, payload: Payload): SVGElement {
+  private _wrapTextIntoSvg(textNode: Text, payload: Payload): SVGElement {
     try {
-
       const { parentStyles, parentNode } = this._getInformationParentNode(textNode, payload);
       const rectSvg: Partial<DOMRect> = {};
-      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
-      const paddingLeft = +parentStyles.paddingLeft.replace('px', '') || 0;
-      const paddingRight = +parentStyles.paddingRight.replace('px', '') || 0;
-      const parentWidth = (parentNode as HTMLElement).offsetWidth;
-      const textNodeWidth = payload.dimensionText?.width || 0;
+      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode, payload);
+      const paddingLeft = +payload.cellStyles.paddingLeft.replace('px', '') || 0;
+      const paddingRight = +payload.cellStyles.paddingRight.replace('px', '') || 0;
       /*
-        kiểm tra độ rộng của parent có lớn hay nhỏ hơn so với tổng số chiều dài của children không!
-        kiểm tra trường hợp nếu text nằm bên trái hay bên phải hay giữa để trừ đi độ rộng sibling tương ứng
+      ?case 1 inline wrap text: width svg = phần còn lại của width trừ đi tổng left siblings và padding left và right
+      ?case 2 nếu là text node duy nhất thì trừ đi cả right siblings! còn không thì không
+      ?case 3 nếu là ko là text node duy nhất thì không trừ đi right siblings
       */
-      if (parentWidth > leftTotalSiblingsWidth + rightTotalSiblingsWidth + textNodeWidth) {
-        rectSvg.width = parentWidth - leftTotalSiblingsWidth - paddingLeft - paddingRight;
+      if (isInline(parentStyles)) {
+        let { leftTotalSiblingsWidth } = this._getTotalWidthSiblingNode(parentNode, payload);
+        rectSvg.width = payload.cellBoundingRect.width - leftTotalSiblingsWidth - paddingLeft - paddingRight;
       } else {
-        rectSvg.width = parentWidth - paddingLeft - paddingRight - leftTotalSiblingsWidth;
+        rectSvg.width = payload.cellBoundingRect.width - leftTotalSiblingsWidth - paddingLeft - paddingRight;
+        if (this.isOnlyNode(textNode, Node.TEXT_NODE)) {
+          rectSvg.width -= rightTotalSiblingsWidth;
+        }
       }
-      rectSvg.x = behaviorText.point.x;
-      rectSvg.y = behaviorText.point.y;
-      rectSvg.height = (parentNode as HTMLElement).clientHeight;
+      rectSvg.x = payload.behaviorText.point.x;
+      rectSvg.y = payload.behaviorText.point.y;
+      rectSvg.height = payload.cellElement.clientHeight || 0;
       const svgWrapText = creatorSVG(rectSvg);
       //draw text
       let textContent = textNode.textContent || '';
       if (!this.isFirstNode(textNode, Node.TEXT_NODE)) {
         textContent = ' '.concat(textContent);
       }
-      const textSvgEl = drawText(textContent, behaviorText as BehaviorText, parentStyles, 'preserve');
+      const textSvgEl = drawText(textContent, payload.behaviorText as BehaviorText, parentStyles, 'preserve');
       textSvgEl.setAttribute('x', '1');
       textSvgEl.setAttribute('y', '1');
       svgWrapText.appendChild(textSvgEl);
@@ -371,10 +380,10 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
   //*util methods
-  private _calculateTotalWidthSiblings(siblings: ChildNode[]): number {
+  private _calculateTotalWidthSiblings(siblings: ChildNode[], payload: Payload): number {
     let totalWidth: number = siblings.reduce((acc, node) => {
       if (isTextNode(node)) {
-        const dimensionOfText = this._measureTextNode(node, true);
+        const dimensionOfText = this._measureTextNode(node, payload, false);
         if (dimensionOfText) {
           acc += dimensionOfText.width;
         }
@@ -387,13 +396,13 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     return totalWidth;
   }
 
-  private _getTotalWidthSiblingNode(node: Node) {
+  private _getTotalWidthSiblingNode(node: Node, payload: Payload) {
     let rightTotalSiblingsWidth = 0;
     let leftTotalSiblingsWidth = 0;
     const siblings: ISiblings = this.scanSiblingsNode(node);
     if (siblings.leftSideCurrentNode.length === 0 && siblings.rightSideCurrentNode.length === 0) return { rightTotalSiblingsWidth, leftTotalSiblingsWidth };
-    leftTotalSiblingsWidth = this._calculateTotalWidthSiblings(siblings.leftSideCurrentNode);
-    rightTotalSiblingsWidth = this._calculateTotalWidthSiblings(siblings.rightSideCurrentNode);
+    leftTotalSiblingsWidth = this._calculateTotalWidthSiblings(siblings.leftSideCurrentNode, payload);
+    rightTotalSiblingsWidth = this._calculateTotalWidthSiblings(siblings.rightSideCurrentNode, payload);
     return {
       rightTotalSiblingsWidth,
       leftTotalSiblingsWidth
@@ -432,9 +441,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     return imageSvgEl;
   }
 
-  private _wrapImageIntoSvg(imageEl: HTMLImageElement, parentEl: Element): SVGElement {
+  private _wrapImageIntoSvg(imageEl: HTMLImageElement, parentNode: Element): SVGElement {
     const rectSvgEl: Partial<DOMRect> = {};
-    const parentBoundingRect = this.changeOriginCoordinates(parentEl.getBoundingClientRect());
+    const parentBoundingRect = this.changeOriginCoordinates(parentNode.getBoundingClientRect());
     rectSvgEl.width = parentBoundingRect.width;
     rectSvgEl.height = parentBoundingRect.height;
     rectSvgEl.x = parentBoundingRect.x;
