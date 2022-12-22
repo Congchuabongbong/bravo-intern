@@ -1,7 +1,7 @@
 import * as wjChart from '@grapecity/wijmo.chart';
 import { isFlexDirectionRow, isFloatLeft, isFloatRight, isInFlow, isInline } from './core/css.util';
 import { textAttributes } from './core/text.util';
-import { ISiblings } from './core/type';
+import { ISiblings } from './core/type.util';
 type Align = 'LeftTop' |
   'LeftCenter' |
   'LeftBottom' |
@@ -243,8 +243,4 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
   public isOnlyNode(node: Node, type: number): boolean {
     return this.isFirstNode(node, type) && this.isLastNode(node, type);
   }
-
-
-
-
 }

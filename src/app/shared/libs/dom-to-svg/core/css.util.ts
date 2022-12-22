@@ -1,6 +1,6 @@
 export const isInline = (styles: CSSStyleDeclaration): boolean =>
   styles.display === 'inline' || styles.display.startsWith('inline-');
-
+export const isCenter = (styles: CSSStyleDeclaration): boolean => styles.display === 'flex' && styles.justifyContent === 'center' && styles.alignItems === 'center';
 export const isFlexDirectionRow = (parentStyles: CSSStyleDeclaration) =>
   parentStyles.display === 'flex' && parentStyles.flexDirection === 'row';
 

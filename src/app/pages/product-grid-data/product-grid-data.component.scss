@@ -35,7 +35,9 @@
   z-index: 9999;
   background-color: rgba(0, 0, 0, 0.1);
 }
-
+::ng-deep body:has(.app-main.active) .container-loading {
+  width: calc(100vw);
+}
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(0deg);
