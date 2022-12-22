@@ -22,7 +22,7 @@ export type BehaviorText = {
 export interface ISiblings {
   leftSideCurrentNode: ChildNode[], rightSideCurrentNode: ChildNode[];
 }
-export type Payload = {
+export type PayloadCache = {
   panel: GridPanel;
   row: number;
   col: number;
@@ -34,7 +34,7 @@ export type Payload = {
   behaviorText: BehaviorText;
 };
 
-export interface IPayloadEvent extends Pick<Payload, 'panel' | 'row' | 'col'> {
+export interface IPayloadEvent extends Pick<PayloadCache, 'panel' | 'row' | 'col'> {
   contentDraw: Node | string;
   svgDrew?: Element;
 }

@@ -1,5 +1,5 @@
 import { Size as wjSize } from '@grapecity/wijmo';
-import { svgNamespace, xLinkNamespace, xmlNamespace } from './dom.util';
+import { SVG_NAMESPACE, XML_NAMESPACE, X_LINK_NAMESPACE } from './dom.util';
 import { copyTextStyles } from './text.util';
 import { BehaviorText } from './type.util';
 export interface ISize extends Pick<wjSize, 'height' | 'width'> { };
@@ -8,7 +8,7 @@ export function setViewportSizeSVG(svg: SVGElement, size: ISize) {
   svg.setAttribute('height', size.height.toString());
 }
 export function drawRect(x: number, y: number, size: ISize, className?: string, style?: CSSStyleDeclaration, clipPath?: string): SVGElement {
-  var rect = document.createElementNS(svgNamespace, 'rect') as SVGElement;
+  var rect = document.createElementNS(SVG_NAMESPACE, 'rect') as SVGElement;
   rect.setAttribute('x', x.toFixed(1));
   rect.setAttribute('y', y.toFixed(1));
   (size.width > 0 && size.width < 0.05) ? rect.setAttribute('width', '0.1') : rect.setAttribute('width', size.width.toFixed(1));
@@ -24,7 +24,7 @@ export function applyStyle(el: SVGElement, style: CSSStyleDeclaration) {
   }
 }
 export function creatorSVG(rect?: Partial<DOMRect>, isDeclareNamespaceSvg?: boolean) {
-  const svg = document.createElementNS(svgNamespace, 'svg') as SVGElement;
+  const svg = document.createElementNS(SVG_NAMESPACE, 'svg') as SVGElement;
   if (rect) {
     rect.width && rect.height && setViewportSize(svg, rect.width, rect.height);
     rect.x && svg.setAttribute('x', rect.x.toString());
@@ -47,7 +47,7 @@ export function deCase(s: string): string {
 
 
 export function drawText(textContent: string, behavior: BehaviorText, style?: CSSStyleDeclaration, whiteSpace: 'default' | 'preserve' = 'default'): SVGElement {
-  const textEl = document.createElementNS(svgNamespace, 'text') as SVGElement;
+  const textEl = document.createElementNS(SVG_NAMESPACE, 'text') as SVGElement;
   textEl.textContent = textContent;
   textEl.setAttribute('x', behavior.point.x.toString());
   textEl.setAttribute('y', (behavior.point.y).toString());
@@ -55,14 +55,14 @@ export function drawText(textContent: string, behavior: BehaviorText, style?: CS
   textEl.setAttribute('dominant-baseline', behavior.dominantBaseline.toString());
   textEl.setAttribute('text-anchor', behavior.textAnchor.toString());
   if (whiteSpace === 'preserve') {
-    textEl.setAttributeNS(xmlNamespace, "xml:space", "preserve");
+    textEl.setAttributeNS(XML_NAMESPACE, "xml:space", "preserve");
   }
   return textEl;
 }
 
 export function drawImage(imageHref: string, x: number, y: number, w: number, h: number, clipPath?: string): SVGElement {
-  var img = document.createElementNS(svgNamespace, 'image') as SVGElement;
-  img.setAttributeNS(xLinkNamespace, 'href', imageHref);
+  var img = document.createElementNS(SVG_NAMESPACE, 'image') as SVGElement;
+  img.setAttributeNS(X_LINK_NAMESPACE, 'href', imageHref);
   img.setAttribute('x', x.toFixed(1));
   img.setAttribute('y', y.toFixed(1));
   img.setAttribute('width', w.toFixed(1));
@@ -73,7 +73,7 @@ export function drawImage(imageHref: string, x: number, y: number, w: number, h:
   return img;
 }
 export function declareNamespaceSvg(svg: SVGElement): SVGElement {
-  svg.setAttribute('xmlns', svgNamespace);
-  svg.setAttribute('xmlns:xlink', xLinkNamespace);
+  svg.setAttribute('xmlns', SVG_NAMESPACE);
+  svg.setAttribute('xmlns:xlink', X_LINK_NAMESPACE);
   return svg;
 }

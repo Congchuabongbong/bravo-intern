@@ -1,5 +1,5 @@
 import { Event as wjEven, Point, Rect } from '@grapecity/wijmo';
-import { CellRange, FlexGrid, GridPanel, CellType } from '@grapecity/wijmo.grid';
+import { CellRange, CellType, FlexGrid, GridPanel } from '@grapecity/wijmo.grid';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
 import { Font } from './bravo-graphics/font';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
@@ -7,7 +7,7 @@ import { BravoSvgEngine } from './bravo.svg.engine';
 import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
 import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
 import { creatorSVG, declareNamespaceSvg, drawImage, drawText } from './core/svg.engine.util';
-import { BehaviorText, IPayloadEvent, ISiblings, Payload, TextAlign } from './core/type.util';
+import { BehaviorText, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
 export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Declaration here...
   public anchorElement!: Element;
@@ -15,11 +15,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public captureElementCoordinates!: Point;
   public flexGrid!: FlexGrid;
   public _svgWrapper!: Element | null;
+  private _payloadCache!: PayloadCache;
   //**events declared here
   public drewRect: wjEven<FlexGridSvgEngine, IPayloadEvent> = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
   public drawingText: wjEven<FlexGridSvgEngine, IPayloadEvent> = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
   public drewText: wjEven<FlexGridSvgEngine, IPayloadEvent> = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
-
   //*constructor
   constructor(_anchorElement: HTMLElement, _flex: FlexGrid) {
     super(_anchorElement);
@@ -52,11 +52,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public onDrewText(payloadEvent: IPayloadEvent) {
     this.drewText.raise(this, payloadEvent);
   }
-  private _getPayloadEvent(payload: Payload): IPayloadEvent {
+  private _getPayloadEvent(payloadCache: PayloadCache): IPayloadEvent {
     const payloadEvent: Partial<IPayloadEvent> = {};
-    payloadEvent.col = payload.col;
-    payloadEvent.row = payload.row;
-    payloadEvent.panel = payload.panel;
+    payloadEvent.col = payloadCache.col;
+    payloadEvent.row = payloadCache.row;
+    payloadEvent.panel = payloadCache.panel;
     return payloadEvent as IPayloadEvent;
   }
   //*render svg
@@ -85,7 +85,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when render visible flex grid SVG!');
-    } finally { this.endRender(); }
+    } finally {
+      this.endRender();
+    }
   }
 
   private _drawCellPanelFrozen(panel: GridPanel) {
@@ -95,27 +97,27 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this._drawCellPanel(panel, viewRange);
   }
   //*handle and draw cell
-  private _drawBorderCell(payload: Payload) {
-    const { left, top, bottom, right } = payload.cellBoundingRect;
-    if (hasBorderBottom(payload.cellStyles)) {
+  private _drawBorderCell() {
+    const { left, top, bottom, right } = this._payloadCache.cellBoundingRect;
+    if (hasBorderBottom(this._payloadCache.cellStyles)) {
       const lineSvgEl = this.drawLine(left, bottom, right, bottom);
-      lineSvgEl.setAttribute('stroke-width', payload.cellStyles.borderBottomWidth);
-      lineSvgEl.setAttribute('stroke', payload.cellStyles.borderBottomColor);
+      lineSvgEl.setAttribute('stroke-width', this._payloadCache.cellStyles.borderBottomWidth);
+      lineSvgEl.setAttribute('stroke', this._payloadCache.cellStyles.borderBottomColor);
     }
-    if (hasBorderTop(payload.cellStyles)) {
+    if (hasBorderTop(this._payloadCache.cellStyles)) {
       const lineSvgEl = this.drawLine(left, top, right, top);
-      lineSvgEl.setAttribute('stroke-width', payload.cellStyles.borderTopWidth);
-      lineSvgEl.setAttribute('stroke', payload.cellStyles.borderTopColor);
+      lineSvgEl.setAttribute('stroke-width', this._payloadCache.cellStyles.borderTopWidth);
+      lineSvgEl.setAttribute('stroke', this._payloadCache.cellStyles.borderTopColor);
     }
-    if (hasBorderRight(payload.cellStyles)) {
+    if (hasBorderRight(this._payloadCache.cellStyles)) {
       const lineSvgEl = this.drawLine(right, top, right, bottom);
-      lineSvgEl.setAttribute('stroke-width', payload.cellStyles.borderRightWidth);
-      lineSvgEl.setAttribute('stroke', payload.cellStyles.borderRightColor);
+      lineSvgEl.setAttribute('stroke-width', this._payloadCache.cellStyles.borderRightWidth);
+      lineSvgEl.setAttribute('stroke', this._payloadCache.cellStyles.borderRightColor);
     }
-    if (hasBorderLeft(payload.cellStyles)) {
+    if (hasBorderLeft(this._payloadCache.cellStyles)) {
       const lineSvgEl = this.drawLine(left, top, left, bottom);
-      lineSvgEl.setAttribute('stroke-width', payload.cellStyles.borderLeftWidth);
-      lineSvgEl.setAttribute('stroke', payload.cellStyles.borderLeftColor);
+      lineSvgEl.setAttribute('stroke-width', this._payloadCache.cellStyles.borderLeftWidth);
+      lineSvgEl.setAttribute('stroke', this._payloadCache.cellStyles.borderLeftColor);
     }
   }
 
@@ -136,45 +138,45 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             }
           }
         }
-        //?Cache payload data and send payload
-        const payload: Partial<Payload> = {};
-        payload.col = colIndex;
-        payload.row = rowIndex;
-        payload.panel = panel;
-        payload.cellElement = cellEl;
-        this._drawRectCell(payload as Payload);
+        //!Cache data: col,row, panel, cellElement
+        this._payloadCache = {} as PayloadCache;
+        this._payloadCache.col = colIndex;
+        this._payloadCache.row = rowIndex;
+        this._payloadCache.panel = panel;
+        this._payloadCache.cellElement = cellEl;
+        this._drawRectCell();
       }
 
     }
   }
 
-  private _drawRectCell(payload: Payload): void {
-    const cellBoundingRect = this.changeOriginCoordinates(payload.cellElement.getBoundingClientRect());
-    const cellStyles = window.getComputedStyle(payload.cellElement);
-    const groupSvgEl = this.startGroup(payload.cellElement.className);
+  private _drawRectCell(): void {
+    const cellBoundingRect = this.changeOriginCoordinates(this._payloadCache.cellElement.getBoundingClientRect());
+    const cellStyles = window.getComputedStyle(this._payloadCache.cellElement);
+    const groupSvgEl = this.startGroup(this._payloadCache.cellElement.className);
     const rectSvgEl = this.drawRect(cellBoundingRect.left, cellBoundingRect.top, cellBoundingRect.width, cellBoundingRect.height);
     cellStyles.backgroundColor && !isTransparent(cellStyles.backgroundColor) && rectSvgEl.setAttribute('fill', cellStyles.backgroundColor || 'rgba(0, 0, 0, 0)');
-    //?cache payload data and send payload
-    payload.cellStyles = cellStyles;
-    payload.cellBoundingRect = cellBoundingRect;
-    payload.group = groupSvgEl;
-    this._drawBorderCell(payload);
-    this._scanCell(payload.cellElement, payload);
+    //!cache cellStyles,cellBoundingRect,group
+    this._payloadCache.cellStyles = cellStyles;
+    this._payloadCache.cellBoundingRect = cellBoundingRect;
+    this._payloadCache.group = groupSvgEl;
+    this._drawBorderCell();
+    this._scanCell(this._payloadCache.cellElement);
     this.endGroup();
   }
 
-  private _scanCell(elementScanned: Element, payload: Payload) {
+  private _scanCell(elementScanned: Element,) {
     if (elementScanned.hasChildNodes()) {
       elementScanned.childNodes.forEach((node: Node) => {
         //?text node;
         if (isTextNode(node)) {
-          const svgEl = this._drawTextInCell(node, payload);
-          svgEl && payload.group.appendChild(svgEl as Node);
+          const svgEl = this._drawTextInCell(node);
+          svgEl && this._payloadCache.group.appendChild(svgEl as Node);
         }
         //?case image;
         if (isHTMLImageElement(node as HTMLElement)) {
           const svgEl = this._drawImageInCell(node as HTMLImageElement, elementScanned);
-          svgEl && payload.group.appendChild(svgEl as Node);
+          svgEl && this._payloadCache.group.appendChild(svgEl as Node);
         }
         //?case input
         if (isHTMLInputElement(node as Element)) { // case input checkbox
@@ -189,26 +191,26 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             svgInput.setAttribute('fill', '#1da1f2');
           }
         };
-        this._scanCell(node as Element, payload);
+        this._scanCell(node as Element);
       });
     }
   }
 
   //*Handle and draw Text Here:
-  private _calculateBehaviorTextNode(textNode: Text, payload: Payload): BehaviorText {
+  private _calculateBehaviorTextNode(textNode: Text): BehaviorText {
     try {
       if (textNode.textContent === 'Dịch vụ ') debugger;
-      const { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode, payload);
+      const { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode);
       let deviationHeight = 0;
-      //?catch payload data
-      payload.dimensionText = this._measureTextNode(textNode, payload);
+      //!catch dimensionText
+      this._payloadCache.dimensionText = this._measureTextNode(textNode);
       //?kiểm tra trường hợp nếu là inline element tính độ chênh lệch chiều cao nội dung bên trong và thẻ chứa nội dung
       if (isInline(parentStyles)) {
-        let heightOfText = payload.dimensionText?.lineHeight || 0;
+        let heightOfText = this._payloadCache.dimensionText?.lineHeight || 0;
         deviationHeight = (parentBoundingRect.height - heightOfText) / 2;
       }
       const alginText = parentStyles.textAlign;
-      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode, payload);
+      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
       const paddingLeft: number = +parentStyles.paddingLeft.replace('px', '');
       const paddingTop: number = +parentStyles.paddingTop.replace('px', '');
       const paddingRight: number = +parentStyles.paddingRight.replace('px', '');
@@ -219,7 +221,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         ?default text alignment left and dominant baseline 'hanging', textAnchor: 'start'
       */
       let behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(xTextDefault, yTextDefault), textAnchor: 'start' };
-      let isFitContent: boolean = this._isTextFitWidthCell(textNode, payload);
+      let isFitContent: boolean = this._isTextFitWidthCell(textNode);
       switch (alginText) {
         case TextAlign.Left:
         case TextAlign.Start:
@@ -255,13 +257,13 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when trying to calculate position text node!');
     }
   };
-  private _isTextFitWidthCell(textNode: Text, payload: Payload, pBreakWords: boolean = false): boolean {
+  private _isTextFitWidthCell(textNode: Text, pBreakWords: boolean = false): boolean {
     try {
-      const { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode, payload);
+      const { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode);
       const paddingLeft: number = +parentStyles.paddingLeft.replace('px', '');
       const paddingRight: number = +parentStyles.paddingRight.replace('px', '');
-      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode, payload);
-      const textWidth = payload.dimensionText?.width || 0;
+      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
+      const textWidth = this._payloadCache.dimensionText?.width || 0;
       return textWidth <= (parentBoundingRect.width - leftTotalSiblingsWidth - rightTotalSiblingsWidth - paddingLeft - paddingRight);
     } catch (error) {
       console.error(error);
@@ -269,9 +271,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
 
-  private _measureTextNode(textNode: Text, payload: Payload, pBreakWords: boolean = false): BravoTextMetrics | undefined {
+  private _measureTextNode(textNode: Text, pBreakWords: boolean = false): BravoTextMetrics | undefined {
     try {
-      const { parentNode, parentStyles, parentBoundingRect } = this._getInformationParentNode(textNode, payload);
+      const { parentNode, parentStyles, parentBoundingRect } = this._getInformationParentNode(textNode);
       if (!parentNode) return undefined;
       const font = new Font(parentStyles.fontFamily, parentStyles.fontSize, parentStyles.fontWeight);
       const dimensionOfText = BravoGraphicsRenderer.measureString(textNode.textContent as string, font, parentBoundingRect.width, pBreakWords);
@@ -281,72 +283,72 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when calculate  width of the text content!');
     }
   }
-  private _drawTextInCell(textNode: Text, payload: Payload): SVGElement | null {
+  private _drawTextInCell(textNode: Text,): SVGElement | null {
     try {
-      const { parentStyles } = this._getInformationParentNode(textNode, payload);
-      const behaviorText: BehaviorText = this._calculateBehaviorTextNode(textNode, payload) as BehaviorText;
-      //?catch payload behavior Text
-      payload.behaviorText = behaviorText;
-      let widthTextNode = payload.dimensionText?.width || 0;
+      const { parentStyles } = this._getInformationParentNode(textNode);
+      const behaviorText: BehaviorText = this._calculateBehaviorTextNode(textNode) as BehaviorText;
+      //!catch behaviorText
+      this._payloadCache.behaviorText = behaviorText;
+      let widthTextNode = this._payloadCache.dimensionText?.width || 0;
       /*
       ? Trường hợp không phải text node duy nhất hoặc là thẻ inline wrap text node
       ?Nếu width của cell nhỏ hơn tọa độ x của text return null ko draw
       ?Nếu width của cell nằm trong tọa độ x đến right thì thay đổi isTextFitWidthCell = false và switch case wrap svg
       */
       if (!this.isOnlyNode(textNode, Node.TEXT_NODE) || isInline(parentStyles)) {
-        if (payload.cellBoundingRect.width < payload.behaviorText.point.x) {
+        if (this._payloadCache.cellBoundingRect.width < this._payloadCache.behaviorText.point.x) {
           return null;
-        } else if (payload.cellBoundingRect.width >= payload.behaviorText.point.x && payload.cellElement.offsetWidth <= payload.behaviorText.point.x + widthTextNode) {
-          payload.behaviorText.isTextFitWidthCell = false;
+        } else if (this._payloadCache.cellBoundingRect.width >= this._payloadCache.behaviorText.point.x && this._payloadCache.cellElement.offsetWidth <= this._payloadCache.behaviorText.point.x + widthTextNode) {
+          this._payloadCache.behaviorText.isTextFitWidthCell = false;
         }
       }
       //?case swap text by svg
-      if (!payload.behaviorText.isTextFitWidthCell) {
-        const svgWrap = this._wrapTextIntoSvg(textNode, payload);
+      if (!this._payloadCache.behaviorText.isTextFitWidthCell) {
+        const svgWrap = this._wrapTextIntoSvg(textNode);
         return svgWrap;
       }
       let textContent = textNode.textContent || '';
       if (!this.isFirstNode(textNode, Node.TEXT_NODE)) {
         textContent = ' '.concat(textContent);
       }
-      const textSvgEl = drawText((textContent as string), payload.behaviorText, parentStyles, 'preserve');
+      const textSvgEl = drawText((textContent as string), this._payloadCache.behaviorText, parentStyles, 'preserve');
       return textSvgEl;
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when draw text in cell!!');
     }
   }
-  private _wrapTextIntoSvg(textNode: Text, payload: Payload): SVGElement {
+  private _wrapTextIntoSvg(textNode: Text): SVGElement {
     try {
-      const { parentStyles, parentNode } = this._getInformationParentNode(textNode, payload);
+      const { parentStyles, parentNode } = this._getInformationParentNode(textNode);
       const rectSvg: Partial<DOMRect> = {};
-      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode, payload);
-      const paddingLeft = +payload.cellStyles.paddingLeft.replace('px', '') || 0;
-      const paddingRight = +payload.cellStyles.paddingRight.replace('px', '') || 0;
+      const { leftTotalSiblingsWidth, rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(textNode);
+      const paddingLeft = +this._payloadCache.cellStyles.paddingLeft.replace('px', '') || 0;
+      const paddingRight = +this._payloadCache.cellStyles.paddingRight.replace('px', '') || 0;
       /*
       ?case 1 inline wrap text: width svg = phần còn lại của width trừ đi tổng left siblings và padding left và right
       ?case 2 nếu là text node duy nhất thì trừ đi cả right siblings! còn không thì không
       ?case 3 nếu là ko là text node duy nhất thì không trừ đi right siblings (trừ sẽ bị âm)
       */
       if (isInline(parentStyles)) {
-        let { leftTotalSiblingsWidth } = this._getTotalWidthSiblingNode(parentNode, payload);
-        rectSvg.width = payload.cellBoundingRect.width - leftTotalSiblingsWidth - paddingLeft - paddingRight;
+        let { leftTotalSiblingsWidth } = this._getTotalWidthSiblingNode(parentNode);
+        rectSvg.width = this._payloadCache.cellBoundingRect.width - leftTotalSiblingsWidth - paddingLeft - paddingRight;
       } else {
-        rectSvg.width = payload.cellBoundingRect.width - leftTotalSiblingsWidth - paddingLeft - paddingRight;
+        rectSvg.width = this._payloadCache.cellBoundingRect.width - leftTotalSiblingsWidth - paddingLeft - paddingRight;
         if (this.isOnlyNode(textNode, Node.TEXT_NODE)) {
           rectSvg.width -= rightTotalSiblingsWidth;
         }
       }
-      rectSvg.x = payload.behaviorText.point.x;
-      rectSvg.y = payload.behaviorText.point.y;
-      rectSvg.height = payload.cellElement.clientHeight || 0;
+      rectSvg.x = this._payloadCache.behaviorText.point.x;
+      rectSvg.y = this._payloadCache.behaviorText.point.y;
+      rectSvg.height = this._payloadCache.cellElement.clientHeight || 0;
       const svgWrapText = creatorSVG(rectSvg);
       //draw text
       let textContent = textNode.textContent || '';
       if (!this.isFirstNode(textNode, Node.TEXT_NODE)) {
         textContent = ' '.concat(textContent);
       }
-      const textSvgEl = drawText(textContent, payload.behaviorText as BehaviorText, parentStyles, 'preserve');
+      const textSvgEl = drawText(textContent, this._payloadCache.behaviorText as BehaviorText, parentStyles, 'preserve');
       textSvgEl.setAttribute('x', '0');
       textSvgEl.setAttribute('y', '0');
       svgWrapText.appendChild(textSvgEl);
@@ -359,10 +361,10 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
   //*util methods
-  private _calculateTotalWidthSiblings(siblings: ChildNode[], payload: Payload): number {
+  private _calculateTotalWidthSiblings(siblings: ChildNode[]): number {
     let totalWidth: number = siblings.reduce((acc, node) => {
       if (isTextNode(node)) {
-        const dimensionOfText = this._measureTextNode(node, payload, false);
+        const dimensionOfText = this._measureTextNode(node, false);
         if (dimensionOfText) {
           acc += dimensionOfText.width;
         }
@@ -375,27 +377,27 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     return totalWidth;
   }
 
-  private _getTotalWidthSiblingNode(node: Node, payload: Payload) {
+  private _getTotalWidthSiblingNode(node: Node) {
     let rightTotalSiblingsWidth = 0;
     let leftTotalSiblingsWidth = 0;
     const siblings: ISiblings = this.scanSiblingsNode(node);
     if (siblings.leftSideCurrentNode.length === 0 && siblings.rightSideCurrentNode.length === 0) return { rightTotalSiblingsWidth, leftTotalSiblingsWidth };
-    leftTotalSiblingsWidth = this._calculateTotalWidthSiblings(siblings.leftSideCurrentNode, payload);
-    rightTotalSiblingsWidth = this._calculateTotalWidthSiblings(siblings.rightSideCurrentNode, payload);
+    leftTotalSiblingsWidth = this._calculateTotalWidthSiblings(siblings.leftSideCurrentNode);
+    rightTotalSiblingsWidth = this._calculateTotalWidthSiblings(siblings.rightSideCurrentNode);
     return {
       rightTotalSiblingsWidth,
       leftTotalSiblingsWidth
     };
   }
 
-  private _getInformationParentNode(node: Node, payload: Payload) {
+  private _getInformationParentNode(node: Node) {
     let parentNode: Element;
     let parentBoundingRect: Rect;
     let parentStyles: CSSStyleDeclaration;
-    if (node.parentElement === payload.cellElement) {
-      parentNode = payload.cellElement;
-      parentStyles = payload.cellStyles;
-      parentBoundingRect = payload.cellBoundingRect;
+    if (node.parentElement === this._payloadCache.cellElement) {
+      parentNode = this._payloadCache.cellElement;
+      parentStyles = this._payloadCache.cellStyles;
+      parentBoundingRect = this._payloadCache.cellBoundingRect;
     } else {
       parentNode = node.parentElement as Element;
       parentStyles = getComputedStyle(parentNode);
