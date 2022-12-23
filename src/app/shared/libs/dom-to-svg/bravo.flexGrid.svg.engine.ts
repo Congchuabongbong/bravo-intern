@@ -1,4 +1,4 @@
-import { Event as wjEven, Point, Rect } from '@grapecity/wijmo';
+import { Point, Rect } from '@grapecity/wijmo';
 import { CellRange, CellType, FlexGrid, GridPanel } from '@grapecity/wijmo.grid';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
 import { Font } from './bravo-graphics/font';
@@ -7,7 +7,7 @@ import { BravoSvgEngine } from './bravo.svg.engine';
 import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
 import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
 import { creatorSVG, declareNamespaceSvg, drawImage, drawText } from './core/svg.engine.util';
-import { BehaviorText, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
+import { BehaviorText, ISiblings, PayloadCache, TextAlign } from './core/type.util';
 export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Declaration here...
   public anchorElement!: Element;
@@ -15,10 +15,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public captureElementCoordinates!: Point;
   public flexGrid!: FlexGrid;
   private _payloadCache!: PayloadCache;
-  //**events declared here
-  public drewRect: wjEven<FlexGridSvgEngine, IPayloadEvent> = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
-  public drawingText: wjEven<FlexGridSvgEngine, IPayloadEvent> = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
-  public drewText: wjEven<FlexGridSvgEngine, IPayloadEvent> = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
   //*constructor
   constructor(_anchorElement: HTMLElement, _flex: FlexGrid) {
     super(_anchorElement);
@@ -32,32 +28,14 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
   }
 
-  public changeOriginCoordinates(elDOMRect: DOMRect): Rect {
+  public changeOriginCoordinates(elDOMRect: DOMRect | Rect): Rect {
     const boundingRect = Rect.fromBoundingRect(elDOMRect);
     boundingRect.left -= this.captureElementCoordinates.x;
     boundingRect.top -= this.captureElementCoordinates.y;
     return boundingRect;
   }
 
-  //*method raise event here::
-  public onDrewRect(payloadEvent: IPayloadEvent) {
-    this.drewRect.raise(this, payloadEvent);
-  }
 
-  public onDrawingText(payloadEvent: IPayloadEvent) {
-    this.drawingText.raise(this, payloadEvent);
-  }
-
-  public onDrewText(payloadEvent: IPayloadEvent) {
-    this.drewText.raise(this, payloadEvent);
-  }
-  private _getPayloadEvent(payloadCache: PayloadCache): IPayloadEvent {
-    const payloadEvent: Partial<IPayloadEvent> = {};
-    payloadEvent.col = payloadCache.col;
-    payloadEvent.row = payloadCache.row;
-    payloadEvent.panel = payloadCache.panel;
-    return payloadEvent as IPayloadEvent;
-  }
   //*render svg
   public renderFlexSvgVisible(): SVGElement {
     try {
@@ -147,35 +125,34 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             }
           }
         }
-        //!Cache data: col,row, panel, cellElement
+        const groupSvgEl = this.startGroup(cellEl.className);
+        //!Cache data
         this._payloadCache = {} as PayloadCache;
         this._payloadCache.col = colIndex;
         this._payloadCache.row = rowIndex;
         this._payloadCache.panel = panel;
         this._payloadCache.cellElement = cellEl;
+        this._payloadCache.cellStyles = getComputedStyle(cellEl);
+        this._payloadCache.cellBoundingRect = this.changeOriginCoordinates(cellEl.getBoundingClientRect());
+        this._payloadCache.group = groupSvgEl;
         this._drawRectCell();
+        this.endGroup();
       }
     }
   }
 
   private _drawRectCell(): void {
-    const cellBoundingRect = this.changeOriginCoordinates(this._payloadCache.cellElement.getBoundingClientRect());
-    const cellStyles = window.getComputedStyle(this._payloadCache.cellElement);
-    const groupSvgEl = this.startGroup(this._payloadCache.cellElement.className);
+    const cellBoundingRect = this._payloadCache.cellBoundingRect;
+    const cellStyles = this._payloadCache.cellStyles;
     const rectSvgEl = this.drawRect(cellBoundingRect.left, cellBoundingRect.top, cellBoundingRect.width, cellBoundingRect.height);
     cellStyles.backgroundColor && !isTransparent(cellStyles.backgroundColor) && rectSvgEl.setAttribute('fill', cellStyles.backgroundColor || 'rgba(0, 0, 0, 0)');
-    //!cache cellStyles,cellBoundingRect,group
-    this._payloadCache.cellStyles = cellStyles;
-    this._payloadCache.cellBoundingRect = cellBoundingRect;
-    this._payloadCache.group = groupSvgEl;
     this._drawBorderCell();
     this._scanCell(this._payloadCache.cellElement);
-    this.endGroup();
   }
 
-  private _scanCell(elementScanned: Element,) {
-    if (elementScanned.hasChildNodes()) {
-      elementScanned.childNodes.forEach((node: Node) => {
+  private _scanCell(elScanned: Element,) {
+    if (elScanned.hasChildNodes()) {
+      elScanned.childNodes.forEach((node: Node) => {
         //?text node;
         if (isTextNode(node)) {
           const svgEl = this._drawTextInCell(node);
@@ -183,7 +160,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         }
         //?case image;
         if (isHTMLImageElement(node as HTMLElement)) {
-          const svgEl = this._drawImageInCell(node as HTMLImageElement, elementScanned);
+          const svgEl = this._drawImageInCell(node as HTMLImageElement, elScanned);
           svgEl && this._payloadCache.group.appendChild(svgEl as Node);
         }
         //?case input
@@ -306,7 +283,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       if (!this.isOnlyNode(textNode, Node.TEXT_NODE) || isInline(parentStyles)) {
         if (this._payloadCache.cellBoundingRect.width < this._payloadCache.behaviorText.point.x) {
           return null;
-        } else if (this._payloadCache.cellBoundingRect.width >= this._payloadCache.behaviorText.point.x && this._payloadCache.cellElement.offsetWidth <= this._payloadCache.behaviorText.point.x + widthTextNode) {
+        } else if (this._payloadCache.cellBoundingRect.width > this._payloadCache.behaviorText.point.x && this._payloadCache.cellElement.offsetWidth < this._payloadCache.behaviorText.point.x + widthTextNode) {
           this._payloadCache.behaviorText.isTextFitWidthCell = false;
         }
       }
@@ -326,7 +303,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when draw text in cell!!');
     }
   }
-  private _wrapTextIntoSvg(textNode: Text): SVGElement {
+  private _wrapTextIntoSvg(textNode: Text): SVGElement | null {
     try {
       const { parentStyles, parentNode } = this._getInformationParentNode(textNode);
       const rectSvg: Partial<DOMRect> = {};
@@ -347,10 +324,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           rectSvg.width -= rightTotalSiblingsWidth;
         }
       }
+      rectSvg.height = this._payloadCache.cellElement.clientHeight || 0;
+      if (rectSvg.width <= 0 || rectSvg.height <= 0) {
+        return null;
+      }
       rectSvg.x = this._payloadCache.behaviorText.point.x;
       rectSvg.y = this._payloadCache.behaviorText.point.y;
-      rectSvg.width = rectSvg.width < 0 ? 0 : rectSvg.width;
-      rectSvg.height = this._payloadCache.cellElement.clientHeight || 0;
       const svgWrapText = creatorSVG(rectSvg);
       //draw text
       let textContent = textNode.textContent || '';
@@ -444,5 +423,4 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.element.appendChild(svgWrapImage);
     return svgWrapImage;
   }
-
 }

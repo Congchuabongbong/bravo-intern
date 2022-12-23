@@ -83,32 +83,32 @@ export class ControlGridDataLayoutPanelComponent
     this.flex = flexGrid;
 
 
-    var extraRow = new Row();
-    extraRow.allowMerging = true;
-    //
-    // add extra header row to the grid
-    var panel = flexGrid.columnHeaders;
-    panel.rows.splice(0, 0, extraRow);
-    //
-    // populate the extra header row
-    for (let colIndex = 1; colIndex <= 2; colIndex++) {
-      panel.setCellData(0, colIndex, 'Amounts');
-    }
-    //
-    // merge "Country" and "Active" headers vertically
-    ['Id', 'Name'].forEach(function (binding) {
-      let col = flexGrid.getColumn(binding);
-      col.allowMerging = true;
-      panel.setCellData(0, col.index, col.header);
-    });
-    //
-    // center-align merged header cells
-    flexGrid.formatItem.addHandler(function (s: FlexGrid, e: FormatItemEventArgs) {
-      if (e.panel == s.columnHeaders && e.range.rowSpan > 1) {
-        var html = e.cell.innerHTML;
-        e.cell.innerHTML = '<div class="v-center">' + html + '</div>';
-      }
-    });
+    // var extraRow = new Row();
+    // extraRow.allowMerging = true;
+    // //
+    // // add extra header row to the grid
+    // var panel = flexGrid.columnHeaders;
+    // panel.rows.splice(0, 0, extraRow);
+    // //
+    // // populate the extra header row
+    // for (let colIndex = 1; colIndex <= 2; colIndex++) {
+    //   panel.setCellData(0, colIndex, 'Amounts');
+    // }
+    // //
+    // // merge "Country" and "Active" headers vertically
+    // ['Id', 'Name'].forEach(function (binding) {
+    //   let col = flexGrid.getColumn(binding);
+    //   col.allowMerging = true;
+    //   panel.setCellData(0, col.index, col.header);
+    // });
+    // //
+    // // center-align merged header cells
+    // flexGrid.formatItem.addHandler(function (s: FlexGrid, e: FormatItemEventArgs) {
+    //   if (e.panel == s.columnHeaders && e.range.rowSpan > 1) {
+    //     var html = e.cell.innerHTML;
+    //     e.cell.innerHTML = '<div class="v-center">' + html + '</div>';
+    //   }
+    // });
 
 
     this.flex.allowMerging = 7;
@@ -567,19 +567,15 @@ export class ControlGridDataLayoutPanelComponent
   public svgEngine!: FlexGridSvgEngine;
   public onExportSvgAction() {
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
-
-    const svg = this.svgEngine.renderFlexSvgVisible();
+    this.svgEngine.renderFlexSvgVisible();
     this.svgContainer.nativeElement.style.display = 'block';
-    // setTimeout(() => {
-    //   this.svgContainer.nativeElement.removeChild(svg);
-    //   this.svgContainer.nativeElement.style.display = 'none';
-    // }, 3000);
 
-    // const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    // const alink = document.createElement('a');
-    // const event = new MouseEvent('click');
-    // alink.download = 'download.svg';
-    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    // alink.dispatchEvent(event);
+
+
+
+
+
+
+
   }
 }
