@@ -86,6 +86,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when render visible flex grid SVG!');
     } finally {
       this.endRender();
+      this._payloadCache = {} as PayloadCache;
     }
   }
 
