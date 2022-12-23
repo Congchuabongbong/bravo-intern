@@ -28,7 +28,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
   }
 
-  public changeOriginCoordinates(elDOMRect: DOMRect | Rect): Rect {
+  public changeOriginCoordinates(elDOMRect: DOMRect): Rect {
     const boundingRect = Rect.fromBoundingRect(elDOMRect);
     boundingRect.left -= this.captureElementCoordinates.x;
     boundingRect.top -= this.captureElementCoordinates.y;
