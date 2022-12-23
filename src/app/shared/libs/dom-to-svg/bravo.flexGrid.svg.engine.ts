@@ -14,7 +14,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public captureElement!: Element;
   public captureElementCoordinates!: Point;
   public flexGrid!: FlexGrid;
-  public _svgWrapper!: Element | null;
   private _payloadCache!: PayloadCache;
   //**events declared here
   public drewRect: wjEven<FlexGridSvgEngine, IPayloadEvent> = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
@@ -131,9 +130,17 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           const cellRange = this.flexGrid.getMergedRange(panel, rowIndex, colIndex);
           if (cellRange) {
             const columnStartGroup = cellRange.col;
+            const rowStartGroup = cellRange.row;
+            //column ignore when drew first time
             if (colStart <= columnStartGroup && colIndex > columnStartGroup) {
               continue;
             } else if (colStart > columnStartGroup && colIndex > colStart) {
+              continue;
+            }
+            //row ignore when drew first time
+            if (rowStart <= rowStartGroup && rowIndex > rowStartGroup) {
+              continue;
+            } else if (rowStart > rowStartGroup && rowIndex > rowStart) {
               continue;
             }
           }
@@ -146,7 +153,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._payloadCache.cellElement = cellEl;
         this._drawRectCell();
       }
-
     }
   }
 
