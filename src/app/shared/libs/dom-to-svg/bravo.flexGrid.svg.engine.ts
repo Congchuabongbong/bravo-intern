@@ -91,7 +91,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
   private _drawCellPanelFrozen(panel: GridPanel) {
-    if (!this.flexGrid.columns.frozen) return;
+    if (!this.flexGrid.frozenColumns) return;
+    console.log(this.flexGrid.frozenColumns);
     const { row2, row } = panel.viewRange;
     const viewRange = new CellRange(row, 0, row2, this.flexGrid.columns.frozen - 1);
     this._drawCellPanel(panel, viewRange);
@@ -346,6 +347,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           rectSvg.width -= rightTotalSiblingsWidth;
         }
       }
+      rectSvg.width = rectSvg.width < 0 ? 0 : rectSvg.width;
       rectSvg.x = this._payloadCache.behaviorText.point.x;
       rectSvg.y = this._payloadCache.behaviorText.point.y;
       rectSvg.height = this._payloadCache.cellElement.clientHeight || 0;
