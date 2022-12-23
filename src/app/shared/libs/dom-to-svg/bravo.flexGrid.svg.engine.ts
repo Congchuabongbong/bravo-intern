@@ -347,9 +347,10 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           rectSvg.width -= rightTotalSiblingsWidth;
         }
       }
-      rectSvg.width = rectSvg.width < 0 ? 0 : rectSvg.width;
+
       rectSvg.x = this._payloadCache.behaviorText.point.x;
       rectSvg.y = this._payloadCache.behaviorText.point.y;
+      rectSvg.width = rectSvg.width < 0 ? 0 : rectSvg.width;
       rectSvg.height = this._payloadCache.cellElement.clientHeight || 0;
       const svgWrapText = creatorSVG(rectSvg);
       //draw text
