@@ -347,7 +347,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           rectSvg.width -= rightTotalSiblingsWidth;
         }
       }
-
       rectSvg.x = this._payloadCache.behaviorText.point.x;
       rectSvg.y = this._payloadCache.behaviorText.point.y;
       rectSvg.width = rectSvg.width < 0 ? 0 : rectSvg.width;
