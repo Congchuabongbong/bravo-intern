@@ -5,7 +5,7 @@
       "header": "Tên vật tư",
       "width": 300,
       "dataType": 1,
-      "align": "left",
+      "align": "center",
       "cellTemplate": "<i class='fa-regular fa-file'></i> ${text}"
     },
     {

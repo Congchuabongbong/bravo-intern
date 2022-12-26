@@ -31,6 +31,7 @@ import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.servic
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
 import { FlexGridSvgEngineRaw } from 'src/app/shared/libs/dom-to-svg/bravo.flexGridRaw.svg.engine';
+import { declareNamespaceSvg } from '../../../shared/libs/dom-to-svg/core/svg.engine.util';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -133,10 +134,10 @@ export class ControlGridDataLayoutPanelComponent
         this.wjFlexColumnConfig
       );
     }
+    flexGrid.groupCollapsedChanged.addHandler((flex, cellEvent) => {
 
-    // this.flex.updatedLayout.addHandler(() => {
-    //   FlexGridSvgEngine.onResizeViewPortAction({ width: this.flex.hostElement.offsetWidth, height: this.flex.hostElement.offsetHeight });
-    // });
+    });
+    flexGrid.groupHeaderFormat = '{name} : {value} {count} items';
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
     //autoSizedColumn
@@ -280,14 +281,14 @@ export class ControlGridDataLayoutPanelComponent
   ): void {
     // console.log('trigger when row auto size changed!');
     // console.log(cellRangeEventArgs.getRow().dataItem);
-  }
+  };
   //**scroll position Changed*/
   private onHandleScrollPositionChanged(
     flex: FlexGrid,
     event: EventArgs
   ): void {
     // console.log('trigger after the control has scrolled.');
-  }
+  };
   //**selection Changed and selection changing
   private onHandleSelectionChanged(
     flex: FlexGrid,
@@ -321,7 +322,7 @@ export class ControlGridDataLayoutPanelComponent
     @trigger : Occurs before selection changes.
     */
     // console.log('trigger when selecting!');
-  }
+  };
   //**sorted Column and sorting Column*/
   private onHandleSortedColumn(
     flex: FlexGrid,
@@ -343,13 +344,13 @@ export class ControlGridDataLayoutPanelComponent
     // console.log(event.getColumn());
     // console.log('trigger when column sorting!');
     if (event.getColumn().binding == 'Id') event.cancel = true;
-  }
+  };
   //**onStarSizedColumns
   private onHandleStarSizedColumns(flex: FlexGrid, event: EventArgs): void {
     /**
     @trigger : When one or more columns have been resized due to star-sizing.
     */
-  }
+  };
   //**updated and updating Layout */
   private onHandleUpdatedLayout(flex: FlexGrid, event: EventArgs): void {
     /**
@@ -362,7 +363,7 @@ export class ControlGridDataLayoutPanelComponent
   @trigger :Occurs before the grid updates its internal layout.
   */
     // console.log("trigger when updating layout");
-  }
+  };
   //**updated and updatingView View
   private onHandleUpdatedView(flex: FlexGrid, event: EventArgs): void {
     /**
@@ -384,7 +385,7 @@ export class ControlGridDataLayoutPanelComponent
     Resizing or scrolling the grid,
     Changing the selection.
    */
-  }
+  };
   //**Beginning Edit
   private onHandleBeginningEdit(
     flex: FlexGrid,
@@ -394,7 +395,7 @@ export class ControlGridDataLayoutPanelComponent
     @trigger : Occurs before a cell enters edit mode; The event handler may cancel the edit operation.
 
    */
-  }
+  };
   //**cell Edit Ending and ended:
   private onHandleCellEditEnding(
     flex: FlexGrid,
@@ -427,7 +428,7 @@ export class ControlGridDataLayoutPanelComponent
   private onHandleColumnGroupCollapsedChanged(
     flex: FlexGrid,
     event: CellRangeEventArgs
-  ): void { }
+  ): void { };
   //** copied and copying */
   private onHandleCopied(flex: FlexGrid, event: CellRangeEventArgs): void {
     /**
@@ -441,7 +442,7 @@ export class ControlGridDataLayoutPanelComponent
     */
     event.cancel = true; // cancel event
     // console.log('trigger when copying!');
-  }
+  };
   //**Handle action here
   public styleHeaderSetup: Partial<CSSStyleDeclaration> = {
     fontWeight: 'bold',
@@ -562,14 +563,39 @@ export class ControlGridDataLayoutPanelComponent
       excelFlexUtil.saveFileAction();
       clearTimeout(idTimeout);
     }, 50);
-  }
+  };
 
   @ViewChild('svgContainer', { static: true }) svgContainer!: ElementRef;
-  public svgEngine!: FlexGridSvgEngineRaw;
+  public svgEngine!: FlexGridSvgEngine;
   public onExportSvgAction() {
-    this.svgEngine = new FlexGridSvgEngineRaw(this.svgContainer.nativeElement, this.flex);
-    this.svgEngine.renderFlexSvgRaw();
-    this.svgContainer.nativeElement.style.display = 'block';
+    this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
+    // this.svgEngine.drewRectHandler.addHandler((svgEngine, payload) => {
+    //   if (payload.panel.columns[payload.col].binding === 'Id' && payload.panel.cellType === CellType.Cell) {
+    //     payload.svgDrew.setAttribute('fill', 'pink');
+    //   }
+    // });
 
+    //test raise event drew bottom border
+    // this.svgEngine.drewBorderBottomHandler.addHandler((svgEngine, payload) => {
+    //   payload.svgDrew.setAttribute('stroke', 'red');
+    // });
+    // //test raise event drew bottom border
+    // this.svgEngine.drewBorderRightHandler.addHandler((svgEngine, payload) => {
+    //   payload.svgDrew.setAttribute('stroke', 'yellow');
+    // });
+
+    this.svgEngine.drawingTextHandler.addHandler((svgEngine, payload) => {
+
+    });
+
+    this.svgEngine.renderFlexSvgRaw();
+
+    this.svgContainer.nativeElement.style.display = 'block';
+    // const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    // const alink = document.createElement('a');
+    // const event = new MouseEvent('click');
+    // alink.download = 'download.svg';
+    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    // alink.dispatchEvent(event);
   }
 }

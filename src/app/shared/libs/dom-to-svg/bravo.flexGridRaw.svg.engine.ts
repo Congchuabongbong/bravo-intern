@@ -1,23 +1,23 @@
-import { Point, Rect, Event as wjEven } from '@grapecity/wijmo';
-import { FlexGrid, GroupRow, GridPanel, CellRange } from '@grapecity/wijmo.grid';
+import { Point, Rect, Event as wjEven, DataType } from '@grapecity/wijmo';
+import { FlexGrid, GroupRow, GridPanel, CellRange, CellType } from '@grapecity/wijmo.grid';
+import { Font } from './bravo-graphics/font';
 import { BravoSvgEngine } from './bravo.svg.engine';
-import { IPayloadEvent, PayloadCache } from './core/type.util';
+import { drawText } from './core/svg.engine.util';
+import { copyTextStyles } from './core/text.util';
+import { IPayloadEvent, PayloadCache, BehaviorText } from './core/type.util';
 export class FlexGridSvgEngineRaw extends BravoSvgEngine {
   //*Declaration here...
   public anchorElement!: Element;
-  public captureElement!: Element;
-  public captureElementCoordinates!: Point;
   public flexGrid!: FlexGrid;
+  public stylesHostElement!: CSSStyleDeclaration;
+  public font!: Font;
+  public _payloadCache!: PayloadCache;
   constructor(_anchorElement: HTMLElement, _flex: FlexGrid) {
     super(_anchorElement);
-    //? lazy initialize
-    // anchorElement
     this.anchorElement = _anchorElement;
     this.flexGrid = _flex;
-    //capture
-    this.captureElement = _flex.hostElement;
-    const { x: xCaptureElement, y: yCaptureElement } = this.captureElement.getBoundingClientRect();
-    this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
+    this.stylesHostElement = getComputedStyle(this.flexGrid.hostElement);
+    this.font = new Font(this.stylesHostElement.fontFamily, this.stylesHostElement.fontSize, this.stylesHostElement.fontWeight);
   };
   //**Draw By Dom here */
   //**events declared here
@@ -43,80 +43,104 @@ export class FlexGridSvgEngineRaw extends BravoSvgEngine {
     payloadEvent.panel = payloadCache.panel;
     return payloadEvent as IPayloadEvent;
   }
-  //*method
-  public changeOriginCoordinates(elRect: Rect): Rect {
-    const boundingRect = Rect.fromBoundingRect(elRect);
-    boundingRect.left -= this.captureElementCoordinates.x;
-    boundingRect.top -= this.captureElementCoordinates.y;
-    return boundingRect;
-  }
 
-  renderFlexSvgRaw() {
-    this.beginRender();
-    this.DrawCellPanel(this.flexGrid.cells);
-    this.DrawCellPanel(this.flexGrid.columnHeaders);
-    const widthSvg = this.flexGrid.columns.getTotalSize();
-    const heightSvg = this.flexGrid.rows.getTotalSize() + this.flexGrid.columnHeaders.height + 100;
-    this.setViewportSize(widthSvg, heightSvg);
-    this.endRender();
-  }
 
-  public DrawColsHeaderPanel(): void {
-    const columnsHeader = this.flexGrid.columnHeaders;
-    const columns = columnsHeader.columns;
-    const rows = columnsHeader.rows;
-    const lengthColsHeader = columns.length;
-    const lengthRowsHeader = rows.length;
-    for (let columnIndex = 0; columnIndex < lengthColsHeader; columnIndex++) {
-      for (let rowIndex = 0; rowIndex < lengthRowsHeader; rowIndex++) {
-        const cellMergeRange = this.flexGrid.getMergedRange(columnsHeader, rowIndex, columnIndex, false);
-        const cellBoundingRect = columnsHeader.getCellBoundingRect(rowIndex, columnIndex, true);
-        if (cellMergeRange && rowIndex == cellMergeRange.row && columnIndex === cellMergeRange.col) {
-          const numberOfRow = cellMergeRange.row2 - cellMergeRange.row + 1;
-          const numberOfColumn = cellMergeRange.col2 - cellMergeRange.col + 1;
-          console.log(numberOfColumn);
-          const widthCell = cellBoundingRect.width * numberOfColumn;
-          const heightCell = cellBoundingRect.height * numberOfRow;
-          const rectSvgEl = this.drawRect(cellBoundingRect.left, cellBoundingRect.top, widthCell, heightCell);
-          rectSvgEl.setAttribute('fill', 'none');
-          rectSvgEl.setAttribute('stroke', 'red');
-        }
-        if (!cellMergeRange) {
-          const rectSvgEl = this.drawRect(cellBoundingRect.left, cellBoundingRect.top, cellBoundingRect.width, cellBoundingRect.height);
-          rectSvgEl.setAttribute('fill', 'none');
-          rectSvgEl.setAttribute('stroke', 'red');
-        }
-      }
+  renderFlexSvgRaw(): SVGElement {
+    try {
+      this.beginRender();
+      this.DrawCellPanel(this.flexGrid.cells);
+      this.DrawCellPanel(this.flexGrid.columnHeaders);
+      const widthSvg = this.flexGrid.columns.getTotalSize() + 100;
+      const heightSvg = this.flexGrid.rows.getTotalSize() + this.flexGrid.columnHeaders.height;
+      this.setViewportSize(widthSvg, heightSvg);
+      return this.element as SVGElement;
+    } catch (error) {
+      console.error(error);
+      throw new Error('');
+    } finally {
+      this.endRender();
     }
   }
+
+
+
+  private _drawContentInCell(): SVGElement | null | void {
+    let currentRow = this._payloadCache.row;
+    let currentCol = this._payloadCache.col;
+    let cellBoundingRect = this._payloadCache.cellBoundingRect;
+    let cellValue = this._payloadCache.panel.getCellData(currentRow, currentCol, true);
+    let dataType = this._payloadCache.panel.columns[currentCol].dataType;
+    if (!cellValue) return null;
+    if (this._payloadCache.panel.cellType !== CellType.Cell) {
+      const pointText = new Point(cellBoundingRect.left + 8, (cellBoundingRect.top + 8));
+      const textBehavior: Partial<BehaviorText> = {};
+      textBehavior.dominantBaseline = 'hanging';
+      textBehavior.textAnchor = 'start';
+      textBehavior.point = pointText;
+      const textSvgEl = drawText(cellValue, textBehavior as BehaviorText, this.stylesHostElement);
+      textSvgEl.setAttribute('fill', this.stylesHostElement.color);
+      this.element.append(textSvgEl);
+      copyTextStyles(textSvgEl, this.stylesHostElement);
+      return textSvgEl as SVGElement;
+    }
+    return null;
+  }
+
+
+
+
+
+
+  private _drawRectCell(rect: Rect, cellRange: CellRange | null) {
+    let widthCell = rect.width;
+    let heightCell = rect.height;
+    if (cellRange) {
+      const numberOfRow = cellRange.row2 - cellRange.row + 1;
+      const numberOfColumn = cellRange.col2 - cellRange.col + 1;
+      widthCell = widthCell * numberOfColumn;
+      heightCell = heightCell * numberOfRow;
+    }
+    const rectSvgEl = this.drawRect(rect.left, rect.top, widthCell, heightCell);
+    rectSvgEl.setAttribute('fill', 'none');
+    rectSvgEl.setAttribute('stroke', 'black');
+  }
+  private _drawBorderCell() { }
+
 
   public DrawCellPanel(panel: GridPanel, viewRange?: CellRange) {
     const columns = panel.columns;
     const rows = panel.rows;
     const lengthColsHeader = columns.length;
     const lengthRowsHeader = rows.length;
-    for (let columnIndex = 0; columnIndex < lengthColsHeader; columnIndex++) {
+    this._payloadCache = {} as PayloadCache;
+    this._payloadCache.panel = panel;
+    for (let colIndex = 0; colIndex < lengthColsHeader; colIndex++) {
       for (let rowIndex = 0; rowIndex < lengthRowsHeader; rowIndex++) {
-        const cellMergeRange = this.flexGrid.getMergedRange(panel, rowIndex, columnIndex, false);
-        const cellBoundingRect = this.changeOriginCoordinates(panel.getCellBoundingRect(rowIndex, columnIndex, false));
-        if (cellMergeRange && rowIndex == cellMergeRange.row && columnIndex === cellMergeRange.col) {
-          const numberOfRow = cellMergeRange.row2 - cellMergeRange.row + 1;
-          const numberOfColumn = cellMergeRange.col2 - cellMergeRange.col + 1;
-          console.log(numberOfColumn);
-          const widthCell = cellBoundingRect.width * numberOfColumn;
-          const heightCell = cellBoundingRect.height * numberOfRow;
-          const rectSvgEl = this.drawRect(cellBoundingRect.left, cellBoundingRect.top, widthCell, heightCell);
-          rectSvgEl.setAttribute('fill', 'none');
-          rectSvgEl.setAttribute('stroke', 'red');
+        const cellMergeRange = this.flexGrid.getMergedRange(panel, rowIndex, colIndex, false);
+        const cellBoundingRect = panel.getCellBoundingRect(rowIndex, colIndex, true);
+        this._payloadCache.col = colIndex;
+        this._payloadCache.row = rowIndex;
+        this._payloadCache.cellBoundingRect = cellBoundingRect;
+        /* đẩy header và body and footer với chiều cao tương ứng */
+        if (panel.cellType === CellType.Cell) {
+          cellBoundingRect.top += this.flexGrid.columnHeaders.height;
+        } else if (panel.cellType === CellType.ColumnFooter) {
+          cellBoundingRect.top += this.flexGrid.columnHeaders.height + this.flexGrid.columnHeaders.height;
         }
         if (!cellMergeRange) {
-          const rectSvgEl = this.drawRect(cellBoundingRect.left, cellBoundingRect.top, cellBoundingRect.width, cellBoundingRect.height);
-          rectSvgEl.setAttribute('fill', 'none');
-          rectSvgEl.setAttribute('stroke', 'red');
+          this._drawRectCell(cellBoundingRect, null);
+          this._drawContentInCell();
+        } else if (cellMergeRange && rowIndex == cellMergeRange.row && colIndex === cellMergeRange.col) {
+          this._drawRectCell(cellBoundingRect, cellMergeRange); //?draw rectangle
+          this._drawContentInCell();
         }
       }
     }
   }
+
+
+
+
 
 
 

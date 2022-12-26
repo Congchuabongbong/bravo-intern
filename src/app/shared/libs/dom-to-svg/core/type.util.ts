@@ -1,5 +1,5 @@
 import { Point, Rect } from '@grapecity/wijmo';
-import { GridPanel } from '@grapecity/wijmo.grid';
+import { GridPanel, CellRange } from '@grapecity/wijmo.grid';
 import { BravoTextMetrics } from '../bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
 
 export enum TextAlign {
@@ -32,9 +32,11 @@ export type PayloadCache = {
   group: Element;
   dimensionText: BravoTextMetrics | undefined,
   behaviorText: BehaviorText;
+  cellRange: CellRange;
+  cellValue: any;
 };
 
-export interface IPayloadEvent extends Pick<PayloadCache, 'panel' | 'row' | 'col'> {
-  contentDraw: Node | string;
-  svgDrew?: Element;
+export interface IPayloadEvent extends Pick<PayloadCache, 'panel' | 'row' | 'col' | 'cellValue'> {
+
+  svgDrew: Element;
 }

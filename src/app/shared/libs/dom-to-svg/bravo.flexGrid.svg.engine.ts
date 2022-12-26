@@ -1,5 +1,5 @@
-import { Point, Rect } from '@grapecity/wijmo';
-import { CellRange, CellType, FlexGrid, GridPanel } from '@grapecity/wijmo.grid';
+import { Point, Rect, Event as wjEven, DataType } from '@grapecity/wijmo';
+import { CellRange, CellType, FlexGrid, GridPanel, GroupRow } from '@grapecity/wijmo.grid';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
 import { Font } from './bravo-graphics/font';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
@@ -7,7 +7,15 @@ import { BravoSvgEngine } from './bravo.svg.engine';
 import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
 import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
 import { creatorSVG, declareNamespaceSvg, drawImage, drawText } from './core/svg.engine.util';
-import { BehaviorText, ISiblings, PayloadCache, TextAlign } from './core/type.util';
+import { copyTextStyles } from './core/text.util';
+import { BehaviorText, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
+
+type CellPadding = {
+  paddingLeft: number;
+  paddingRight: number;
+  paddingTop: number;
+  paddingBottom: number;
+};
 export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Declaration here...
   public anchorElement!: Element;
@@ -26,6 +34,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.captureElement = _flex.hostElement;
     const { x: xCaptureElement, y: yCaptureElement } = this.captureElement.getBoundingClientRect();
     this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
+    this.stylesHostElement = getComputedStyle(this.flexGrid.hostElement);
+    this.fontDefault = new Font(this.stylesHostElement.fontFamily, this.stylesHostElement.fontSize, this.stylesHostElement.fontWeight);
   }
 
   public changeOriginCoordinates(elDOMRect: DOMRect): Rect {
@@ -64,7 +74,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when render visible flex grid SVG!');
     } finally {
       this.endRender();
-      this._payloadCache = {} as PayloadCache;
+      this._payloadCache = {} as PayloadCache; //clean cache
     }
   }
 
@@ -100,8 +110,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
 
+
   private _drawCellPanel(panel: GridPanel, viewRange?: CellRange) {
     const { row: rowStart, row2: rowEnd, col: colStart, col2: colEnd } = viewRange || panel.viewRange;
+    //!initial Cache data
+    this._payloadCache = {} as PayloadCache;
     for (let colIndex = colStart; colIndex <= colEnd; colIndex++) {
       for (let rowIndex = rowStart; rowIndex <= rowEnd; rowIndex++) {
         let cellEl = panel.getCellElement(rowIndex, colIndex);
@@ -126,11 +139,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           }
         }
         const groupSvgEl = this.startGroup(cellEl.className);
-        //!Cache data
-        this._payloadCache = {} as PayloadCache;
-        this._payloadCache.col = colIndex;
-        this._payloadCache.row = rowIndex;
-        this._payloadCache.panel = panel;
+        //!Cache data here
         this._payloadCache.cellElement = cellEl;
         this._payloadCache.cellStyles = getComputedStyle(cellEl);
         this._payloadCache.cellBoundingRect = this.changeOriginCoordinates(cellEl.getBoundingClientRect());
@@ -155,7 +164,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       elScanned.childNodes.forEach((node: Node) => {
         //?text node;
         if (isTextNode(node)) {
-          const svgEl = this._drawTextInCell(node);
+          const svgEl = this._drawTextNodeInCell(node);
           svgEl && this._payloadCache.group.appendChild(svgEl as Node);
         }
         //?case image;
@@ -184,7 +193,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Handle and draw Text Here:
   private _calculateBehaviorTextNode(textNode: Text): BehaviorText {
     try {
-      if (textNode.textContent === 'Dịch vụ ') debugger;
       const { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode);
       let deviationHeight = 0;
       //!catch dimensionText
@@ -206,7 +214,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         ?default text alignment left and dominant baseline 'hanging', textAnchor: 'start'
       */
       let behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(xTextDefault, yTextDefault), textAnchor: 'start' };
-      let isFitContent: boolean = this._isTextFitWidthCell(textNode);
+      let isFitContent: boolean = this._isTextNodeFitWidthCell(textNode);
       switch (alginText) {
         case TextAlign.Left:
         case TextAlign.Start:
@@ -242,7 +250,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when trying to calculate position text node!');
     }
   };
-  private _isTextFitWidthCell(textNode: Text, pBreakWords: boolean = false): boolean {
+
+  private _isTextNodeFitWidthCell(textNode: Text, pBreakWords: boolean = false): boolean {
     try {
       const { parentBoundingRect, parentStyles } = this._getInformationParentNode(textNode);
       const paddingLeft: number = +parentStyles.paddingLeft.replace('px', '');
@@ -268,7 +277,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when calculate  width of the text content!');
     }
   }
-  private _drawTextInCell(textNode: Text,): SVGElement | null {
+
+  private _drawTextNodeInCell(textNode: Text,): SVGElement | null {
     try {
       const { parentStyles } = this._getInformationParentNode(textNode);
       const behaviorText: BehaviorText = this._calculateBehaviorTextNode(textNode) as BehaviorText;
@@ -289,7 +299,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       }
       //?case swap text by svg
       if (!this._payloadCache.behaviorText.isTextFitWidthCell) {
-        const svgWrap = this._wrapTextIntoSvg(textNode);
+        const svgWrap = this._wrapTextNodeIntoSvg(textNode);
         return svgWrap;
       }
       let textContent = textNode.textContent || '';
@@ -303,7 +313,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when draw text in cell!!');
     }
   }
-  private _wrapTextIntoSvg(textNode: Text): SVGElement | null {
+
+  private _wrapTextNodeIntoSvg(textNode: Text): SVGElement | null {
     try {
       const { parentStyles, parentNode } = this._getInformationParentNode(textNode);
       const rectSvg: Partial<DOMRect> = {};
@@ -422,5 +433,277 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     svgWrapImage.appendChild(imageSvgEl);
     this.element.appendChild(svgWrapImage);
     return svgWrapImage;
+  }
+  //================================================================================================================================
+  //================================================================================================================================
+  //================================================================================================================================
+  //================================================================================================================================
+  //================================================================================================================================
+  //**Draw raw svg start here:
+  //**declared property here */
+  public stylesHostElement!: CSSStyleDeclaration;
+  public fontDefault!: Font;
+  public cellPadding: CellPadding = { paddingBottom: 8, paddingLeft: 8, paddingTop: 8, paddingRight: 8 };
+  //**events declared here
+  public drewRectHandler = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
+  public drewBorderRightHandler = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
+  public drewBorderBottomHandler = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
+  public drawingTextHandler = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
+  public drewTextHandler = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
+
+  //*method raise event here::
+  public onDrewRect(payloadEvent: IPayloadEvent) {
+    this.drewRectHandler.raise(this, payloadEvent);
+  }
+
+  public onDrawingText(payloadEvent: IPayloadEvent) {
+    this.drawingTextHandler.raise(this, payloadEvent);
+  }
+
+  public onDrewText(payloadEvent: IPayloadEvent) {
+    this.drewTextHandler.raise(this, payloadEvent);
+  }
+  public onDrawBorderRight(payloadEvent: IPayloadEvent) {
+    this.drewBorderRightHandler.raise(this, payloadEvent);
+  }
+  public onDrawBorderBottom(payloadEvent: IPayloadEvent) {
+    this.drewBorderBottomHandler.raise(this, payloadEvent);
+  }
+  private _getPayloadEvent(payloadCache: PayloadCache): IPayloadEvent {
+    const payloadEvent: Partial<IPayloadEvent> = {};
+    payloadEvent.col = payloadCache.col;
+    payloadEvent.row = payloadCache.row;
+    payloadEvent.panel = payloadCache.panel;
+    payloadCache.cellBoundingRect = payloadCache.cellBoundingRect;
+    payloadEvent.cellValue = payloadCache.cellValue;
+    return payloadEvent as IPayloadEvent;
+  }
+  //!Todo render flex svg raw here;
+  public renderFlexSvgRaw(): SVGElement {
+    try {
+      this.beginRender();
+      const colsHeaderPanel = this.flexGrid.columnHeaders;
+      const colsFooterPanel = this.flexGrid.columnFooters;
+      const cellsPanel = this.flexGrid.cells;
+      const rowsHeaderPanel = this.flexGrid.rowHeaders;
+      //?draw cells panel and cells frozen
+      this._drawRawCellPanel(cellsPanel);
+      //?draw cells rows header and cells row header frozen
+      this.flexGrid.headersVisibility === 2 && this._drawRawCellPanel(rowsHeaderPanel);
+      //?draw cells columns header and cells columns header frozen
+      this._drawRawCellPanel(colsHeaderPanel);
+      //?draw cells columns footer and cells columns footer frozen
+      this._drawRawCellPanel(colsFooterPanel);
+      const widthSvg = this.flexGrid.columns.getTotalSize() + 100;
+      const heightSvg = this.flexGrid.rows.getTotalSize() + this.flexGrid.columnHeaders.height;
+      this.setViewportSize(widthSvg, heightSvg);
+      const svgEl = declareNamespaceSvg(this.element as SVGElement);
+      return svgEl;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Occurs when render raw flex grid SVG!');
+    } finally {
+      this.endRender();
+      //clean cache
+      this._payloadCache = {} as PayloadCache;
+    }
+  }
+
+  //Todo draw draw cell panel:
+  private _drawRawCellPanel(panel: GridPanel) {
+    const columns = panel.columns;
+    const rows = panel.rows;
+    const lengthColsHeader = columns.length;
+    const lengthRowsHeader = rows.length;
+    //!initialize cache data here
+    this._payloadCache = {} as PayloadCache;
+    this._payloadCache.panel = panel;
+    for (let colIndex = 0; colIndex < lengthColsHeader; colIndex++) {
+      for (let rowIndex = 0; rowIndex < lengthRowsHeader; rowIndex++) {
+        const cellRange = this.flexGrid.getMergedRange(panel, rowIndex, colIndex, false);
+        const cellBoundingRect = panel.getCellBoundingRect(rowIndex, colIndex, true);
+        const cellValue = panel.getCellData(rowIndex, colIndex, false);
+        //!cache data
+        this._payloadCache.col = colIndex;
+        this._payloadCache.row = rowIndex;
+        this._payloadCache.cellBoundingRect = cellBoundingRect;
+        this._payloadCache.cellRange = cellRange;
+        this._payloadCache.cellValue = cellValue;
+        /* đẩy header và body and footer với chiều cao tương ứng */
+        if (panel.cellType === CellType.Cell) {
+          cellBoundingRect.top += this.flexGrid.columnHeaders.height;
+        } else if (panel.cellType === CellType.ColumnFooter) {
+          cellBoundingRect.top += this.flexGrid.columnHeaders.height + this.flexGrid.columnHeaders.height;
+        }
+        //check cell is grouped or not grouped
+        if (!cellRange) {
+          if (rows[rowIndex].visibleIndex !== -1) {
+            const groupEl = this.startGroup();
+            //!cache group
+            this._payloadCache.group = groupEl;
+            this._drawRawRectCell();
+            this._drawContentInCell();
+            this.endGroup();
+          }
+        } else {
+          if ((rowIndex == cellRange.row && colIndex === cellRange.col && rows[rowIndex].visibleIndex !== -1)) {
+            const groupEl = this.startGroup();
+            this._payloadCache.group = groupEl;
+            this._drawRawRectCell();
+            this._drawContentInCell();
+            this.endGroup();
+          }
+        }
+      }
+    }
+  }
+
+  //Todo: draw raw rectangle cell
+  private _drawRawRectCell(): void {
+    const rect = this._payloadCache.cellBoundingRect;
+    const panel = this._payloadCache.panel;
+    let cellRange = this._payloadCache.cellRange;
+    if (cellRange) {
+      for (let index = cellRange.col + 1; index <= cellRange.col2; index++) {
+        rect.width += panel.columns[index].renderWidth;
+      }
+      for (let index = cellRange.row + 1; index <= cellRange.row2; index++) {
+        rect.height += panel.rows[index].renderHeight;
+      }
+    }
+    const rectSvgEl = this.drawRect(rect.left, rect.top, rect.width, rect.height);
+    const payloadEvent = this._getPayloadEvent(this._payloadCache);
+    payloadEvent.svgDrew = rectSvgEl;
+    rectSvgEl.setAttribute('fill', 'none'); // default none
+    this.onDrewRect(payloadEvent);
+    this._drawRawBorderCell();
+  }
+  //Todo: Draw raw border cell
+  private _drawRawBorderCell() {
+    const rect = this._payloadCache.cellBoundingRect;
+    const payloadEvent = this._getPayloadEvent(this._payloadCache);
+    //border bottom
+    const lineBottomSvgEl = this.drawLine(rect.left, rect.bottom, rect.right, rect.bottom);
+    lineBottomSvgEl.setAttribute('stroke-width', '1px'); //default stroke width = 1px
+    lineBottomSvgEl.setAttribute('stroke', 'black'); // default stroke is black
+    payloadEvent.svgDrew = lineBottomSvgEl;
+    this.onDrawBorderBottom(payloadEvent); //raise event drew border bottom here
+    //border right
+    const lineRightSvgEl = this.drawLine(rect.right, rect.top, rect.right, rect.bottom);
+    lineRightSvgEl.setAttribute('stroke-width', '1px');//default stroke width = 1px
+    lineRightSvgEl.setAttribute('stroke', 'black');// default stroke is black
+    payloadEvent.svgDrew = lineRightSvgEl;
+    this.onDrawBorderRight(payloadEvent);//raise event drew border right here
+  }
+
+  private _drawContentInCell() {
+    const panel = this._payloadCache.panel;
+    const currentCol = this._payloadCache.col;
+    const cols = panel.columns;
+    const cellValue = this._payloadCache.cellValue;
+    if (panel.cellType === CellType.Cell && cols[currentCol].dataType === DataType.Boolean) {
+      //case checkbox:
+    } else if (cellValue) {
+      const payloadEvent = this._getPayloadEvent(this._payloadCache);
+      this.onDrawingText(payloadEvent);
+      this._payloadCache = { ...this._payloadCache, ...payloadEvent };
+      this._drawTextRawInCell();
+    }
+  }
+
+
+  //Todo: calculate behavior text raw
+  private _calculateBehaviorTextRaw(): BehaviorText {
+    try {
+      const panel = this._payloadCache.panel;
+      const currentCol = this._payloadCache.col;
+      const currentRow = this._payloadCache.row;
+      const cellValue = this._payloadCache.cellValue;
+      const cellBoundingRect = this._payloadCache.cellBoundingRect;
+      let paddingLeft = this.cellPadding.paddingLeft;
+      let paddingRight = this.cellPadding.paddingRight;
+      let paddingTop = this.cellPadding.paddingTop;
+      let xTextDefault = cellBoundingRect.left + paddingLeft;
+      const yTextDefault = cellBoundingRect.top + paddingTop;
+      let alginText = panel.columns[currentCol].align || 'left'; //default left
+      if (panel.rows[currentRow] instanceof GroupRow) {
+        xTextDefault += (panel.rows[currentRow] as GroupRow).level * 12;
+        alginText = panel.rows[currentRow].align || 'left';//default left
+      }
+      const behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(xTextDefault, yTextDefault), textAnchor: 'start' };
+      const dimensionOfText = BravoGraphicsRenderer.measureString(cellValue, this.fontDefault, cellBoundingRect.width, false);
+      let isFitContent: boolean = (dimensionOfText?.width || 0) <= (cellBoundingRect.width - paddingLeft - paddingRight);
+      switch (alginText) {
+        case TextAlign.Left:
+        case TextAlign.Start:
+          behaviorTextBase.textAnchor = 'start';
+          behaviorTextBase.isTextFitWidthCell = isFitContent;
+          return (behaviorTextBase as BehaviorText);
+        case TextAlign.Center:
+          if (isFitContent) {
+            behaviorTextBase.point!.x += (cellBoundingRect.width) / 2 - paddingRight;
+            behaviorTextBase.textAnchor = 'middle';
+            behaviorTextBase.isTextFitWidthCell = true;
+            return (behaviorTextBase as BehaviorText);
+          }
+          behaviorTextBase.isTextFitWidthCell = false;
+          return (behaviorTextBase as BehaviorText);
+        case TextAlign.Right:
+        case TextAlign.End:
+          if (isFitContent) {
+            behaviorTextBase.point!.x += (cellBoundingRect.width - paddingRight - paddingLeft);
+            behaviorTextBase.textAnchor = 'end';
+            behaviorTextBase.isTextFitWidthCell = true;
+            return (behaviorTextBase as BehaviorText);
+          }
+          behaviorTextBase.isTextFitWidthCell = false;
+          return (behaviorTextBase as BehaviorText);
+        default:
+          behaviorTextBase.isTextFitWidthCell = true;
+          return (behaviorTextBase as BehaviorText);
+      }
+    } catch (error) {
+      console.error(error);
+      throw new Error('Occurs when trying to calculate position text node!');
+    }
+  }
+
+  //Todo: draw text raw in cell
+  private _drawTextRawInCell(): SVGElement | null {
+    const textBehavior = this._calculateBehaviorTextRaw();
+    //!cache text behavior
+    this._payloadCache.behaviorText = textBehavior;
+    if (!textBehavior.isTextFitWidthCell) {
+      return this._wrapTextRawIntoSvg();
+    }
+    const textSvgEl = drawText(this._payloadCache.cellValue, textBehavior as BehaviorText, this.stylesHostElement);
+    textSvgEl.setAttribute('fill', this.stylesHostElement.color);
+    this._payloadCache.group.appendChild(textSvgEl);
+    copyTextStyles(textSvgEl, this.stylesHostElement);
+    return textSvgEl as SVGElement;
+  }
+
+  //Todo: wrap svg text raw in cell
+  private _wrapTextRawIntoSvg(): SVGElement | null {
+    try {
+      const rectSvg: Partial<DOMRect> = {};
+      rectSvg.width = this._payloadCache.cellBoundingRect.width - this.cellPadding.paddingLeft - this.cellPadding.paddingRight;
+      rectSvg.height = this._payloadCache.cellBoundingRect.height || 0;
+      if (rectSvg.width <= 0 || rectSvg.height <= 0) {
+        return null;
+      }
+      rectSvg.x = this._payloadCache.behaviorText.point.x;
+      rectSvg.y = this._payloadCache.behaviorText.point.y;
+      const svgWrapText = creatorSVG(rectSvg);
+      const textSvgEl = drawText(this._payloadCache.cellValue, this._payloadCache.behaviorText as BehaviorText, this.stylesHostElement, 'preserve');
+      textSvgEl.setAttribute('x', '0');
+      textSvgEl.setAttribute('y', '0');
+      svgWrapText.appendChild(textSvgEl);
+      this.element.appendChild(svgWrapText);
+      return svgWrapText;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Something wrong when wrap text in svg');
+    }
   }
 }
