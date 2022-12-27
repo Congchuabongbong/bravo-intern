@@ -1,8 +1,6 @@
-import { FontStyle } from './../bravo-graphics/font';
 import { Point, Rect } from '@grapecity/wijmo';
-import { GridPanel, CellRange } from '@grapecity/wijmo.grid';
+import { CellRange, GridPanel } from '@grapecity/wijmo.grid';
 import { BravoTextMetrics } from '../bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
-import { Font } from '../bravo-graphics/font';
 
 export enum TextAlign {
   Left = 'left',
@@ -42,7 +40,12 @@ export type PayloadCache = {
   cellRange: CellRange;
   cellValue: any;
 };
-
+export type CellPadding = {
+  paddingLeft: number;
+  paddingRight: number;
+  paddingTop: number;
+  paddingBottom: number;
+};
 export interface IPayloadEvent extends Pick<PayloadCache, 'panel' | 'row' | 'col' | 'cellValue'> {
   svgDrew?: Element;
 }

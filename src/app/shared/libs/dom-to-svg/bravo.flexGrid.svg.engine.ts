@@ -1,5 +1,5 @@
-import { Point, Rect, Event as wjEven, DataType } from '@grapecity/wijmo';
-import { CellRange, CellType, FlexGrid, GridPanel, GroupRow, CellRangeEventArgs } from '@grapecity/wijmo.grid';
+import { DataType, Event as wjEven, Point, Rect } from '@grapecity/wijmo';
+import { CellRange, CellType, FlexGrid, GridPanel, GroupRow } from '@grapecity/wijmo.grid';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
 import { Font } from './bravo-graphics/font';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
@@ -8,14 +8,8 @@ import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline,
 import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
 import { creatorSVG, declareNamespaceSvg, drawImage, drawText } from './core/svg.engine.util';
 import { copyTextStyles } from './core/text.util';
-import { BehaviorText, IPayloadEvent, ISiblings, PayloadCache, TextAlign, IFont } from './core/type.util';
+import { BehaviorText, CellPadding, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
 
-type CellPadding = {
-  paddingLeft: number;
-  paddingRight: number;
-  paddingTop: number;
-  paddingBottom: number;
-};
 export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Declaration here...
   public anchorElement!: Element;
