@@ -179,9 +179,12 @@ export class Font {
   }
 }
 
+//TODO: by me
 export enum FontStyle {
   Regular = 0,
   Bold = 1,
+  Medium = 3,
+  Semi_Bold = 5,
   Italic = 2,
   Underline = 4,
   Strikeout = 8,
