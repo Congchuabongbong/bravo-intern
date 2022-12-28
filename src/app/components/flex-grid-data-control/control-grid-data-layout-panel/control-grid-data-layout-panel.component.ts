@@ -5,9 +5,8 @@ import {
   OnInit,
   Output, ViewChild
 } from '@angular/core';
-import {
-  addClass, CancelEventArgs, CollectionView, EventArgs, hasClass, hidePopup, PopupPosition, PropertyGroupDescription, showPopup
-} from '@grapecity/wijmo';
+import { addClass, CancelEventArgs, CollectionView, EventArgs, hasClass, hidePopup, PopupPosition, PropertyGroupDescription, showPopup } from '@grapecity/wijmo';
+
 import {
   CellEditEndingEventArgs, CellRangeEventArgs, CellType, FlexGrid,
   FormatItemEventArgs, Row
@@ -15,7 +14,7 @@ import {
 import { CellMaker } from '@grapecity/wijmo.grid.cellmaker';
 import { ListBox } from '@grapecity/wijmo.input';
 import * as Excel from 'exceljs';
-import { Worksheet, Cell } from 'exceljs';
+import { Worksheet } from 'exceljs';
 import { Observable } from 'rxjs';
 import {
   IWjFlexColumnConfig,
@@ -30,6 +29,7 @@ import { HttpProductService } from 'src/app/shared/services/http-product.service
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
+import { copyTextStyles, creatorCssDeclaration } from 'src/app/shared/libs/dom-to-svg/core/text.util';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -112,10 +112,6 @@ export class ControlGridDataLayoutPanelComponent
 
 
     this.flex.allowMerging = 7;
-    this.flex.getColumn(6).allowMerging = true;
-    // this.flex.columnFooters;
-
-    // this.flex.allowPinning = true;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
@@ -131,7 +127,7 @@ export class ControlGridDataLayoutPanelComponent
         this.wjFlexColumnConfig
       );
     }
-
+    flexGrid.headersVisibility = 3;
     flexGrid.groupHeaderFormat = '{name} : {value} {count} items';
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
@@ -564,29 +560,22 @@ export class ControlGridDataLayoutPanelComponent
   public svgEngine!: FlexGridSvgEngine;
   public onExportSvgAction() {
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
-    this.svgEngine.isRawValue = true;
-
-    this.svgEngine.drawingTextHandler.addHandler((svgEngine, payload) => {
-
-    });
-
+    this.svgEngine.isRawValue = false;
     this.svgEngine.drewTextHandler.addHandler((svgEngine, payload) => {
-      // if (payload.panel.cellType === CellType.Cell && payload.panel.columns[payload.col].binding === 'Id' && payload.cellValue % 2) {
-      //   payload.svgDrew?.setAttribute('fill', 'red');
-      // }
-      // payload.svgDrew?.setAttribute('fill', 'red');
+      const svg = payload.svgDrew as SVGElement;
+      const styles = creatorCssDeclaration();
+      styles.color = 'red';
+      styles.fontWeight = 'bold';
+      copyTextStyles(svg, styles);
     });
-    this.svgEngine.drewRectHandler.addHandler((svgEngine, payload) => {
-      // payload.svgDrew?.setAttribute('fill', 'green');
-    });
-    const svg = this.svgEngine.renderFlexSvgRaw();
-    // this.svgContainer.nativeElement.style.display = 'block';
-    const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    const alink = document.createElement('a');
-    const event = new MouseEvent('click');
-    alink.download = 'download.svg';
-    alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    alink.dispatchEvent(event);
+    const svg = this.svgEngine.renderFlexSvgVisible();
+    this.svgContainer.nativeElement.style.display = 'block';
+    // const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    // const alink = document.createElement('a');
+    // const event = new MouseEvent('click');
+    // alink.download = 'download.svg';
+    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    // alink.dispatchEvent(event);
   }
 
 

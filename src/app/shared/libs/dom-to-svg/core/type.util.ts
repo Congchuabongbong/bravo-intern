@@ -49,3 +49,4 @@ export type CellPadding = {
 export interface IPayloadEvent extends Pick<PayloadCache, 'panel' | 'row' | 'col' | 'cellValue'> {
   svgDrew?: Element;
 }
+

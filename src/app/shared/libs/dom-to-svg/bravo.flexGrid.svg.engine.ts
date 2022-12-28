@@ -43,22 +43,21 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public renderFlexSvgVisible(): SVGElement {
     try {
       this.beginRender();
-      const colsHeaderPanel = this.flexGrid.columnHeaders;
-      const colsFooterPanel = this.flexGrid.columnFooters;
-      const cellsPanel = this.flexGrid.cells;
-      const rowsHeaderPanel = this.flexGrid.rowHeaders;
       //?draw cells panel and cells frozen
-      this._drawCellPanel(cellsPanel);
-      this._drawCellPanelFrozen(cellsPanel);
-      //?draw cells rows header and cells row header frozen
-      this._drawCellPanel(rowsHeaderPanel);
-      this._drawCellPanelFrozen(rowsHeaderPanel);
+      this._drawCellPanel(this.flexGrid.cells);
+      this._drawCellPanelFrozen(this.flexGrid.cells);
+
       //?draw cells columns header and cells columns header frozen
-      this._drawCellPanel(colsHeaderPanel);
-      this._drawCellPanelFrozen(colsHeaderPanel);
+      this._drawCellPanel(this.flexGrid.columnHeaders);
+      this._drawCellPanelFrozen(this.flexGrid.columnHeaders);
       //?draw cells columns footer and cells columns footer frozen
-      this._drawCellPanel(colsFooterPanel);
-      this._drawCellPanelFrozen(colsFooterPanel);
+      this._drawCellPanel(this.flexGrid.columnFooters);
+      this._drawCellPanelFrozen(this.flexGrid.columnFooters);
+      //?draw cells rows header and cells row header frozen
+      this._drawCellPanel(this.flexGrid.rowHeaders);
+      this._drawCellPanelFrozen(this.flexGrid.rowHeaders);
+      this._drawCellPanel(this.flexGrid.topLeftCells);
+      //?set viewport
       this.setViewportSize(this.flexGrid.hostElement.offsetWidth, this.flexGrid.hostElement.offsetHeight);
       const svgEl = declareNamespaceSvg(this.element as SVGElement);
       return svgEl;
@@ -478,14 +477,16 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       const colsFooterPanel = this.flexGrid.columnFooters;
       const cellsPanel = this.flexGrid.cells;
       const rowsHeaderPanel = this.flexGrid.rowHeaders;
+      const topLeft = this.flexGrid.topLeftCells;
       //?draw cells panel
       this._drawRawCellPanel(cellsPanel);
-      //?draw cells rows header
-      this.flexGrid.headersVisibility === 2 && this._drawRawCellPanel(rowsHeaderPanel);
       //?draw cells columns header
       this._drawRawCellPanel(colsHeaderPanel);
       //?draw cells columns footer
       this._drawRawCellPanel(colsFooterPanel);
+      //?draw cells rows header
+      this._drawRawCellPanel(rowsHeaderPanel);
+      this._drawRawCellPanel(topLeft);
       const widthSvg = this.flexGrid.columns.getTotalSize() + 100;
       const heightSvg = this.flexGrid.rows.getTotalSize() + this.flexGrid.columnHeaders.height;
       this.setViewportSize(widthSvg, heightSvg);
@@ -524,7 +525,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         if (panel.cellType === CellType.Cell) {
           cellBoundingRect.top += this.flexGrid.columnHeaders.height;
         } else if (panel.cellType === CellType.ColumnFooter) {
-          cellBoundingRect.top += this.flexGrid.columnHeaders.height + this.flexGrid.columnHeaders.height;
+          cellBoundingRect.top += this.flexGrid.columnHeaders.height + this.flexGrid.cells.height;
+        } else if (panel.cellType === CellType.RowHeader) {
+          cellBoundingRect.top += this.flexGrid.columnHeaders.height;
+        }
+        if (panel.cellType === CellType.Cell || panel.cellType === CellType.ColumnFooter || panel.cellType === CellType.ColumnHeader) {
+          cellBoundingRect.left += this.flexGrid.rowHeaders.width;
         }
         //check cell is merged or not
         if (!cellRange) {
@@ -682,7 +688,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   //Todo: wrap svg text raw in cell
   private _wrapTextRawIntoSvg(): SVGElement | null {
     try {
-      const rectSvg: Partial<DOMRect> = {};
+      const rectSvg: Partial<Rect> = {};
       let paddingLeft = this.cellPadding.paddingLeft;
       let paddingRight = this.cellPadding.paddingRight;
       //Case indent for row group
@@ -694,8 +700,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       if (rectSvg.width <= 0 || rectSvg.height <= 0) {
         return null;
       }
-      rectSvg.x = this._payloadCache.behaviorText.point.x;
-      rectSvg.y = this._payloadCache.behaviorText.point.y;
+      rectSvg.left = this._payloadCache.behaviorText.point.x;
+      rectSvg.top = this._payloadCache.behaviorText.point.y;
       const svgWrapText = creatorSVG(rectSvg);
       const textSvgEl = drawText(this._payloadCache.cellValue, this._payloadCache.behaviorText as BehaviorText, this.stylesBase, 'preserve');
       textSvgEl.setAttribute('x', '0');
@@ -722,7 +728,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     svgEl.setAttribute('fill', '#fff');
     svgEl.setAttribute('stroke', '#767676');
     svgEl.setAttribute('stroke-width', '1.2');
-    if (this._payloadCache.cellValue === 'true') {
+    if (this._payloadCache.cellValue === 'true' || this._payloadCache.cellValue === true) {
       svgEl.setAttribute('fill', '#1da1f2');
     }
   }

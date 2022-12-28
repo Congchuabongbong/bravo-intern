@@ -25,6 +25,11 @@ export function copyTextStyles(svgElement: SVGElement, styles: CSSStyleDeclarati
       svgElement.setAttribute(textProperty, value);
     }
   }
-  // tspan uses fill, CSS uses color
   svgElement.setAttribute('fill', styles.color);
+}
+export function creatorCssDeclaration(): CSSStyleDeclaration {
+  var spanVirtual = document.createElement('span');
+  const styles = spanVirtual.style;
+  styles.display = 'none';
+  return styles;
 }
