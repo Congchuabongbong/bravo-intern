@@ -1,12 +1,12 @@
 export enum CellStyleEnum {
-  Normal = 0,
+  Normal = 0, // cells //x
   Alternate = 1,
-  Fixed = 2,
+  Fixed = 2, // ColumnsHeader
   Highlight = 3,
   Focus = 4,
   Editor = 5,
   Search = 6,
-  Frozen = 7,
+  Frozen = 7, //x
   FrozenAlternate = 8,
   NewRow = 9,
   EmptyArea = 10,
@@ -22,6 +22,7 @@ export enum CellStyleEnum {
   FilterEditor = 20,
   FirstCustomStyle = 21,
   RowHeader = 22,
+  ColumnsFooter = 25, //add by me
   NullStyle = 23,
   NoCaptionColumn = 24
 }
@@ -40,3 +41,5 @@ export enum StyleElementFlags {
   BackgroundImage = 2097152,
   LineHeight = 8388608,
 }
+
+

@@ -39,6 +39,8 @@ export type PayloadCache = {
   behaviorText: BehaviorText;
   cellRange: CellRange;
   cellValue: any;
+  isRowGroup: boolean;
+  sepAlternate: number;
 };
 export type CellPadding = {
   paddingLeft: number;

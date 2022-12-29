@@ -29,7 +29,6 @@ import { HttpProductService } from 'src/app/shared/services/http-product.service
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
 import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
-import { copyTextStyles, creatorCssDeclaration } from 'src/app/shared/libs/dom-to-svg/core/text.util';
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -81,8 +80,6 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
-
-
     var extraRow = new Row();
     extraRow.allowMerging = true;
     //
@@ -109,8 +106,6 @@ export class ControlGridDataLayoutPanelComponent
         e.cell.innerHTML = '<div class="v-center">' + html + '</div>';
       }
     });
-
-
     this.flex.allowMerging = 7;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
@@ -561,14 +556,7 @@ export class ControlGridDataLayoutPanelComponent
   public onExportSvgAction() {
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
     this.svgEngine.isRawValue = false;
-    this.svgEngine.drewTextHandler.addHandler((svgEngine, payload) => {
-      const svg = payload.svgDrew as SVGElement;
-      const styles = creatorCssDeclaration();
-      styles.color = 'red';
-      styles.fontWeight = 'bold';
-      copyTextStyles(svg, styles);
-    });
-    const svg = this.svgEngine.renderFlexSvgVisible();
+    const svg = this.svgEngine.renderFlexSvgRaw();
     this.svgContainer.nativeElement.style.display = 'block';
     // const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
     // const alink = document.createElement('a');

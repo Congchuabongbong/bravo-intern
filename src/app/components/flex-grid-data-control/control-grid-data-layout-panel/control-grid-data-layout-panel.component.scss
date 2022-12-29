@@ -36,12 +36,12 @@
   background: #b3ffae;
 }
 
-::ng-deep.wj-cell[role*="gridcell"]:not(.wj-group).even {
-  background-color: #ffddd2 !important;
-}
-::ng-deep.wj-cell[role*="gridcell"]:not(.wj-group).odd {
-  background-color: #82cd47 !important;
-}
+// ::ng-deep.wj-cell[role*="gridcell"]:not(.wj-group).even {
+//   background-color: #ffddd2 !important;
+// }
+// ::ng-deep.wj-cell[role*="gridcell"]:not(.wj-group).odd {
+//   background-color: #82cd47 !important;
+// }
 
 ::ng-deep.wj-flexgrid .cell-changed {
   background-color: #e0144c;

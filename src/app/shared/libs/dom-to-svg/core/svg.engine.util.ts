@@ -1,6 +1,6 @@
 import { Size as wjSize } from '@grapecity/wijmo';
 import { SVG_NAMESPACE, XML_NAMESPACE, X_LINK_NAMESPACE } from './dom.util';
-import { copyTextStyles } from './text.util';
+import { copyTextStylesSvg } from './text.util';
 import { BehaviorText } from './type.util';
 export interface ISize extends Pick<wjSize, 'height' | 'width'> { };
 export function setViewportSizeSVG(svg: SVGElement, size: ISize) {
@@ -44,6 +44,9 @@ export function appendMultipleChildren(svg: SVGElement, children: SVGAElement[])
 export function deCase(s: string): string {
   return s.replace(/[A-Z]/g, function (a) { return '-' + a.toLowerCase(); });
 }
+export function camelCase(s: string): string {
+  return s.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+}
 
 
 export function drawText(textContent: string, behavior: BehaviorText, style?: CSSStyleDeclaration, whiteSpace: 'default' | 'preserve' = 'default'): SVGElement {
@@ -51,7 +54,7 @@ export function drawText(textContent: string, behavior: BehaviorText, style?: CS
   textEl.textContent = textContent;
   textEl.setAttribute('x', behavior.point.x.toString());
   textEl.setAttribute('y', (behavior.point.y).toString());
-  style && copyTextStyles(textEl, style);
+  style && copyTextStylesSvg(textEl, style);
   textEl.setAttribute('dominant-baseline', behavior.dominantBaseline.toString());
   textEl.setAttribute('text-anchor', behavior.textAnchor.toString());
   if (whiteSpace === 'preserve') {

@@ -149,7 +149,6 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
 
   //TODO: Add By Me
   public static applyAttribute(pElement: Element, pAttribute: Record<string, any>) {
-    console.log(pAttribute);
     Object.keys(pAttribute).forEach(key => {
       pElement.setAttribute(key, pAttribute[key]);
     });

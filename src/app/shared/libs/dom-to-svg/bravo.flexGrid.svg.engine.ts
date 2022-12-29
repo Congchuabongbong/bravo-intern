@@ -1,15 +1,20 @@
 import { DataType, Event as wjEven, Point, Rect } from '@grapecity/wijmo';
-import { CellRange, CellType, FlexGrid, GridPanel, GroupRow } from '@grapecity/wijmo.grid';
+import { CellRange, CellType, FlexGrid, GridPanel, GroupRow, Row } from '@grapecity/wijmo.grid';
+import { CellStyleEnum } from '../../data-type/enum';
 import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer';
 import { Font } from './bravo-graphics/font';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
 import { BravoSvgEngine } from './bravo.svg.engine';
 import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
 import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
+import { alternateStyles, fixedStyles, frozenStyles, normalStyles, rowsHeaderStyles, subtotal0Styles, subtotal1Styles } from './core/stylesSeup';
 import { creatorSVG, declareNamespaceSvg, drawImage, drawText } from './core/svg.engine.util';
-import { copyTextStyles } from './core/text.util';
+import { applyTextSvgStylesRaw, copyTextStylesSvg, getStyleAcceptTextSvg } from './core/text.util';
 import { BehaviorText, CellPadding, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
 
+
+export class _NewRowTemplate extends Row {
+}
 export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Declaration here...
   public anchorElement!: Element;
@@ -17,6 +22,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public captureElementCoordinates!: Point;
   public flexGrid!: FlexGrid;
   private _payloadCache!: PayloadCache;
+  public stylesSetup = new Map<CellStyleEnum, Record<string, string>>();
   //*constructor
   constructor(_anchorElement: HTMLElement, _flex: FlexGrid) {
     super(_anchorElement);
@@ -30,6 +36,13 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
     this.stylesBase = getComputedStyle(this.flexGrid.hostElement); //base style
     this.fontBase = new Font(this.stylesBase.fontFamily, this.stylesBase.fontSize); //base font
+    this.stylesSetup.set(CellStyleEnum.Normal, normalStyles);
+    this.stylesSetup.set(CellStyleEnum.Fixed, fixedStyles);
+    this.stylesSetup.set(CellStyleEnum.Alternate, alternateStyles);
+    this.stylesSetup.set(CellStyleEnum.Subtotal0, subtotal0Styles);
+    this.stylesSetup.set(CellStyleEnum.Subtotal1, subtotal1Styles);
+    this.stylesSetup.set(CellStyleEnum.Frozen, frozenStyles);
+    this.stylesSetup.set(CellStyleEnum.RowHeader, rowsHeaderStyles);
   }
 
   public changeOriginCoordinates(elDOMRect: DOMRect): Rect {
@@ -507,6 +520,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this._payloadCache = {} as PayloadCache;
     this._payloadCache.panel = panel;
     for (let colIndex = 0; colIndex < panel.columns.length; colIndex++) {
+      this._payloadCache.sepAlternate = this.flexGrid.alternatingRowStep === 1 ? 1 : 0;
       for (let rowIndex = 0; rowIndex < panel.rows.length; rowIndex++) {
         const cellRange = this.flexGrid.getMergedRange(panel, rowIndex, colIndex, false);
         const cellBoundingRect = panel.getCellBoundingRect(rowIndex, colIndex, true);
@@ -521,6 +535,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._payloadCache.cellBoundingRect = cellBoundingRect;
         this._payloadCache.cellRange = cellRange;
         this._payloadCache.cellValue = cellValue;
+        this._payloadCache.isRowGroup = panel.rows[rowIndex] instanceof GroupRow;
         /* đẩy header và body and footer với chiều cao tương ứng */
         if (panel.cellType === CellType.Cell) {
           cellBoundingRect.top += this.flexGrid.columnHeaders.height;
@@ -557,20 +572,22 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   //Todo: draw raw rectangle cell
   private _drawRawRectCell(): void {
+    const panel = this._payloadCache.panel;
     const rect = this._payloadCache.cellBoundingRect;
     const cellRange = this._payloadCache.cellRange;
     if (cellRange) {
       for (let index = cellRange.col + 1; index <= cellRange.col2; index++) {
-        rect.width += this._payloadCache.panel.columns[index].renderWidth; // total width of rectangle
+        rect.width += panel.columns[index].renderWidth; // total width of rectangle
       }
       for (let index = cellRange.row + 1; index <= cellRange.row2; index++) {
-        rect.height += this._payloadCache.panel.rows[index].renderHeight; // total height of rectangle
+        rect.height += panel.rows[index].renderHeight; // total height of rectangle
       }
     }
     const rectSvgEl = this.drawRect(rect.left, rect.top, rect.width, rect.height);
     const payloadEvent = this._getPayloadEvent();
     payloadEvent.svgDrew = rectSvgEl;
-    rectSvgEl.setAttribute('fill', 'none'); // default none
+    rectSvgEl.setAttribute('fill', 'none');
+    this.applyStyleSetup(rectSvgEl);
     this.onDrewRect(payloadEvent);
     this._drawRawBorderCell();
   }
@@ -594,7 +611,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   private _drawContentInCell() {
     const cellValue = this._payloadCache.cellValue;
-    if (this._payloadCache.panel.cellType === CellType.Cell && this._payloadCache.panel.columns[this._payloadCache.col].dataType === DataType.Boolean) {
+    if (this._payloadCache.panel.cellType === CellType.Cell && this._payloadCache.panel.columns[this._payloadCache.col].dataType === DataType.Boolean && !this._payloadCache.isRowGroup) {
       this._drawCheckboxRaw();
     } else if (cellValue) {
       const payloadEvent = this._getPayloadEvent();
@@ -624,7 +641,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         alginText = panel.columns[currentCol].align || 'center'; //default center for data type is boolean
       }
       //Case indent for row group
-      if (panel.rows[currentRow] instanceof GroupRow) {
+      if (this._payloadCache.isRowGroup) {
         xTextDefault += (panel.rows[currentRow] as GroupRow).level * this.flexGrid.treeIndent;
         paddingLeft += (panel.rows[currentRow] as GroupRow).level * this.flexGrid.treeIndent;
         alginText = panel.rows[currentRow].align || 'left';//default left
@@ -677,7 +694,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
     const textSvgEl = drawText(this._payloadCache.cellValue, textBehavior as BehaviorText, this.stylesBase);
     textSvgEl.setAttribute('fill', this.stylesBase.color);
-    copyTextStyles(textSvgEl, this.stylesBase);
+    copyTextStylesSvg(textSvgEl, this.stylesBase);
+    this.applyStyleSetup(textSvgEl);
     const payloadEvent = this._getPayloadEvent();
     payloadEvent.svgDrew = textSvgEl;
     this.onDrewText(payloadEvent);
@@ -688,11 +706,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   //Todo: wrap svg text raw in cell
   private _wrapTextRawIntoSvg(): SVGElement | null {
     try {
-      const rectSvg: Partial<Rect> = {};
+      const rectSvg: Partial<DOMRect> = {};
       let paddingLeft = this.cellPadding.paddingLeft;
       let paddingRight = this.cellPadding.paddingRight;
       //Case indent for row group
-      if (this._payloadCache.panel.rows[this._payloadCache.row] instanceof GroupRow) {
+      if (this._payloadCache.isRowGroup) {
         paddingLeft += (this._payloadCache.panel.rows[this._payloadCache.row] as GroupRow).level * this.flexGrid.treeIndent;
       }
       rectSvg.width = this._payloadCache.cellBoundingRect.width - paddingLeft - paddingRight;
@@ -700,10 +718,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       if (rectSvg.width <= 0 || rectSvg.height <= 0) {
         return null;
       }
-      rectSvg.left = this._payloadCache.behaviorText.point.x;
-      rectSvg.top = this._payloadCache.behaviorText.point.y;
+      rectSvg.x = this._payloadCache.behaviorText.point.x;
+      rectSvg.y = this._payloadCache.behaviorText.point.y;
       const svgWrapText = creatorSVG(rectSvg);
       const textSvgEl = drawText(this._payloadCache.cellValue, this._payloadCache.behaviorText as BehaviorText, this.stylesBase, 'preserve');
+      this.applyStyleSetup(textSvgEl); //apply style setup for svg text element
       textSvgEl.setAttribute('x', '0');
       textSvgEl.setAttribute('y', '0');
       const payloadEvent = this._getPayloadEvent();
@@ -732,4 +751,129 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       svgEl.setAttribute('fill', '#1da1f2');
     }
   }
+
+  private applyStyleSetup(pSvgEl: SVGElement) {
+    const panel = this._payloadCache.panel;
+    const currentRow = this._payloadCache.row;
+    const currentCol = this._payloadCache.col;
+    const cellRange = this._payloadCache.cellRange;
+    let rowAlternate = this.flexGrid.alternatingRowStep;
+    //backgroundColor:
+    let stylesNormal = this.stylesSetup.has(CellStyleEnum.Normal) && this.stylesSetup.get(CellStyleEnum.Normal) || null;
+    let bgClNormal = stylesNormal && stylesNormal['backgroundColor'] || 'none';
+
+    let stylesAlternate = this.stylesSetup.has(CellStyleEnum.Alternate) && this.stylesSetup.get(CellStyleEnum.Alternate) || null;
+    let bgClAlternate = stylesAlternate && stylesAlternate['backgroundColor'] || bgClNormal;
+
+    let stylesColsHeader = this.stylesSetup.has(CellStyleEnum.Fixed) && this.stylesSetup.get(CellStyleEnum.Fixed) || null;
+    let bgColsHeader = stylesColsHeader && stylesColsHeader['backgroundColor'] || bgClNormal;
+
+    let stylesColsFooter = this.stylesSetup.has(CellStyleEnum.ColumnsFooter) && this.stylesSetup.get(CellStyleEnum.ColumnsFooter) || null;
+    let bgColsFooter = stylesColsFooter && stylesColsFooter['backgroundColor'] || bgColsHeader;
+
+    let stylesRowsHeader = this.stylesSetup.has(CellStyleEnum.RowHeader) && this.stylesSetup.get(CellStyleEnum.RowHeader) || null;
+    let bgRowsHeader = stylesRowsHeader && stylesRowsHeader['backgroundColor'] || bgClNormal;;
+
+    let stylesFrozen = this.stylesSetup.has(CellStyleEnum.Frozen) && this.stylesSetup.get(CellStyleEnum.Frozen) || null;
+    let bgFrozen = stylesFrozen && stylesFrozen['backgroundColor'] || bgClAlternate;
+
+    let stylesGroupLv0 = this.stylesSetup.has(CellStyleEnum.Subtotal0) && this.stylesSetup.get(CellStyleEnum.Subtotal0) || null;
+    let bgClGroupLv0 = stylesGroupLv0 && stylesGroupLv0['backgroundColor'] || bgFrozen;
+
+    let stylesGroupLv1 = this.stylesSetup.has(CellStyleEnum.Subtotal1) && this.stylesSetup.get(CellStyleEnum.Subtotal1) || null;
+    let bgClGroupLv1 = stylesGroupLv1 && stylesGroupLv1['backgroundColor'] || bgFrozen;
+
+    let stylesGroupLv2 = this.stylesSetup.has(CellStyleEnum.Subtotal2) && this.stylesSetup.get(CellStyleEnum.Subtotal2) || null;
+    let bgClGroupLv2 = stylesGroupLv2 && stylesGroupLv2['backgroundColor'] || bgFrozen;
+
+    let stylesGroupLv3 = this.stylesSetup.has(CellStyleEnum.Subtotal3) && this.stylesSetup.get(CellStyleEnum.Subtotal3) || null;
+    let bgClGroupLv3 = stylesGroupLv3 && stylesGroupLv3['backgroundColor'] || bgFrozen;
+
+    let stylesGroupLv4 = this.stylesSetup.has(CellStyleEnum.Subtotal4) && this.stylesSetup.get(CellStyleEnum.Subtotal4) || null;
+    let bgClGroupLv4 = stylesGroupLv4 && stylesGroupLv4['backgroundColor'] || bgFrozen;
+
+    let stylesGroupLv5 = this.stylesSetup.has(CellStyleEnum.Subtotal5) && this.stylesSetup.get(CellStyleEnum.Subtotal5) || null;
+    let bgClGroupLv5 = stylesGroupLv5 && stylesGroupLv5['backgroundColor'] || bgFrozen;
+    switch (panel.cellType) {
+      case CellType.Cell:
+        if (pSvgEl instanceof SVGRectElement) {
+          pSvgEl.setAttribute('fill', bgClNormal);
+          //case alternating row
+          if (this.flexGrid.showAlternatingRows) {
+            if (rowAlternate !== 1) {
+              if (panel.rows[currentRow].visibleIndex === this._payloadCache.sepAlternate) {
+                this._payloadCache.sepAlternate += this.flexGrid.alternatingRowStep + 1;
+                pSvgEl.setAttribute('fill', bgClAlternate);
+              }
+            } else {
+              if (panel.rows[currentRow].visibleIndex % 2 != 0) {
+                pSvgEl.setAttribute('fill', bgClAlternate);
+              }
+            }
+          }
+          //case frozen
+          if (currentRow < panel.rows.frozen || currentCol < panel.columns.frozen) {
+            pSvgEl.setAttribute('fill', bgFrozen);
+            // if (cellRange) {
+            //   if (cellRange.row2 == panel.rows.frozen - 1) {
+            //     rectSvgEl.setAttribute('fill', bgFrozen);
+            //   }
+            //   if (cellRange.col2 == panel.columns.frozen - 1) {
+            //     rectSvgEl.setAttribute('fill', bgFrozen);
+            //   }
+            // }
+          }
+          //case row group by level
+          if (this._payloadCache.isRowGroup) {
+            switch ((panel.rows[currentRow] as GroupRow).level) {
+              case 0:
+                pSvgEl.setAttribute('fill', bgClGroupLv0);
+                break;
+              case 1:
+                pSvgEl.setAttribute('fill', bgClGroupLv1);
+                break;
+              case 2:
+                pSvgEl.setAttribute('fill', bgClGroupLv2);
+                break;
+              case 3:
+                pSvgEl.setAttribute('fill', bgClGroupLv3);
+                break;
+              case 4:
+                pSvgEl.setAttribute('fill', bgClGroupLv4);
+                break;
+              case 5:
+                pSvgEl.setAttribute('fill', bgClGroupLv5);
+                break;
+              default:
+                pSvgEl.setAttribute('fill', bgFrozen);
+            }
+          }
+        } else if (pSvgEl instanceof SVGTextElement) {
+          stylesNormal && applyTextSvgStylesRaw(pSvgEl, stylesNormal);
+        }
+
+        break;
+      case CellType.ColumnHeader:
+        if (pSvgEl instanceof SVGRectElement) {
+          pSvgEl.setAttribute('fill', bgColsHeader);
+        } else if (pSvgEl instanceof SVGTextElement) {
+          stylesColsHeader && applyTextSvgStylesRaw(pSvgEl, stylesColsHeader);
+        }
+        break;
+      case CellType.ColumnFooter:
+        if (pSvgEl instanceof SVGRectElement) {
+          pSvgEl.setAttribute('fill', bgColsFooter);
+        }
+        break;
+      case CellType.RowHeader:
+      case CellType.TopLeft:
+        if (pSvgEl instanceof SVGRectElement) {
+          pSvgEl.setAttribute('fill', bgRowsHeader);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
 }
