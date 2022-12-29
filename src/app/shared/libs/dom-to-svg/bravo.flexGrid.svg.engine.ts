@@ -8,10 +8,9 @@ import { BravoSvgEngine } from './bravo.svg.engine';
 import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
 import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
 import { alternateStyles, fixedStyles, frozenStyles, normalStyles, rowsHeaderStyles, subtotal0Styles, subtotal1Styles } from './core/stylesSeup';
-import { creatorSVG, declareNamespaceSvg, drawImage, drawText } from './core/svg.engine.util';
-import { applyTextSvgStylesRaw, copyTextStylesSvg, getStyleAcceptTextSvg } from './core/text.util';
+import { creatorSVG, declareNamespaceSvg, drawImage, drawText, getBgRectFormStylesSetup } from './core/svg.engine.util';
+import { getStylesAcceptTextSvg } from './core/text.util';
 import { BehaviorText, CellPadding, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
-
 
 export class _NewRowTemplate extends Row {
 }
@@ -34,8 +33,10 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.captureElement = _flex.hostElement;
     const { x: xCaptureElement, y: yCaptureElement } = this.captureElement.getBoundingClientRect();
     this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
-    this.stylesBase = getComputedStyle(this.flexGrid.hostElement); //base style
-    this.fontBase = new Font(this.stylesBase.fontFamily, this.stylesBase.fontSize); //base font
+    this._stylesBase = getComputedStyle(this.flexGrid.hostElement);
+    this._stylesTextBase = getStylesAcceptTextSvg(getComputedStyle(this.flexGrid.hostElement));
+
+    //test setup styles
     this.stylesSetup.set(CellStyleEnum.Normal, normalStyles);
     this.stylesSetup.set(CellStyleEnum.Fixed, fixedStyles);
     this.stylesSetup.set(CellStyleEnum.Alternate, alternateStyles);
@@ -443,10 +444,19 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
   //==========================================================================================================
+  //==========================================================================================================
+  //==========================================================================================================
+  //==========================================================================================================
+
   //**Draw raw svg start here:
   //**declared property here */
-  public stylesBase!: CSSStyleDeclaration;
-  public fontBase!: Font;
+
+  private readonly _stylesTextBase!: Record<string, string>;
+  private _stylesBase!: CSSStyleDeclaration;
+  private _stylesTextSetup!: Record<string, string>;
+  private _stylesBorderSetup!: Record<string, string>;
+  private _bgColorSetup!: string;
+
   public cellPadding: CellPadding = { paddingBottom: 8, paddingLeft: 8, paddingTop: 8, paddingRight: 8 };
   public isRawValue: boolean = false;
   //**events declared here
@@ -500,7 +510,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       //?draw cells rows header
       this._drawRawCellPanel(rowsHeaderPanel);
       this._drawRawCellPanel(topLeft);
-      const widthSvg = this.flexGrid.columns.getTotalSize() + 100;
+      const widthSvg = this.flexGrid.columns.getTotalSize() + this.flexGrid.rowHeaders.columns.getTotalSize();
       const heightSvg = this.flexGrid.rows.getTotalSize() + this.flexGrid.columnHeaders.height;
       this.setViewportSize(widthSvg, heightSvg);
       const svgEl = declareNamespaceSvg(this.element as SVGElement);
@@ -519,8 +529,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     //!initialize cache data here
     this._payloadCache = {} as PayloadCache;
     this._payloadCache.panel = panel;
+
     for (let colIndex = 0; colIndex < panel.columns.length; colIndex++) {
-      this._payloadCache.sepAlternate = this.flexGrid.alternatingRowStep === 1 ? 1 : 0;
+      this._payloadCache.sepAlternate = 0;
       for (let rowIndex = 0; rowIndex < panel.rows.length; rowIndex++) {
         const cellRange = this.flexGrid.getMergedRange(panel, rowIndex, colIndex, false);
         const cellBoundingRect = panel.getCellBoundingRect(rowIndex, colIndex, true);
@@ -554,7 +565,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             //!cache group
             this._payloadCache.group = groupEl;
             this._drawRawRectCell();
-            this._drawContentInCell();
+            // this._drawContentInCell();
             this.endGroup();
           }
         } else {
@@ -562,7 +573,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             const groupEl = this.startGroup();
             this._payloadCache.group = groupEl;
             this._drawRawRectCell();
-            this._drawContentInCell();
+            // this._drawContentInCell();
             this.endGroup();
           }
         }
@@ -586,10 +597,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const rectSvgEl = this.drawRect(rect.left, rect.top, rect.width, rect.height);
     const payloadEvent = this._getPayloadEvent();
     payloadEvent.svgDrew = rectSvgEl;
-    rectSvgEl.setAttribute('fill', 'none');
-    this.applyStyleSetup(rectSvgEl);
+    this._applyStyleSetup(); // apply style setup to set bg, styles text,...
+    rectSvgEl.setAttribute('fill', this._bgColorSetup);
     this.onDrewRect(payloadEvent);
     this._drawRawBorderCell();
+    this._drawContentInCell();
   }
   //Todo: Draw raw border cell
   private _drawRawBorderCell() {
@@ -615,6 +627,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       this._drawCheckboxRaw();
     } else if (cellValue) {
       const payloadEvent = this._getPayloadEvent();
+      // this._getStylesTextSetup();
       this.onDrawingText(payloadEvent);//raise event draw text
       if (this._payloadCache.cellValue !== payloadEvent.cellValue) {
         this._payloadCache.cellValue = payloadEvent.cellValue;
@@ -647,7 +660,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         alginText = panel.rows[currentRow].align || 'left';//default left
       }
       const behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(xTextDefault, yTextDefault), textAnchor: 'start' };
-      const dimensionOfText = BravoGraphicsRenderer.measureString(cellValue, this.fontBase, cellBoundingRect.width, false);
+      const font = new Font(this._stylesTextSetup['fontFamily'], this._stylesTextSetup['fontSize'], this._stylesTextSetup['fontWeight']);
+      const dimensionOfText = BravoGraphicsRenderer.measureString(cellValue, font, cellBoundingRect.width, false);
       let isFitContent: boolean = (dimensionOfText?.width || 0) <= (cellBoundingRect.width - paddingLeft - paddingRight);
       switch (alginText) {
         case TextAlign.Left:
@@ -692,10 +706,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       const svgEl = this._wrapTextRawIntoSvg();
       return svgEl;
     }
-    const textSvgEl = drawText(this._payloadCache.cellValue, textBehavior as BehaviorText, this.stylesBase);
-    textSvgEl.setAttribute('fill', this.stylesBase.color);
-    copyTextStylesSvg(textSvgEl, this.stylesBase);
-    this.applyStyleSetup(textSvgEl);
+    const textSvgEl = drawText(this._payloadCache.cellValue, textBehavior as BehaviorText, this._stylesTextSetup);
     const payloadEvent = this._getPayloadEvent();
     payloadEvent.svgDrew = textSvgEl;
     this.onDrewText(payloadEvent);
@@ -714,15 +725,14 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         paddingLeft += (this._payloadCache.panel.rows[this._payloadCache.row] as GroupRow).level * this.flexGrid.treeIndent;
       }
       rectSvg.width = this._payloadCache.cellBoundingRect.width - paddingLeft - paddingRight;
-      rectSvg.height = this._payloadCache.cellBoundingRect.height || 0;
+      rectSvg.height = (this._payloadCache.cellBoundingRect.height - this.cellPadding.paddingTop - this.cellPadding.paddingBottom) || 0;
       if (rectSvg.width <= 0 || rectSvg.height <= 0) {
         return null;
       }
       rectSvg.x = this._payloadCache.behaviorText.point.x;
       rectSvg.y = this._payloadCache.behaviorText.point.y;
       const svgWrapText = creatorSVG(rectSvg);
-      const textSvgEl = drawText(this._payloadCache.cellValue, this._payloadCache.behaviorText as BehaviorText, this.stylesBase, 'preserve');
-      this.applyStyleSetup(textSvgEl); //apply style setup for svg text element
+      const textSvgEl = drawText(this._payloadCache.cellValue, this._payloadCache.behaviorText as BehaviorText, this._stylesTextSetup, 'preserve');
       textSvgEl.setAttribute('x', '0');
       textSvgEl.setAttribute('y', '0');
       const payloadEvent = this._getPayloadEvent();
@@ -752,128 +762,96 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
 
-  private applyStyleSetup(pSvgEl: SVGElement) {
+  private _applyStyleSetup() {
     const panel = this._payloadCache.panel;
     const currentRow = this._payloadCache.row;
     const currentCol = this._payloadCache.col;
     const cellRange = this._payloadCache.cellRange;
     let rowAlternate = this.flexGrid.alternatingRowStep;
     //backgroundColor:
-    let stylesNormal = this.stylesSetup.has(CellStyleEnum.Normal) && this.stylesSetup.get(CellStyleEnum.Normal) || null;
-    let bgClNormal = stylesNormal && stylesNormal['backgroundColor'] || 'none';
-
-    let stylesAlternate = this.stylesSetup.has(CellStyleEnum.Alternate) && this.stylesSetup.get(CellStyleEnum.Alternate) || null;
-    let bgClAlternate = stylesAlternate && stylesAlternate['backgroundColor'] || bgClNormal;
-
-    let stylesColsHeader = this.stylesSetup.has(CellStyleEnum.Fixed) && this.stylesSetup.get(CellStyleEnum.Fixed) || null;
-    let bgColsHeader = stylesColsHeader && stylesColsHeader['backgroundColor'] || bgClNormal;
-
-    let stylesColsFooter = this.stylesSetup.has(CellStyleEnum.ColumnsFooter) && this.stylesSetup.get(CellStyleEnum.ColumnsFooter) || null;
-    let bgColsFooter = stylesColsFooter && stylesColsFooter['backgroundColor'] || bgColsHeader;
-
-    let stylesRowsHeader = this.stylesSetup.has(CellStyleEnum.RowHeader) && this.stylesSetup.get(CellStyleEnum.RowHeader) || null;
-    let bgRowsHeader = stylesRowsHeader && stylesRowsHeader['backgroundColor'] || bgClNormal;;
-
-    let stylesFrozen = this.stylesSetup.has(CellStyleEnum.Frozen) && this.stylesSetup.get(CellStyleEnum.Frozen) || null;
-    let bgFrozen = stylesFrozen && stylesFrozen['backgroundColor'] || bgClAlternate;
-
-    let stylesGroupLv0 = this.stylesSetup.has(CellStyleEnum.Subtotal0) && this.stylesSetup.get(CellStyleEnum.Subtotal0) || null;
-    let bgClGroupLv0 = stylesGroupLv0 && stylesGroupLv0['backgroundColor'] || bgFrozen;
-
-    let stylesGroupLv1 = this.stylesSetup.has(CellStyleEnum.Subtotal1) && this.stylesSetup.get(CellStyleEnum.Subtotal1) || null;
-    let bgClGroupLv1 = stylesGroupLv1 && stylesGroupLv1['backgroundColor'] || bgFrozen;
-
-    let stylesGroupLv2 = this.stylesSetup.has(CellStyleEnum.Subtotal2) && this.stylesSetup.get(CellStyleEnum.Subtotal2) || null;
-    let bgClGroupLv2 = stylesGroupLv2 && stylesGroupLv2['backgroundColor'] || bgFrozen;
-
-    let stylesGroupLv3 = this.stylesSetup.has(CellStyleEnum.Subtotal3) && this.stylesSetup.get(CellStyleEnum.Subtotal3) || null;
-    let bgClGroupLv3 = stylesGroupLv3 && stylesGroupLv3['backgroundColor'] || bgFrozen;
-
-    let stylesGroupLv4 = this.stylesSetup.has(CellStyleEnum.Subtotal4) && this.stylesSetup.get(CellStyleEnum.Subtotal4) || null;
-    let bgClGroupLv4 = stylesGroupLv4 && stylesGroupLv4['backgroundColor'] || bgFrozen;
-
-    let stylesGroupLv5 = this.stylesSetup.has(CellStyleEnum.Subtotal5) && this.stylesSetup.get(CellStyleEnum.Subtotal5) || null;
-    let bgClGroupLv5 = stylesGroupLv5 && stylesGroupLv5['backgroundColor'] || bgFrozen;
+    let stylesNormal = this.stylesSetup.has(CellStyleEnum.Normal) && this.stylesSetup.get(CellStyleEnum.Normal) || this._stylesBase;
+    let stylesAlternate = this.stylesSetup.has(CellStyleEnum.Alternate) && this.stylesSetup.get(CellStyleEnum.Alternate) || stylesNormal;
+    let stylesColsHeader = this.stylesSetup.has(CellStyleEnum.Fixed) && this.stylesSetup.get(CellStyleEnum.Fixed) || stylesNormal;
+    let stylesColsFooter = this.stylesSetup.has(CellStyleEnum.ColumnsFooter) && this.stylesSetup.get(CellStyleEnum.ColumnsFooter) || stylesColsHeader;
+    let stylesRowsHeader = this.stylesSetup.has(CellStyleEnum.RowHeader) && this.stylesSetup.get(CellStyleEnum.RowHeader) || stylesNormal;
+    let stylesFrozen = this.stylesSetup.has(CellStyleEnum.Frozen) && this.stylesSetup.get(CellStyleEnum.Frozen) || stylesAlternate;
+    let stylesGroupLv0 = this.stylesSetup.has(CellStyleEnum.Subtotal0) && this.stylesSetup.get(CellStyleEnum.Subtotal0) || stylesFrozen;
+    let stylesGroupLv1 = this.stylesSetup.has(CellStyleEnum.Subtotal1) && this.stylesSetup.get(CellStyleEnum.Subtotal1) || stylesFrozen;
+    let stylesGroupLv2 = this.stylesSetup.has(CellStyleEnum.Subtotal2) && this.stylesSetup.get(CellStyleEnum.Subtotal2) || stylesFrozen;
+    let stylesGroupLv3 = this.stylesSetup.has(CellStyleEnum.Subtotal3) && this.stylesSetup.get(CellStyleEnum.Subtotal3) || stylesFrozen;
+    let stylesGroupLv4 = this.stylesSetup.has(CellStyleEnum.Subtotal4) && this.stylesSetup.get(CellStyleEnum.Subtotal4) || stylesFrozen;
+    let stylesGroupLv5 = this.stylesSetup.has(CellStyleEnum.Subtotal5) && this.stylesSetup.get(CellStyleEnum.Subtotal5) || stylesFrozen;
     switch (panel.cellType) {
       case CellType.Cell:
-        if (pSvgEl instanceof SVGRectElement) {
-          pSvgEl.setAttribute('fill', bgClNormal);
-          //case alternating row
-          if (this.flexGrid.showAlternatingRows) {
-            if (rowAlternate !== 1) {
-              if (panel.rows[currentRow].visibleIndex === this._payloadCache.sepAlternate) {
-                this._payloadCache.sepAlternate += this.flexGrid.alternatingRowStep + 1;
-                pSvgEl.setAttribute('fill', bgClAlternate);
-              }
-            } else {
-              if (panel.rows[currentRow].visibleIndex % 2 != 0) {
-                pSvgEl.setAttribute('fill', bgClAlternate);
-              }
-            }
+        this._bgColorSetup = getBgRectFormStylesSetup(stylesNormal);
+        this._stylesTextSetup = { ...this._stylesTextBase, ...getStylesAcceptTextSvg(stylesNormal) } || this._stylesTextBase;
+        //case alternating row
+        if (this.flexGrid.showAlternatingRows) {
+          let isAlternate = false;
+          if (rowAlternate && (!cellRange || cellRange.row == cellRange.row2)) {
+            isAlternate = panel.rows[currentRow].visibleIndex % (rowAlternate + 1) === 0;
+            rowAlternate == 1 && (isAlternate = !isAlternate);
           }
-          //case frozen
-          if (currentRow < panel.rows.frozen || currentCol < panel.columns.frozen) {
-            pSvgEl.setAttribute('fill', bgFrozen);
-            // if (cellRange) {
-            //   if (cellRange.row2 == panel.rows.frozen - 1) {
-            //     rectSvgEl.setAttribute('fill', bgFrozen);
-            //   }
-            //   if (cellRange.col2 == panel.columns.frozen - 1) {
-            //     rectSvgEl.setAttribute('fill', bgFrozen);
-            //   }
-            // }
+          if (isAlternate) {
+            this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesAlternate) };
+            this._bgColorSetup = getBgRectFormStylesSetup(stylesAlternate);;
           }
-          //case row group by level
-          if (this._payloadCache.isRowGroup) {
-            switch ((panel.rows[currentRow] as GroupRow).level) {
-              case 0:
-                pSvgEl.setAttribute('fill', bgClGroupLv0);
-                break;
-              case 1:
-                pSvgEl.setAttribute('fill', bgClGroupLv1);
-                break;
-              case 2:
-                pSvgEl.setAttribute('fill', bgClGroupLv2);
-                break;
-              case 3:
-                pSvgEl.setAttribute('fill', bgClGroupLv3);
-                break;
-              case 4:
-                pSvgEl.setAttribute('fill', bgClGroupLv4);
-                break;
-              case 5:
-                pSvgEl.setAttribute('fill', bgClGroupLv5);
-                break;
-              default:
-                pSvgEl.setAttribute('fill', bgFrozen);
-            }
-          }
-        } else if (pSvgEl instanceof SVGTextElement) {
-          stylesNormal && applyTextSvgStylesRaw(pSvgEl, stylesNormal);
         }
-
+        //case frozen
+        if (currentRow < panel.rows.frozen || currentCol < panel.columns.frozen) {
+          this._bgColorSetup = getBgRectFormStylesSetup(stylesFrozen);;;
+          this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesFrozen) };
+        }
+        //case row group by level
+        if (this._payloadCache.isRowGroup) {
+          switch ((panel.rows[currentRow] as GroupRow).level) {
+            case 0:
+              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv0);
+              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv0) };
+              break;
+            case 1:
+              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv1);
+              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv1) };
+              break;
+            case 2:
+              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv2);
+              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv2) };
+              break;
+            case 3:
+              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv3);
+              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv3) };
+              break;
+            case 4:
+              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv4);
+              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv4) };
+              break;
+            case 5:
+              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv5);
+              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv5) };
+              break;
+            default:
+              this._bgColorSetup = getBgRectFormStylesSetup(stylesFrozen);
+              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesFrozen) };
+          }
+        }
         break;
       case CellType.ColumnHeader:
-        if (pSvgEl instanceof SVGRectElement) {
-          pSvgEl.setAttribute('fill', bgColsHeader);
-        } else if (pSvgEl instanceof SVGTextElement) {
-          stylesColsHeader && applyTextSvgStylesRaw(pSvgEl, stylesColsHeader);
-        }
+        this._bgColorSetup = getBgRectFormStylesSetup(stylesColsHeader);
+        this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesColsHeader) };
         break;
       case CellType.ColumnFooter:
-        if (pSvgEl instanceof SVGRectElement) {
-          pSvgEl.setAttribute('fill', bgColsFooter);
-        }
+        this._bgColorSetup = getBgRectFormStylesSetup(stylesColsFooter);
+        this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesColsFooter) };
         break;
       case CellType.RowHeader:
       case CellType.TopLeft:
-        if (pSvgEl instanceof SVGRectElement) {
-          pSvgEl.setAttribute('fill', bgRowsHeader);
-        }
+        this._bgColorSetup = getBgRectFormStylesSetup(stylesRowsHeader);
+        this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesRowsHeader) };
         break;
       default:
+        this._bgColorSetup = getBgRectFormStylesSetup(stylesNormal);
+        this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesNormal) };
         break;
     }
   }
-
 }

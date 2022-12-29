@@ -1,6 +1,6 @@
 import { Size as wjSize } from '@grapecity/wijmo';
 import { SVG_NAMESPACE, XML_NAMESPACE, X_LINK_NAMESPACE } from './dom.util';
-import { copyTextStylesSvg } from './text.util';
+import { applyTextSvgStylesRaw, copyTextStylesSvg } from './text.util';
 import { BehaviorText } from './type.util';
 export interface ISize extends Pick<wjSize, 'height' | 'width'> { };
 export function setViewportSizeSVG(svg: SVGElement, size: ISize) {
@@ -49,12 +49,16 @@ export function camelCase(s: string): string {
 }
 
 
-export function drawText(textContent: string, behavior: BehaviorText, style?: CSSStyleDeclaration, whiteSpace: 'default' | 'preserve' = 'default'): SVGElement {
+export function drawText(textContent: string, behavior: BehaviorText, styles?: CSSStyleDeclaration | Record<string, string>, whiteSpace: 'default' | 'preserve' = 'default'): SVGElement {
   const textEl = document.createElementNS(SVG_NAMESPACE, 'text') as SVGElement;
   textEl.textContent = textContent;
   textEl.setAttribute('x', behavior.point.x.toString());
   textEl.setAttribute('y', (behavior.point.y).toString());
-  style && copyTextStylesSvg(textEl, style);
+  if (styles && styles instanceof CSSStyleDeclaration) {
+    copyTextStylesSvg(textEl, styles);
+  } else if (styles) {
+    applyTextSvgStylesRaw(textEl, styles);
+  }
   textEl.setAttribute('dominant-baseline', behavior.dominantBaseline.toString());
   textEl.setAttribute('text-anchor', behavior.textAnchor.toString());
   if (whiteSpace === 'preserve') {
@@ -79,4 +83,14 @@ export function declareNamespaceSvg(svg: SVGElement): SVGElement {
   svg.setAttribute('xmlns', SVG_NAMESPACE);
   svg.setAttribute('xmlns:xlink', X_LINK_NAMESPACE);
   return svg;
+}
+export function getBgRectFormStylesSetup(styles: Record<string, string> | CSSStyleDeclaration): string {
+  let bg = '';
+  if (styles instanceof CSSStyleDeclaration) {
+    bg = styles.getPropertyValue('background-color');
+  } else {
+    bg = styles['backgroundColor'] || '';
+  }
+  return bg;
+
 }

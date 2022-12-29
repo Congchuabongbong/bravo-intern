@@ -1,4 +1,4 @@
-import { camelCase, deCase } from "./svg.engine.util";
+import { camelCase } from "./svg.engine.util";
 
 export const textAttributes = new Set([
   'color',
@@ -37,6 +37,23 @@ export function applyTextSvgStylesRaw(svgElement: SVGElement, styles: Record<str
   }
   svgElement.setAttribute('fill', styles['color']);
 }
+
+export function getStylesAcceptTextSvg(styles: CSSStyleDeclaration | Record<string, string>): Record<string, string> {
+  const stylesText: Record<string, string> = {};
+  for (const textProperty of textAttributes) {
+    let value = '';
+    if (styles instanceof CSSStyleDeclaration) {
+      value = styles.getPropertyValue(textProperty);
+    } else {
+      value = styles[camelCase(textProperty)] || '';
+    }
+    if (value) {
+      stylesText[camelCase(textProperty)] = value;
+    }
+  }
+  return stylesText;
+}
+
 export function creatorCssDeclaration(): CSSStyleDeclaration {
   var spanVirtual = document.createElement('span');
   const styles = spanVirtual.style;
@@ -44,14 +61,5 @@ export function creatorCssDeclaration(): CSSStyleDeclaration {
   return styles;
 }
 
-export function getStyleAcceptTextSvg(styles: CSSStyleDeclaration): Record<string, string> {
-  const stylesText: Record<string, string> = {};
-  for (const textProperty of textAttributes) {
-    const value = styles.getPropertyValue(textProperty);
-    if (value) {
-      stylesText[camelCase(textProperty)] = value;
-    }
-  }
-  return stylesText;
-}
+
 

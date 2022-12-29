@@ -80,6 +80,7 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
+
     var extraRow = new Row();
     extraRow.allowMerging = true;
     //
