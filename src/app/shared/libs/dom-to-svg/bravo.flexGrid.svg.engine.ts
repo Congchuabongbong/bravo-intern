@@ -8,8 +8,8 @@ import { BravoSvgEngine } from './bravo.svg.engine';
 import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
 import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
 import { alternateStyles, fixedStyles, frozenStyles, normalStyles, rowsHeaderStyles, subtotal0Styles, subtotal1Styles } from './core/stylesSeup';
-import { creatorSVG, declareNamespaceSvg, drawImage, drawText, getBgRectFormStylesSetup } from './core/svg.engine.util';
-import { getStylesAcceptTextSvg } from './core/text.util';
+import { creatorSVG, declareNamespaceSvg, drawImage, drawText, getAcceptStylesBorderSvg, getBgRectFromStylesSetup } from './core/svg.engine.util';
+import { getAcceptStylesTextSvg } from './core/text.util';
 import { BehaviorText, CellPadding, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
 
 export class _NewRowTemplate extends Row {
@@ -34,7 +34,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const { x: xCaptureElement, y: yCaptureElement } = this.captureElement.getBoundingClientRect();
     this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
     this._stylesBase = getComputedStyle(this.flexGrid.hostElement);
-    this._stylesTextBase = getStylesAcceptTextSvg(getComputedStyle(this.flexGrid.hostElement));
+    this._stylesTextBase = getAcceptStylesTextSvg(getComputedStyle(this.flexGrid.hostElement));
 
     //test setup styles
     this.stylesSetup.set(CellStyleEnum.Normal, normalStyles);
@@ -450,7 +450,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   //**Draw raw svg start here:
   //**declared property here */
-
   private readonly _stylesTextBase!: Record<string, string>;
   private _stylesBase!: CSSStyleDeclaration;
   private _stylesTextSetup!: Record<string, string>;
@@ -531,7 +530,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this._payloadCache.panel = panel;
 
     for (let colIndex = 0; colIndex < panel.columns.length; colIndex++) {
-      this._payloadCache.sepAlternate = 0;
       for (let rowIndex = 0; rowIndex < panel.rows.length; rowIndex++) {
         const cellRange = this.flexGrid.getMergedRange(panel, rowIndex, colIndex, false);
         const cellBoundingRect = panel.getCellBoundingRect(rowIndex, colIndex, true);
@@ -547,6 +545,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._payloadCache.cellRange = cellRange;
         this._payloadCache.cellValue = cellValue;
         this._payloadCache.isRowGroup = panel.rows[rowIndex] instanceof GroupRow;
+        this._applyStyleSetup(); // apply style setup to set bg, styles text,...
         /* đẩy header và body and footer với chiều cao tương ứng */
         if (panel.cellType === CellType.Cell) {
           cellBoundingRect.top += this.flexGrid.columnHeaders.height;
@@ -565,7 +564,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             //!cache group
             this._payloadCache.group = groupEl;
             this._drawRawRectCell();
-            // this._drawContentInCell();
             this.endGroup();
           }
         } else {
@@ -573,7 +571,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             const groupEl = this.startGroup();
             this._payloadCache.group = groupEl;
             this._drawRawRectCell();
-            // this._drawContentInCell();
             this.endGroup();
           }
         }
@@ -597,7 +594,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const rectSvgEl = this.drawRect(rect.left, rect.top, rect.width, rect.height);
     const payloadEvent = this._getPayloadEvent();
     payloadEvent.svgDrew = rectSvgEl;
-    this._applyStyleSetup(); // apply style setup to set bg, styles text,...
+
     rectSvgEl.setAttribute('fill', this._bgColorSetup);
     this.onDrewRect(payloadEvent);
     this._drawRawBorderCell();
@@ -609,14 +606,14 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const payloadEvent = this._getPayloadEvent();
     //border bottom
     const lineBottomSvgEl = this.drawLine(rect.left, rect.bottom, rect.right, rect.bottom);
-    lineBottomSvgEl.setAttribute('stroke-width', '1px');
-    lineBottomSvgEl.setAttribute('stroke', 'black');
+    lineBottomSvgEl.setAttribute('stroke-width', this._stylesBorderSetup['borderBottomWidth']);
+    lineBottomSvgEl.setAttribute('stroke', this._stylesBorderSetup['borderBottomColor']);
     payloadEvent.svgDrew = lineBottomSvgEl;
     this.onDrawBorderBottom(payloadEvent); //raise event drew border bottom here
     //border right
     const lineRightSvgEl = this.drawLine(rect.right, rect.top, rect.right, rect.bottom);
-    lineRightSvgEl.setAttribute('stroke-width', '1px');
-    lineRightSvgEl.setAttribute('stroke', 'black');
+    lineRightSvgEl.setAttribute('stroke-width', this._stylesBorderSetup['borderRightWidth']);
+    lineRightSvgEl.setAttribute('stroke', this._stylesBorderSetup['borderRightColor']);
     payloadEvent.svgDrew = lineRightSvgEl;
     this.onDrawBorderRight(payloadEvent);//raise event drew border right here
   }
@@ -627,7 +624,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       this._drawCheckboxRaw();
     } else if (cellValue) {
       const payloadEvent = this._getPayloadEvent();
-      // this._getStylesTextSetup();
       this.onDrawingText(payloadEvent);//raise event draw text
       if (this._payloadCache.cellValue !== payloadEvent.cellValue) {
         this._payloadCache.cellValue = payloadEvent.cellValue;
@@ -769,22 +765,95 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const cellRange = this._payloadCache.cellRange;
     let rowAlternate = this.flexGrid.alternatingRowStep;
     //backgroundColor:
-    let stylesNormal = this.stylesSetup.has(CellStyleEnum.Normal) && this.stylesSetup.get(CellStyleEnum.Normal) || this._stylesBase;
-    let stylesAlternate = this.stylesSetup.has(CellStyleEnum.Alternate) && this.stylesSetup.get(CellStyleEnum.Alternate) || stylesNormal;
-    let stylesColsHeader = this.stylesSetup.has(CellStyleEnum.Fixed) && this.stylesSetup.get(CellStyleEnum.Fixed) || stylesNormal;
-    let stylesColsFooter = this.stylesSetup.has(CellStyleEnum.ColumnsFooter) && this.stylesSetup.get(CellStyleEnum.ColumnsFooter) || stylesColsHeader;
-    let stylesRowsHeader = this.stylesSetup.has(CellStyleEnum.RowHeader) && this.stylesSetup.get(CellStyleEnum.RowHeader) || stylesNormal;
-    let stylesFrozen = this.stylesSetup.has(CellStyleEnum.Frozen) && this.stylesSetup.get(CellStyleEnum.Frozen) || stylesAlternate;
-    let stylesGroupLv0 = this.stylesSetup.has(CellStyleEnum.Subtotal0) && this.stylesSetup.get(CellStyleEnum.Subtotal0) || stylesFrozen;
-    let stylesGroupLv1 = this.stylesSetup.has(CellStyleEnum.Subtotal1) && this.stylesSetup.get(CellStyleEnum.Subtotal1) || stylesFrozen;
-    let stylesGroupLv2 = this.stylesSetup.has(CellStyleEnum.Subtotal2) && this.stylesSetup.get(CellStyleEnum.Subtotal2) || stylesFrozen;
-    let stylesGroupLv3 = this.stylesSetup.has(CellStyleEnum.Subtotal3) && this.stylesSetup.get(CellStyleEnum.Subtotal3) || stylesFrozen;
-    let stylesGroupLv4 = this.stylesSetup.has(CellStyleEnum.Subtotal4) && this.stylesSetup.get(CellStyleEnum.Subtotal4) || stylesFrozen;
-    let stylesGroupLv5 = this.stylesSetup.has(CellStyleEnum.Subtotal5) && this.stylesSetup.get(CellStyleEnum.Subtotal5) || stylesFrozen;
+    let stylesNormal, stylesAlternate, stylesColsHeader, stylesColsFooter, stylesRowsHeader, stylesFrozen, stylesGroupLv0, stylesGroupLv1, stylesGroupLv2, stylesGroupLv3, stylesGroupLv4, stylesGroupLv5;
+    if (!this._payloadCache.stylesNormal) {
+      stylesNormal = (this.stylesSetup.has(CellStyleEnum.Normal) && this.stylesSetup.get(CellStyleEnum.Normal)) ? { ...this._stylesBase, ...this.stylesSetup.get(CellStyleEnum.Normal) } : this._stylesBase;
+      this._payloadCache.stylesNormal = stylesNormal; //cache styles normal
+    } else {
+      stylesNormal = this._payloadCache.stylesNormal;
+    }
+
+    if (!this._payloadCache.stylesAlternate) {
+      stylesAlternate = (this.stylesSetup.has(CellStyleEnum.Alternate) && this.stylesSetup.get(CellStyleEnum.Alternate)) ? { ...stylesNormal, ...this.stylesSetup.get(CellStyleEnum.Alternate) } : stylesNormal;
+      this._payloadCache.stylesAlternate = stylesAlternate; //cache styles alternate
+    } else {
+      stylesAlternate = this._payloadCache.stylesAlternate;
+    }
+
+    if (!this._payloadCache.stylesColsHeader) {
+      stylesColsHeader = (this.stylesSetup.has(CellStyleEnum.Fixed) && this.stylesSetup.get(CellStyleEnum.Fixed)) ? { ...stylesNormal, ...this.stylesSetup.get(CellStyleEnum.Fixed) } : stylesNormal;
+      this._payloadCache.stylesColsHeader = stylesColsHeader; //cache styles cols header
+    } else {
+      stylesColsHeader = this._payloadCache.stylesColsHeader;
+    }
+
+    if (!this._payloadCache.stylesColsFooter) {
+      stylesColsFooter = (this.stylesSetup.has(CellStyleEnum.ColumnsFooter) && this.stylesSetup.get(CellStyleEnum.ColumnsFooter)) ? { ...stylesColsHeader, ...this.stylesSetup.get(CellStyleEnum.ColumnsFooter) } : stylesColsHeader;
+      this._payloadCache.stylesColsHeader = stylesColsFooter; //cache styles cols footer
+    } else {
+      stylesColsFooter = this._payloadCache.stylesColsFooter;
+    }
+
+    if (!this._payloadCache.stylesRowsHeader) {
+      stylesRowsHeader = (this.stylesSetup.has(CellStyleEnum.RowHeader) && this.stylesSetup.get(CellStyleEnum.RowHeader)) ? { ...stylesNormal, ... this.stylesSetup.get(CellStyleEnum.RowHeader) } : stylesNormal;
+      this._payloadCache.stylesRowsHeader = stylesRowsHeader; //cache styles rowsHeader
+    } else {
+      stylesRowsHeader = this._payloadCache.stylesRowsHeader;
+    }
+
+    if (!this._payloadCache.stylesFrozen) {
+      stylesFrozen = (this.stylesSetup.has(CellStyleEnum.Frozen) && this.stylesSetup.get(CellStyleEnum.Frozen)) ? { ...stylesAlternate, ...this.stylesSetup.get(CellStyleEnum.Frozen) } : stylesAlternate;
+      this._payloadCache.stylesFrozen = stylesFrozen; //cache styles frozen
+    } else {
+      stylesFrozen = this._payloadCache.stylesFrozen;
+    }
+
+    if (!this._payloadCache.stylesGroupLv0) {
+      stylesGroupLv0 = (this.stylesSetup.has(CellStyleEnum.Subtotal0) && this.stylesSetup.get(CellStyleEnum.Subtotal0)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal0) } : stylesFrozen;
+      this._payloadCache.stylesGroupLv0 = stylesGroupLv0;  //cache styles group lever 0
+    } else {
+      stylesGroupLv0 = this._payloadCache.stylesGroupLv0;
+    }
+
+    if (!this._payloadCache.stylesGroupLv1) {
+      stylesGroupLv1 = (this.stylesSetup.has(CellStyleEnum.Subtotal1) && this.stylesSetup.get(CellStyleEnum.Subtotal1)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal1) } : stylesFrozen;
+      this._payloadCache.stylesGroupLv1 = stylesGroupLv1;  //cache styles group lever 1
+    } else {
+      stylesGroupLv1 = this._payloadCache.stylesGroupLv1;
+    }
+
+    if (!this._payloadCache.stylesGroupLv2) {
+      stylesGroupLv2 = (this.stylesSetup.has(CellStyleEnum.Subtotal2) && this.stylesSetup.get(CellStyleEnum.Subtotal2)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal2) } : stylesFrozen;
+      this._payloadCache.stylesGroupLv2 = stylesGroupLv2;  //cache styles group lever 2
+    } else {
+      stylesGroupLv2 = this._payloadCache.stylesGroupLv2;
+    }
+
+    if (!this._payloadCache.stylesGroupLv3) {
+      stylesGroupLv3 = (this.stylesSetup.has(CellStyleEnum.Subtotal3) && this.stylesSetup.get(CellStyleEnum.Subtotal3)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal3) } : stylesFrozen;
+      this._payloadCache.stylesGroupLv3 = stylesGroupLv3; //cache styles group lever 3
+    } else {
+      stylesGroupLv3 = this._payloadCache.stylesGroupLv3;
+    }
+
+    if (!this._payloadCache.stylesGroupLv4) {
+      stylesGroupLv4 = (this.stylesSetup.has(CellStyleEnum.Subtotal4) && this.stylesSetup.get(CellStyleEnum.Subtotal4)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal4) } : stylesFrozen;
+      this._payloadCache.stylesGroupLv4 = stylesGroupLv4; //cache styles group lever 4
+    } else {
+      stylesGroupLv4 = this._payloadCache.stylesGroupLv4;
+    }
+
+    if (!this._payloadCache.stylesGroupLv5) {
+      stylesGroupLv5 = (this.stylesSetup.has(CellStyleEnum.Subtotal5) && this.stylesSetup.get(CellStyleEnum.Subtotal5)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal5) } : stylesFrozen;
+      this._payloadCache.stylesGroupLv5 = stylesGroupLv5;  //cache styles group lever 5
+    } else {
+      stylesGroupLv5 = this._payloadCache.stylesGroupLv5;
+    }
     switch (panel.cellType) {
       case CellType.Cell:
-        this._bgColorSetup = getBgRectFormStylesSetup(stylesNormal);
-        this._stylesTextSetup = { ...this._stylesTextBase, ...getStylesAcceptTextSvg(stylesNormal) } || this._stylesTextBase;
+        this._bgColorSetup = getBgRectFromStylesSetup(stylesNormal);
+        this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesNormal);
+        this._stylesTextSetup = getAcceptStylesTextSvg(stylesNormal);
         //case alternating row
         if (this.flexGrid.showAlternatingRows) {
           let isAlternate = false;
@@ -793,65 +862,80 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             rowAlternate == 1 && (isAlternate = !isAlternate);
           }
           if (isAlternate) {
-            this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesAlternate) };
-            this._bgColorSetup = getBgRectFormStylesSetup(stylesAlternate);;
+            this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesAlternate);
+            this._stylesTextSetup = getAcceptStylesTextSvg(stylesAlternate);
+            this._bgColorSetup = getBgRectFromStylesSetup(stylesAlternate);;
           }
         }
         //case frozen
         if (currentRow < panel.rows.frozen || currentCol < panel.columns.frozen) {
-          this._bgColorSetup = getBgRectFormStylesSetup(stylesFrozen);;;
-          this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesFrozen) };
+          this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesFrozen);
+          this._bgColorSetup = getBgRectFromStylesSetup(stylesFrozen);
+          this._stylesTextSetup = getAcceptStylesTextSvg(stylesFrozen);
         }
         //case row group by level
         if (this._payloadCache.isRowGroup) {
           switch ((panel.rows[currentRow] as GroupRow).level) {
             case 0:
-              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv0);
-              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv0) };
+              this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesGroupLv0);
+              this._bgColorSetup = getBgRectFromStylesSetup(stylesGroupLv0);
+              this._stylesTextSetup = getAcceptStylesTextSvg(stylesGroupLv0);
               break;
             case 1:
-              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv1);
-              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv1) };
+              this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesGroupLv1);
+              this._bgColorSetup = getBgRectFromStylesSetup(stylesGroupLv1);
+              this._stylesTextSetup = getAcceptStylesTextSvg(stylesGroupLv1);
               break;
             case 2:
-              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv2);
-              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv2) };
+              this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesGroupLv2);
+              this._bgColorSetup = getBgRectFromStylesSetup(stylesGroupLv2);
+              this._stylesTextSetup = getAcceptStylesTextSvg(stylesGroupLv2);
               break;
             case 3:
-              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv3);
-              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv3) };
+              this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesGroupLv3);
+              this._bgColorSetup = getBgRectFromStylesSetup(stylesGroupLv3);
+              this._stylesTextSetup = getAcceptStylesTextSvg(stylesGroupLv3);
               break;
             case 4:
-              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv4);
-              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv4) };
+              this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesGroupLv4);
+              this._bgColorSetup = getBgRectFromStylesSetup(stylesGroupLv4);
+              this._stylesTextSetup = getAcceptStylesTextSvg(stylesGroupLv4);
               break;
             case 5:
-              this._bgColorSetup = getBgRectFormStylesSetup(stylesGroupLv5);
-              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesGroupLv5) };
+              this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesGroupLv5);
+              this._bgColorSetup = getBgRectFromStylesSetup(stylesGroupLv5);
+              this._stylesTextSetup = getAcceptStylesTextSvg(stylesGroupLv5);
               break;
             default:
-              this._bgColorSetup = getBgRectFormStylesSetup(stylesFrozen);
-              this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesFrozen) };
+              this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesFrozen);
+              this._bgColorSetup = getBgRectFromStylesSetup(stylesFrozen);
+              this._stylesTextSetup = getAcceptStylesTextSvg(stylesFrozen);
           }
         }
         break;
       case CellType.ColumnHeader:
-        this._bgColorSetup = getBgRectFormStylesSetup(stylesColsHeader);
-        this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesColsHeader) };
+        this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesColsHeader);
+        this._bgColorSetup = getBgRectFromStylesSetup(stylesColsHeader);
+        this._stylesTextSetup = getAcceptStylesTextSvg(stylesColsHeader);
         break;
       case CellType.ColumnFooter:
-        this._bgColorSetup = getBgRectFormStylesSetup(stylesColsFooter);
-        this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesColsFooter) };
+        this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesColsFooter);
+        this._bgColorSetup = getBgRectFromStylesSetup(stylesColsFooter);
+        this._stylesTextSetup = getAcceptStylesTextSvg(stylesColsFooter);
         break;
       case CellType.RowHeader:
       case CellType.TopLeft:
-        this._bgColorSetup = getBgRectFormStylesSetup(stylesRowsHeader);
-        this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesRowsHeader) };
+        this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesRowsHeader);
+        this._bgColorSetup = getBgRectFromStylesSetup(stylesRowsHeader);
+        this._stylesTextSetup = getAcceptStylesTextSvg(stylesRowsHeader);
         break;
       default:
-        this._bgColorSetup = getBgRectFormStylesSetup(stylesNormal);
-        this._stylesTextSetup = { ...getStylesAcceptTextSvg(stylesNormal) };
+        this._stylesBorderSetup = getAcceptStylesBorderSvg(stylesNormal);
+        this._bgColorSetup = getBgRectFromStylesSetup(stylesNormal);
+        this._stylesTextSetup = getAcceptStylesTextSvg(stylesNormal);
         break;
     }
   }
+
+
 }

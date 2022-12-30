@@ -2,6 +2,33 @@ import { Point, Rect } from '@grapecity/wijmo';
 import { CellRange, GridPanel } from '@grapecity/wijmo.grid';
 import { BravoTextMetrics } from '../bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
 
+export const textAttributes = new Set([
+  'color',
+  'font-family',
+  'font-size',
+  'font-size-adjust',
+  'font-stretch',
+  'font-style',
+  'font-variant',
+  'font-weight',
+  'direction',
+  'letter-spacing',
+  'text-decoration',
+  'text-decoration',
+  'text-rendering',
+  'unicode-bidi',
+  'word-spacing',
+  'writing-mode',
+  'user-select', 'white-space'
+] as const);
+
+export const borderAttributes = new Set([
+  'border-right-width',
+  'border-right-color',
+  'border-bottom-width',
+  'border-bottom-color'
+] as const);
+
 export enum TextAlign {
   Left = 'left',
   Center = 'center',
@@ -40,7 +67,18 @@ export type PayloadCache = {
   cellRange: CellRange;
   cellValue: any;
   isRowGroup: boolean;
-  sepAlternate: number;
+  stylesNormal: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesAlternate: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesColsHeader: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesColsFooter: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesRowsHeader: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesFrozen: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesGroupLv0: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesGroupLv1: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesGroupLv2: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesGroupLv3: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesGroupLv4: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesGroupLv5: Record<string, string> | CSSStyleDeclaration | undefined;
 };
 export type CellPadding = {
   paddingLeft: number;

@@ -1,7 +1,7 @@
 import * as wjChart from '@grapecity/wijmo.chart';
 import { isFlexDirectionRow, isFloatLeft, isFloatRight, isInFlow, isInline } from './core/css.util';
-import { textAttributes } from './core/text.util';
-import { ISiblings } from './core/type.util';
+
+import { ISiblings, textAttributes } from './core/type.util';
 type Align = 'LeftTop' |
   'LeftCenter' |
   'LeftBottom' |

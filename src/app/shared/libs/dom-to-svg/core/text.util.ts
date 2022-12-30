@@ -1,24 +1,6 @@
 import { camelCase } from "./svg.engine.util";
+import { textAttributes } from "./type.util";
 
-export const textAttributes = new Set([
-  'color',
-  'font-family',
-  'font-size',
-  'font-size-adjust',
-  'font-stretch',
-  'font-style',
-  'font-variant',
-  'font-weight',
-  'direction',
-  'letter-spacing',
-  'text-decoration',
-  'text-decoration',
-  'text-rendering',
-  'unicode-bidi',
-  'word-spacing',
-  'writing-mode',
-  'user-select', 'white-space'
-] as const);
 
 export function copyTextStylesSvg(svgElement: SVGElement, styles: CSSStyleDeclaration): void {
   for (const textProperty of textAttributes) {
@@ -30,7 +12,7 @@ export function copyTextStylesSvg(svgElement: SVGElement, styles: CSSStyleDeclar
   svgElement.setAttribute('fill', styles.color);
 }
 
-export function applyTextSvgStylesRaw(svgElement: SVGElement, styles: Record<string, string>) {
+export function applyStylesTextSvgRaw(svgElement: SVGElement, styles: Record<string, string>) {
   for (const textProperty of textAttributes) {
     const value = styles[camelCase(textProperty)] || '';
     value && svgElement.setAttribute(textProperty, value);
@@ -38,7 +20,7 @@ export function applyTextSvgStylesRaw(svgElement: SVGElement, styles: Record<str
   svgElement.setAttribute('fill', styles['color']);
 }
 
-export function getStylesAcceptTextSvg(styles: CSSStyleDeclaration | Record<string, string>): Record<string, string> {
+export function getAcceptStylesTextSvg(styles: CSSStyleDeclaration | Record<string, string>): Record<string, string> {
   const stylesText: Record<string, string> = {};
   for (const textProperty of textAttributes) {
     let value = '';
