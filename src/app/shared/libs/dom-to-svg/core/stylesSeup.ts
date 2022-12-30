@@ -6,6 +6,7 @@ export const normalStyles: Record<string, string> = {
   borderBottomColor: 'rgba(0,0,0,.2)',
   borderRightColor: 'rgba(0,0,0,.2)',
   lineHeight: 'normal',
+  fontFamily: 'Segoe UI,Tahoma,Geneva,Verdana,sans-serif',
   fontWeight: 'normal',
   fontSize: '16px',
 };

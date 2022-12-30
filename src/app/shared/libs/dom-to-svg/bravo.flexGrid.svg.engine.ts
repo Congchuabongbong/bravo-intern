@@ -937,6 +937,4 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         break;
     }
   }
-
-
 }
