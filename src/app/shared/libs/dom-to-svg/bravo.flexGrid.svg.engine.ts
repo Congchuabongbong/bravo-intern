@@ -34,8 +34,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const { x: xCaptureElement, y: yCaptureElement } = this.captureElement.getBoundingClientRect();
     this.captureElementCoordinates = new Point(xCaptureElement, yCaptureElement);
     this._stylesBase = getComputedStyle(this.flexGrid.hostElement);
-    this._stylesTextBase = getAcceptStylesTextSvg(getComputedStyle(this.flexGrid.hostElement));
-
     //test setup styles
     this.stylesSetup.set(CellStyleEnum.Normal, normalStyles);
     this.stylesSetup.set(CellStyleEnum.Fixed, fixedStyles);
@@ -450,7 +448,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   //**Draw raw svg start here:
   //**declared property here */
-  private readonly _stylesTextBase!: Record<string, string>;
   private _stylesBase!: CSSStyleDeclaration;
   private _stylesTextSetup!: Record<string, string>;
   private _stylesBorderSetup!: Record<string, string>;
@@ -545,7 +542,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._payloadCache.cellRange = cellRange;
         this._payloadCache.cellValue = cellValue;
         this._payloadCache.isRowGroup = panel.rows[rowIndex] instanceof GroupRow;
-        this._applyStyleSetup(); // apply style setup to set bg, styles text,...
+        /*
+          apply style setup to set bg, styles text,...
+          !apply style run after cache data
+        */
+        this._applyStyleSetup();
         /* đẩy header và body and footer với chiều cao tương ứng */
         if (panel.cellType === CellType.Cell) {
           cellBoundingRect.top += this.flexGrid.columnHeaders.height;
@@ -810,42 +811,42 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
     if (!this._payloadCache.stylesGroupLv0) {
       stylesGroupLv0 = (this.stylesSetup.has(CellStyleEnum.Subtotal0) && this.stylesSetup.get(CellStyleEnum.Subtotal0)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal0) } : stylesFrozen;
-      this._payloadCache.stylesGroupLv0 = stylesGroupLv0;  //cache styles group lever 0
+      this._payloadCache.stylesGroupLv0 = stylesGroupLv0;  //cache styles group level 0
     } else {
       stylesGroupLv0 = this._payloadCache.stylesGroupLv0;
     }
 
     if (!this._payloadCache.stylesGroupLv1) {
       stylesGroupLv1 = (this.stylesSetup.has(CellStyleEnum.Subtotal1) && this.stylesSetup.get(CellStyleEnum.Subtotal1)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal1) } : stylesFrozen;
-      this._payloadCache.stylesGroupLv1 = stylesGroupLv1;  //cache styles group lever 1
+      this._payloadCache.stylesGroupLv1 = stylesGroupLv1;  //cache styles group level 1
     } else {
       stylesGroupLv1 = this._payloadCache.stylesGroupLv1;
     }
 
     if (!this._payloadCache.stylesGroupLv2) {
       stylesGroupLv2 = (this.stylesSetup.has(CellStyleEnum.Subtotal2) && this.stylesSetup.get(CellStyleEnum.Subtotal2)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal2) } : stylesFrozen;
-      this._payloadCache.stylesGroupLv2 = stylesGroupLv2;  //cache styles group lever 2
+      this._payloadCache.stylesGroupLv2 = stylesGroupLv2;  //cache styles group level 2
     } else {
       stylesGroupLv2 = this._payloadCache.stylesGroupLv2;
     }
 
     if (!this._payloadCache.stylesGroupLv3) {
       stylesGroupLv3 = (this.stylesSetup.has(CellStyleEnum.Subtotal3) && this.stylesSetup.get(CellStyleEnum.Subtotal3)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal3) } : stylesFrozen;
-      this._payloadCache.stylesGroupLv3 = stylesGroupLv3; //cache styles group lever 3
+      this._payloadCache.stylesGroupLv3 = stylesGroupLv3; //cache styles group level 3
     } else {
       stylesGroupLv3 = this._payloadCache.stylesGroupLv3;
     }
 
     if (!this._payloadCache.stylesGroupLv4) {
       stylesGroupLv4 = (this.stylesSetup.has(CellStyleEnum.Subtotal4) && this.stylesSetup.get(CellStyleEnum.Subtotal4)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal4) } : stylesFrozen;
-      this._payloadCache.stylesGroupLv4 = stylesGroupLv4; //cache styles group lever 4
+      this._payloadCache.stylesGroupLv4 = stylesGroupLv4; //cache styles group level 4
     } else {
       stylesGroupLv4 = this._payloadCache.stylesGroupLv4;
     }
 
     if (!this._payloadCache.stylesGroupLv5) {
       stylesGroupLv5 = (this.stylesSetup.has(CellStyleEnum.Subtotal5) && this.stylesSetup.get(CellStyleEnum.Subtotal5)) ? { ...stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal5) } : stylesFrozen;
-      this._payloadCache.stylesGroupLv5 = stylesGroupLv5;  //cache styles group lever 5
+      this._payloadCache.stylesGroupLv5 = stylesGroupLv5;  //cache styles group level 5
     } else {
       stylesGroupLv5 = this._payloadCache.stylesGroupLv5;
     }

@@ -12,26 +12,22 @@ export const normalStyles: Record<string, string> = {
 
 export const alternateStyles: Record<string, string> = {
   backgroundColor: '#b7c4cf',
-  fontWeight: '500',
+  fontWeight: '400',
 };
 
 export const subtotal0Styles: Record<string, string> = {
+  fontWeight: '500',
   backgroundColor: '#FFF6BD',
-
 };
 export const subtotal1Styles: Record<string, string> = {
-  color: '#FF597B',
+  fontWeight: '600',
   backgroundColor: '#FBC252'
 };
 
 
 export const frozenStyles: Record<string, string> = {
   backgroundColor: '#b3ffae',
-  fontWeight: '500',
-  borderBottomWidth: '3px',
-  borderRightWidth: '3px',
-  borderBottomColor: '#D09CFA',
-  borderRightColor: '#D09CFA',
+  fontWeight: '400',
 };
 
 export const fixedStyles: Record<string, string> = {
