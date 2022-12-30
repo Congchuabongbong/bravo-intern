@@ -559,12 +559,12 @@ export class ControlGridDataLayoutPanelComponent
     this.svgEngine.isRawValue = false;
     const svg = this.svgEngine.renderFlexSvgRaw();
     this.svgContainer.nativeElement.style.display = 'block';
-    // const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    // const alink = document.createElement('a');
-    // const event = new MouseEvent('click');
-    // alink.download = 'download.svg';
-    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    // alink.dispatchEvent(event);
+    const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    const alink = document.createElement('a');
+    const event = new MouseEvent('click');
+    alink.download = 'download.svg';
+    alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    alink.dispatchEvent(event);
   }
 
 
