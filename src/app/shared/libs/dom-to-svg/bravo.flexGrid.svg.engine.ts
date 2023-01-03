@@ -12,7 +12,6 @@ import { creatorSVG, declareNamespaceSvg, drawImage, drawText, getAcceptStylesBo
 import { BehaviorText, CellPadding, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
 export class _NewRowTemplate extends Row {
 }
-
 /**
  * @desc: dùng kiết xuất ra flex grid svg thô hoặc chụp lại phần nhìn thấy của flex grid
  * @extends: BravoSvgEngine
@@ -57,7 +56,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     _boundingRect.top -= this.captureElementCoordinates.y;
     return _boundingRect;
   }
-
   /**
    * @desc: Hàm này dùng để export ra svg nhìn thấy được trong flex grid
    * @return : SvgElement
@@ -91,7 +89,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       this._payloadCache = {} as PayloadCache;
     }
   }
-
   /**
      * @desc: vẽ các cột bị pin hoặc đóng băng (frozen)
      * @pram pPanel: GridPanel
@@ -106,7 +103,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const _viewRange = new CellRange(_nRow, 0, _nRow2, this.flexGrid.columns.frozen - 1);
     this._drawCellPanel(pPanel, _viewRange);
   }
-
   /**
     * @desc: vẽ border theo styles của cell trong flex
  */
@@ -134,8 +130,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       _lineSvgEl.setAttribute('stroke', _borders['borderLeftColor']);
     }
   }
-
-
   /**
      * @desc: dùng để vẽ theo cell Panel : cells, columnsHeader,columnsFooter,...
      * @pram pPanel: GridPanel, pViewRange(optional): CellRange
@@ -181,7 +175,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       }
     }
   }
-
   /**
      * @desc: dùng để vẽ rectangle svg theo kích thước và tọa độ của cell
   */
@@ -196,7 +189,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     */
     this._scanCell(this._payloadCache.cellElement);
   }
-
   /**
      * @desc: dùng để quét và vẽ các phần tử con theo các trường hợp tương ứng như image,button,text node,etc...
      * @param pElScanned: Element (phần tử được quét)
@@ -222,14 +214,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       });
     }
   }
-
   //*Handle and draw Text Here:
-
   /**
     * @desc: expensive function dùng để tính toán hành vi (tọa độ, điểm vẽ, hướng vẽ,...) của text node dựa trên tọa độ, kích thước của phần tử cha
     * @param pTextNode: Text
     * @returns: BehaviorText
- */
+  */
   private _calculateBehaviorTextNode(pTextNode: Text): BehaviorText {
     try {
       const { parentBoundingRect: _parentBoundingRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode);
@@ -292,7 +282,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when trying to calculate position text node!');
     }
   };
-
   /**
    * @description: Kiểm tra xem liệu chiều rộng của text node có vừa với chiều rộng của node chứa nó hay không
    * @param: pTextNode: Text, pbBreakWords: boolean
@@ -311,7 +300,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when check the width of the text content to see if it fits the width of the parent!');
     }
   }
-
   /**
     * @description: một expensive function, dùng để tính toán kích thước của text node dựa trến content của text node và font và kích thước của phần tử chá
     * @param: pTextNode: Text, pbBreakWords: boolean
@@ -329,7 +317,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when calculate  width of the text content!');
     }
   }
-
   /**
    * @description: Dùng để vẽ text node trong cell dựa trên behavior của text node
    * @param: pTextNode: Text
@@ -370,7 +357,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when draw text in cell!!');
     }
   }
-
   /**
   * @description: Dùng để bọc svg bên ngoài text svg trong trường hợp width cửa text dài hơn chiều rộng của phần tử chứa
   * @param: pTextNode: Text
@@ -404,7 +390,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       _rectSvg.x = this._payloadCache.behaviorText.point.x;
       _rectSvg.y = this._payloadCache.behaviorText.point.y;
       const _svgWrapText = creatorSVG(_rectSvg, true);
-
       //draw text
       let _ztextContent = pTextNode.textContent || '';
       if (!this.isFirstNode(pTextNode, Node.TEXT_NODE)) {
@@ -421,7 +406,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Something wrong when wrap text in svg');
     }
   }
-
   //*util methods
   /**
     * @description:(expensive funtion) dùng để tính toán tổng chiều rộng của các phần tử anh chị em bên trái hoặc bên phải
@@ -707,7 +691,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       }
     }
   }
-
   /**
   * @desc: vẽ rectangle svg theo thông số của cell.
   */
@@ -835,7 +818,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when trying to calculate position text node!');
     }
   }
-
   /**
    * @description: Dùng để vẽ text node trong cell dựa trên behavior
    * @return: SVGElement | null
@@ -855,7 +837,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this._payloadCache.group.appendChild(_textSvgEl);
     return _textSvgEl as SVGElement;
   }
-
   /**
   * @description: Dùng để bọc svg bên ngoài text svg trong trường hợp width cửa text dài hơn chiều rộng của cell
   * @return: SVGElement | null
@@ -891,7 +872,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Something wrong when wrap text raw in svg');
     }
   }
-
   /**
  * @description: Dùng để vẽ check box với những giá trị là boolean
  */
