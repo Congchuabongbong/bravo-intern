@@ -39,3 +39,7 @@ export const fixedStyles: Record<string, string> = {
 export const rowsHeaderStyles: Record<string, string> = {
   backgroundColor: '#dfe3e8',
 };
+
+export const newRowStyes: Record<string, string> = {
+
+};

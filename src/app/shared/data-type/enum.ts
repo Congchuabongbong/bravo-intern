@@ -1,12 +1,12 @@
 export enum CellStyleEnum {
-  Normal = 0, // cells //x
+  Normal = 0,
   Alternate = 1,
-  Fixed = 2, // ColumnsHeader
+  Fixed = 2,
   Highlight = 3,
   Focus = 4,
   Editor = 5,
   Search = 6,
-  Frozen = 7, //x
+  Frozen = 7,
   FrozenAlternate = 8,
   NewRow = 9,
   EmptyArea = 10,

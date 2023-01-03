@@ -80,7 +80,6 @@ export class ControlGridDataLayoutPanelComponent
   //**Initialized */
   public flexMainInitialized(flexGrid: FlexGrid) {
     this.flex = flexGrid;
-
     var extraRow = new Row();
     extraRow.allowMerging = true;
     //
@@ -556,15 +555,15 @@ export class ControlGridDataLayoutPanelComponent
   public svgEngine!: FlexGridSvgEngine;
   public onExportSvgAction() {
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
-    this.svgEngine.isRawValue = false;
+    this.svgEngine.isRawValue = true;
     const svg = this.svgEngine.renderFlexSvgRaw();
     this.svgContainer.nativeElement.style.display = 'block';
-    const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    const alink = document.createElement('a');
-    const event = new MouseEvent('click');
-    alink.download = 'download.svg';
-    alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    alink.dispatchEvent(event);
+    // const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    // const alink = document.createElement('a');
+    // const event = new MouseEvent('click');
+    // alink.download = 'download.svg';
+    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    // alink.dispatchEvent(event);
   }
 
 

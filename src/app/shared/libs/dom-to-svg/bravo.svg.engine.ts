@@ -154,92 +154,92 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     });
   }
 
-  public applyTextStyles(svgElement: SVGElement, styles: CSSStyleDeclaration): void {
+  public applyTextStyles(pSvgElement: SVGElement, pStyles: CSSStyleDeclaration): void {
     for (const textProperty of textAttributes) {
-      const value = styles.getPropertyValue(textProperty);
+      const value = pStyles.getPropertyValue(textProperty);
       if (value) {
-        svgElement.setAttribute(textProperty, value);
+        pSvgElement.setAttribute(textProperty, value);
       }
     }
-    svgElement.setAttribute('fill', styles.color);
+    pSvgElement.setAttribute('fill', pStyles.color);
   }
 
   //*scan sibling node nếu nó là inline hoặc flex direction rows hoặc float
-  public scanSiblingsNode(node: Node): ISiblings {
-    const leftSideCurrentNode: ChildNode[] = [];
-    const rightSideCurrentNode: ChildNode[] = [];
-    if (!node.parentNode) return { leftSideCurrentNode, rightSideCurrentNode };
-    const parentStyles = getComputedStyle(node.parentNode as Element);
-    let nextSibling = node.nextSibling;
-    let previousSibling = node.previousSibling;
-    //case next sibling node
-    if (node.parentNode.lastChild !== node) {
-      while (nextSibling) {
-        switch (nextSibling.nodeType) {
+  public scanSiblingsNode(pNode: Node): ISiblings {
+    const _leftSideCurrentNode: ChildNode[] = [];
+    const _rightSideCurrentNode: ChildNode[] = [];
+    if (!pNode.parentNode) return { leftSideCurrentNode: _leftSideCurrentNode, rightSideCurrentNode: _rightSideCurrentNode };
+    const parentStyles = getComputedStyle(pNode.parentNode as Element);
+    let _nextSibling = pNode.nextSibling;
+    let _previousSibling = pNode.previousSibling;
+    //case next sibling pNode
+    if (pNode.parentNode.lastChild !== pNode) {
+      while (_nextSibling) {
+        switch (_nextSibling.nodeType) {
           case Node.COMMENT_NODE:
             break;
           case Node.TEXT_NODE:
-            rightSideCurrentNode.push(nextSibling);
+            _rightSideCurrentNode.push(_nextSibling);
             break;
           case Node.ELEMENT_NODE:
-            const computedNode = getComputedStyle(nextSibling as Element);
+            const computedNode = getComputedStyle(_nextSibling as Element);
             if (isInFlow(computedNode) || isFlexDirectionRow(parentStyles) || isInline(computedNode)) {
-              isFloatLeft(computedNode) ? leftSideCurrentNode.push(nextSibling) : rightSideCurrentNode.push(nextSibling);
+              isFloatLeft(computedNode) ? _leftSideCurrentNode.push(_nextSibling) : _rightSideCurrentNode.push(_nextSibling);
             }
             break;
           default:
             break;
         }
-        nextSibling = nextSibling.nextSibling;
+        _nextSibling = _nextSibling.nextSibling;
       }
     }
     //case previous sibling node
-    if (node.parentNode.firstChild !== node) {
-      while (previousSibling) {
-        switch (previousSibling.nodeType) {
+    if (pNode.parentNode.firstChild !== pNode) {
+      while (_previousSibling) {
+        switch (_previousSibling.nodeType) {
           case Node.COMMENT_NODE:
             break;
           case Node.TEXT_NODE:
-            leftSideCurrentNode.push(previousSibling);
+            _leftSideCurrentNode.push(_previousSibling);
             break;
           case Node.ELEMENT_NODE:
-            const computedNode = getComputedStyle(previousSibling as Element);
+            const computedNode = getComputedStyle(_previousSibling as Element);
             if (isInFlow(computedNode) || isFlexDirectionRow(parentStyles) || isInline(computedNode)) {
-              isFloatRight(computedNode) ? rightSideCurrentNode.push(previousSibling) : leftSideCurrentNode.push(previousSibling);
+              isFloatRight(computedNode) ? _rightSideCurrentNode.push(_previousSibling) : _leftSideCurrentNode.push(_previousSibling);
             }
             break;
           default:
             break;
         }
-        previousSibling = previousSibling.previousSibling;
+        _previousSibling = _previousSibling.previousSibling;
       }
     }
-    return { leftSideCurrentNode, rightSideCurrentNode };
+    return { leftSideCurrentNode: _leftSideCurrentNode, rightSideCurrentNode: _rightSideCurrentNode };
   }
 
-  public isFirstNode(node: Node, type: number): boolean {
-    const parentNode = node.parentNode;
-    if (!parentNode) return false;
-    let firstChild = parentNode.firstChild || node;
-    while (firstChild.nodeType !== type) {
-      if (!firstChild.nextSibling) return false;
-      firstChild = firstChild.nextSibling;
+  public isFirstNode(pNode: Node, pnType: number): boolean {
+    const _parentNode = pNode.parentNode;
+    if (!_parentNode) return false;
+    let _firstChild = _parentNode.firstChild || pNode;
+    while (_firstChild.nodeType !== pnType) {
+      if (!_firstChild.nextSibling) return false;
+      _firstChild = _firstChild.nextSibling;
     }
-    return firstChild === node;
+    return _firstChild === pNode;
   };
 
-  public isLastNode(node: Node, type: number): boolean {
-    const parentNode = node.parentNode;
-    if (!parentNode) return false;
-    let lastChild = parentNode.lastChild || node;
-    while (lastChild.nodeType !== type) {
+  public isLastNode(pNode: Node, pnType: number): boolean {
+    const _parentNode = pNode.parentNode;
+    if (!_parentNode) return false;
+    let lastChild = _parentNode.lastChild || pNode;
+    while (lastChild.nodeType !== pnType) {
       if (!lastChild.previousSibling) return false;
       lastChild = lastChild.previousSibling;
     }
-    return lastChild === node;
+    return lastChild === pNode;
   };
 
-  public isOnlyNode(node: Node, type: number): boolean {
-    return this.isFirstNode(node, type) && this.isLastNode(node, type);
+  public isOnlyNode(pNode: Node, pnType: number): boolean {
+    return this.isFirstNode(pNode, pnType) && this.isLastNode(pNode, pnType);
   }
 }

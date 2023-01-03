@@ -73,6 +73,7 @@ export type PayloadCache = {
   stylesColsFooter: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesRowsHeader: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesFrozen: Record<string, string> | CSSStyleDeclaration | undefined;
+  stylesNewRow: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesGroupLv0: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesGroupLv1: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesGroupLv2: Record<string, string> | CSSStyleDeclaration | undefined;
