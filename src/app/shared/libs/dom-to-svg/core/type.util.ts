@@ -55,7 +55,7 @@ export interface IFont {
   fontStyle: string;
 };
 
-export type PayloadObj = {
+export type Payload = {
   panel: GridPanel;
   row: number;
   col: number;
@@ -63,20 +63,13 @@ export type PayloadObj = {
   cellStyles: CSSStyleDeclaration;
   cellBoundingRect: Rect;
   group: Element;
-};
-export type PayloadCache = {
-  panel: GridPanel;//x
-  row: number;//x
-  col: number;//x
-  cellElement: HTMLElement; //x
-  cellStyles: CSSStyleDeclaration; //x
-  cellBoundingRect: Rect;//x
-  group: Element;//x
-  cellRange: CellRange;//remove
-  cellValue: any; //remove
-  isRowGroup: boolean; //remove
   dimensionText: BravoTextMetrics | undefined,
   behaviorText: BehaviorText;
+  cellRange: CellRange;
+  cellValue: any;
+  isRowGroup: boolean;
+};
+export type StylesCache = {
   stylesNormal: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesAlternate: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesColsHeader: Record<string, string> | CSSStyleDeclaration | undefined;
@@ -97,7 +90,7 @@ export type CellPadding = {
   paddingTop: number;
   paddingBottom: number;
 };
-export interface IPayloadEvent extends Pick<PayloadCache, 'panel' | 'row' | 'col' | 'cellValue'> {
+export interface IPayloadEvent extends Pick<Payload, 'panel' | 'row' | 'col' | 'cellValue'> {
   svgDrew?: Element;
 }
 

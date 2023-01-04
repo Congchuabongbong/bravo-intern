@@ -39,7 +39,6 @@ export function setAttrSvgIcon(pSvg: SVGElement, pnX: number, pnY: number, pnWid
   pSvg.setAttribute('y', pnY.toString());
 }
 
-
 export function setViewportSize(pSvg: SVGElement, pnWidth: number, pnHeight: number) {
   pSvg.setAttribute('width', pnWidth.toString());
   pSvg.setAttribute('height', pnHeight.toString());
