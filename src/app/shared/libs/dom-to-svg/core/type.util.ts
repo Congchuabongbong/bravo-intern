@@ -54,7 +54,8 @@ export interface IFont {
   fontSize: number | string;
   fontStyle: string;
 };
-export type PayloadCache = {
+
+export type PayloadObj = {
   panel: GridPanel;
   row: number;
   col: number;
@@ -62,11 +63,20 @@ export type PayloadCache = {
   cellStyles: CSSStyleDeclaration;
   cellBoundingRect: Rect;
   group: Element;
+};
+export type PayloadCache = {
+  panel: GridPanel;//x
+  row: number;//x
+  col: number;//x
+  cellElement: HTMLElement; //x
+  cellStyles: CSSStyleDeclaration; //x
+  cellBoundingRect: Rect;//x
+  group: Element;//x
+  cellRange: CellRange;//remove
+  cellValue: any; //remove
+  isRowGroup: boolean; //remove
   dimensionText: BravoTextMetrics | undefined,
   behaviorText: BehaviorText;
-  cellRange: CellRange;
-  cellValue: any;
-  isRowGroup: boolean;
   stylesNormal: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesAlternate: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesColsHeader: Record<string, string> | CSSStyleDeclaration | undefined;

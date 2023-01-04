@@ -32,6 +32,14 @@ export function creatorSVG(pRect?: Partial<DOMRect>, pbIsDeclareNamespaceSvg?: b
   pbIsDeclareNamespaceSvg && declareNamespaceSvg(_svg);
   return _svg;
 }
+export function setAttrSvgIcon(pSvg: SVGElement, pnX: number, pnY: number, pnWidth: number, pnHeight: number) {
+  pSvg.setAttribute('width', pnWidth.toString());
+  pSvg.setAttribute('height', pnHeight.toString());
+  pSvg.setAttribute('x', pnX.toString());
+  pSvg.setAttribute('y', pnY.toString());
+}
+
+
 export function setViewportSize(pSvg: SVGElement, pnWidth: number, pnHeight: number) {
   pSvg.setAttribute('width', pnWidth.toString());
   pSvg.setAttribute('height', pnHeight.toString());

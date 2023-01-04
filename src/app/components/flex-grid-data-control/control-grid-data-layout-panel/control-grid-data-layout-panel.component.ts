@@ -28,7 +28,12 @@ import { HttpLayoutService } from 'src/app/shared/services/http-layout.service';
 import { HttpProductService } from 'src/app/shared/services/http-product.service';
 import { WijFlexGridService } from 'src/app/shared/services/wij-flex-grid.service';
 // import { documentToSVG, elementToSVG, inlineResources } from 'dom-to-svg';
+import { HttpClient } from '@angular/common/http';
+import { DomSanitizer } from '@angular/platform-browser';
+import { CellStyleEnum } from 'src/app/shared/data-type/enum';
 import FlexGridSvgEngine from 'src/app/shared/libs/dom-to-svg/bravo.flexGrid.svg.engine';
+import { alternateStyles, fixedStyles, frozenStyles, normalStyles, rowsHeaderStyles, subtotal0Styles, subtotal1Styles } from 'src/app/shared/libs/dom-to-svg/core/stylesSeup';
+
 @Component({
   selector: 'app-control-grid-data-layout-panel',
   templateUrl: './control-grid-data-layout-panel.component.html',
@@ -65,7 +70,9 @@ export class ControlGridDataLayoutPanelComponent
     private _wijFlexGridService: WijFlexGridService,
     private _httpProductService: HttpProductService,
     private _httpLayoutService: HttpLayoutService,
-    private _el: ElementRef
+    private _httpService: HttpClient,
+    private _el: ElementRef,
+    private _sanitizer: DomSanitizer
   ) { }
 
   //**lifecycle hooks
@@ -554,16 +561,29 @@ export class ControlGridDataLayoutPanelComponent
   @ViewChild('svgContainer', { static: true }) svgContainer!: ElementRef;
   public svgEngine!: FlexGridSvgEngine;
   public onExportSvgAction() {
+    console.time("Second call");
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
     this.svgEngine.isRawValue = true;
-    const svg = this.svgEngine.renderFlexSvgRaw();
+    const stylesSetup = new Map<CellStyleEnum, Record<string, string>>;
+    stylesSetup.set(CellStyleEnum.Normal, normalStyles);
+    stylesSetup.set(CellStyleEnum.Fixed, fixedStyles);
+    stylesSetup.set(CellStyleEnum.Alternate, alternateStyles);
+    stylesSetup.set(CellStyleEnum.Subtotal0, subtotal0Styles);
+    stylesSetup.set(CellStyleEnum.Subtotal1, subtotal1Styles);
+    stylesSetup.set(CellStyleEnum.Frozen, frozenStyles);
+    stylesSetup.set(CellStyleEnum.RowHeader, rowsHeaderStyles);
+    this.svgEngine.stylesSetup = stylesSetup;
+    const svg = this.svgEngine.renderFlexSvgVisible();
     this.svgContainer.nativeElement.style.display = 'block';
+
+
     // const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
     // const alink = document.createElement('a');
     // const event = new MouseEvent('click');
     // alink.download = 'download.svg';
     // alink.href = 'data:image/svg+xml;base64,' + base64doc;
     // alink.dispatchEvent(event);
+    // console.timeEnd("Second call");
   }
 
 

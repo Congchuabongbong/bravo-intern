@@ -19,6 +19,8 @@ export const isHTMLInputElement = (pElement: Element): pElement is HTMLInputElem
   pElement.tagName === 'INPUT' && isHTMLElement(pElement);
 export const hasLabels = (pElement: HTMLElement): pElement is HTMLElement & Pick<HTMLInputElement, 'labels'> =>
   'labels' in pElement;
+export const isHTMLSpanElement = (pElement: Element) => pElement.tagName === 'SPAN' && isHTMLElement(pElement);
+export const isHTMLButtonElement = (pElement: Element) => pElement.tagName === 'BUTTON' && isHTMLElement(pElement);
 // SVG
 export const isSVGElement = (pElement: Element): pElement is SVGElement => pElement.namespaceURI === SVG_NAMESPACE;
 export const isSVGSVGElement = (pElement: Element): pElement is SVGSVGElement =>

@@ -6,11 +6,11 @@ import { Font } from './bravo-graphics/font';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
 import { BravoSvgEngine } from './bravo.svg.engine';
 import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
-import { isElement, isHTMLImageElement, isHTMLInputElement, isTextNode } from './core/dom.util';
-import { alternateStyles, fixedStyles, frozenStyles, normalStyles, rowsHeaderStyles, subtotal0Styles, subtotal1Styles } from './core/stylesSeup';
-import { creatorSVG, declareNamespaceSvg, drawImage, drawText, getAcceptStylesBorderSvg, getAcceptStylesTextSvg, getBgRectFromStylesSetup } from './core/svg.engine.util';
+import { isElement, isHTMLButtonElement, isHTMLImageElement, isHTMLInputElement, isHTMLSpanElement, isTextNode } from './core/dom.util';
+import { arrowDown, arrowUp, collapse, expand, inputChecked, inputUnchecked, pinned, unpinned } from './core/icons.svg';
+import { creatorSVG, declareNamespaceSvg, drawImage, drawText, getAcceptStylesBorderSvg, getAcceptStylesTextSvg, getBgRectFromStylesSetup, setAttrSvgIcon } from './core/svg.engine.util';
 import { BehaviorText, CellPadding, IPayloadEvent, ISiblings, PayloadCache, TextAlign } from './core/type.util';
-export class _NewRowTemplate extends Row {
+class _NewRowTemplate extends Row {
 }
 /**
  * @desc: dùng kiết xuất ra flex grid svg thô hoặc chụp lại phần nhìn thấy của flex grid
@@ -24,6 +24,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public flexGrid!: FlexGrid;
   public stylesSetup: Map<CellStyleEnum, Record<string, string>> = new Map<CellStyleEnum, Record<string, string>>();
   private _payloadCache!: PayloadCache;
+  private _parser!: DOMParser;
   //*constructor
   constructor(_anchorElement: HTMLElement, _flex: FlexGrid) {
     super(_anchorElement);
@@ -36,20 +37,13 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const { x: _xCaptureElement, y: _yCaptureElement } = this.captureElement.getBoundingClientRect();
     this.captureElementCoordinates = new Point(_xCaptureElement, _yCaptureElement);
     this._stylesBase = getComputedStyle(this.flexGrid.hostElement);
-    //test setup styles
-    this.stylesSetup.set(CellStyleEnum.Normal, normalStyles);
-    this.stylesSetup.set(CellStyleEnum.Fixed, fixedStyles);
-    this.stylesSetup.set(CellStyleEnum.Alternate, alternateStyles);
-    this.stylesSetup.set(CellStyleEnum.Subtotal0, subtotal0Styles);
-    this.stylesSetup.set(CellStyleEnum.Subtotal1, subtotal1Styles);
-    this.stylesSetup.set(CellStyleEnum.Frozen, frozenStyles);
-    this.stylesSetup.set(CellStyleEnum.RowHeader, rowsHeaderStyles);
+    this._parser = new DOMParser();
   }
   /**
-     * @desc: thay đổi gốc trục tọa độ của phần tử theo Dom  về gốc tọa độ của Svg
-     * @pram pElDOMRect : DOMRect (tọa độ của phần tử được vẽ)
-     * @return: Rect
-    */
+  * @desc: thay đổi gốc trục tọa độ của phần tử theo Dom  về gốc tọa độ của Svg
+  * @pram pElDOMRect : DOMRect (tọa độ của phần tử được vẽ)
+  * @return: Rect
+  */
   private _changeOriginCoordinates(pElDOMRect: DOMRect): Rect {
     const _boundingRect = Rect.fromBoundingRect(pElDOMRect);
     _boundingRect.left -= this.captureElementCoordinates.x;
@@ -131,20 +125,21 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
   /**
-     * @desc: dùng để vẽ theo cell Panel : cells, columnsHeader,columnsFooter,...
-     * @pram pPanel: GridPanel, pViewRange(optional): CellRange
+  * @desc: dùng để vẽ theo cell Panel : cells, columnsHeader,columnsFooter,...
+  * @pram pPanel: GridPanel, pViewRange(optional): CellRange
   */
   private _drawCellPanel(pPanel: GridPanel, pViewRange?: CellRange) {
     const { row: _nRowStart, row2: _nRowEnd, col: _nColStart, col2: _nColEnd } = pViewRange || pPanel.viewRange;
     //!initial Cache data
     this._payloadCache = {} as PayloadCache;
+    this._payloadCache.panel = pPanel;
     for (let _nColIndex = _nColStart; _nColIndex <= _nColEnd; _nColIndex++) {
       for (let _nRowIndex = _nRowStart; _nRowIndex <= _nRowEnd; _nRowIndex++) {
         let _cellEl = pPanel.getCellElement(_nRowIndex, _nColIndex);
         if (!_cellEl) continue;
         if ((_cellEl.className.includes('wj-group') || _cellEl.className.includes('wj-header') || _cellEl.className.includes('wj-footer')) && (pPanel.cellType === CellType.Cell || pPanel.cellType === CellType.ColumnHeader || pPanel.cellType === CellType.ColumnFooter)) {
           const cellRange = this.flexGrid.getMergedRange(pPanel, _nRowIndex, _nColIndex);
-          if (cellRange) {
+          if (cellRange && !cellRange.isSingleCell) {
             const columnStartGroup = cellRange.col;
             const rowStartGroup = cellRange.row;
             //column ignore when drew first time
@@ -169,6 +164,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._payloadCache.cellElement = _cellEl;
         this._payloadCache.cellStyles = getComputedStyle(_cellEl);
         this._payloadCache.cellBoundingRect = this._changeOriginCoordinates(_cellEl.getBoundingClientRect());
+        this._payloadCache.row = _nRowIndex;
+        this._payloadCache.col = _nColIndex;
         this._payloadCache.group = _groupSvgEl;
         this._drawRectCell();
         this.endGroup();
@@ -196,20 +193,32 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   private _scanCell(pElScanned: Element,) {
     if (pElScanned.hasChildNodes()) {
       pElScanned.childNodes.forEach((pNode: Node) => {
-        //? trường hợp là text node;
+        //?case text node;
         if (isTextNode(pNode)) {
           const _svgEl = this._drawTextNodeInCell(pNode);
           _svgEl && this._payloadCache.group.appendChild(_svgEl as Node);
         }
-        //?trường hợp là image;
+        //?case image;
         if (isHTMLImageElement(pNode as HTMLElement)) {
           const _svgEl = this._drawImageInCell(pNode as HTMLImageElement);
           _svgEl && this._payloadCache.group.appendChild(_svgEl as Node);
         }
-        //?trường hợp là input checkbox
+        //?case input checkbox
         if (isHTMLInputElement(pNode as Element)) { // case input checkbox
           this._drawCheckBox(pNode);
         };
+        //?case button pin
+        if (this.flexGrid.allowPinning && isHTMLButtonElement(pNode as Element) && (pNode as Element).className.includes('wj-elem-pin')) {
+          this._drawPin(pNode);
+        }
+        //?case collapse/expand
+        if (isHTMLButtonElement(pNode as Element) && (pNode as Element).className.includes('wj-elem-collapse')) {
+          this._drawGroupBtn(pNode);
+        }
+        //?case btn sort
+        if (this.flexGrid.allowSorting && isHTMLSpanElement(pNode as Element) && ((pNode as Element).className.includes('wj-glyph-up') || (pNode as Element).className.includes('wj-glyph-down'))) {
+          this._drawSortBtn(pNode);
+        }
         this._scanCell(pNode as Element);
       });
     }
@@ -242,8 +251,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       const _nXTextDefault = _parentBoundingRect.left + _nPaddingLeft;
       const _nYTextDefault = _parentBoundingRect.top + _nPaddingTop + _nDeviationHeight;
       /*
-        ?tạo default behavior text base.
-        ?default text alignment left and dominant baseline 'hanging', textAnchor: 'start'
+      ?tạo default behavior text base.
+      ?default text alignment left and dominant baseline 'hanging', textAnchor: 'start'
       */
       let _behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(_nXTextDefault, _nYTextDefault), textAnchor: 'start' };
       let _bIsFitContent: boolean = this._isTextNodeFitWidthCell(pTextNode);
@@ -289,12 +298,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   */
   private _isTextNodeFitWidthCell(pTextNode: Text): boolean {
     try {
-      const { parentBoundingRect, parentStyles } = this._getInformationParentNode(pTextNode);
-      const _nPaddingLeft = +parentStyles.paddingLeft.replace('px', '');
-      const _nPaddingRight = +parentStyles.paddingRight.replace('px', '');
+      const { parentBoundingRect: _parentBoundingRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode);
+      const _nPaddingLeft = +_parentStyles.paddingLeft.replace('px', '');
+      const _nPaddingRight = +_parentStyles.paddingRight.replace('px', '');
       const { leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth, rightTotalSiblingsWidth: _nRightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode);
       const _nTextWidth = this._payloadCache.dimensionText?.width || 0;
-      return _nTextWidth <= (parentBoundingRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight);
+      return _nTextWidth <= (_parentBoundingRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight);
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when check the width of the text content to see if it fits the width of the parent!');
@@ -322,7 +331,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
    * @param: pTextNode: Text
    * @return: SVGElement | null
   */
-  private _drawTextNodeInCell(pTextNode: Text,): SVGElement | null {
+  private _drawTextNodeInCell(pTextNode: Text): SVGElement | null {
     try {
       const { parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode);
       const _behaviorText: BehaviorText = this._calculateBehaviorTextNode(pTextNode) as BehaviorText;
@@ -346,11 +355,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         const _svgWrap = this._wrapTextNodeIntoSvg(pTextNode);
         return _svgWrap;
       }
-      let _ztextContent = pTextNode.textContent || '';
+      let _zTextContent = pTextNode.textContent || '';
+      if (_zTextContent === 'Parent Id ') debugger;
       if (!this.isFirstNode(pTextNode, Node.TEXT_NODE)) {
-        _ztextContent = ' '.concat(_ztextContent);
+        _zTextContent = ' '.concat(_zTextContent);
       }
-      const _textSvgEl = drawText((_ztextContent as string), this._payloadCache.behaviorText, _parentStyles, 'preserve');
+      const _textSvgEl = drawText((_zTextContent as string), this._payloadCache.behaviorText, _parentStyles, 'preserve');
       return _textSvgEl;
     } catch (error) {
       console.error(error);
@@ -514,14 +524,65 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     */
   private _drawCheckBox(pNode: Node) {
     const _inputNode = pNode as HTMLInputElement;
-    const _inputBoundingRect = this._changeOriginCoordinates(_inputNode.getBoundingClientRect());
-    const _svgInput = this.drawRect(_inputBoundingRect.left, _inputBoundingRect.top, _inputBoundingRect.width, _inputBoundingRect.height);
-    _svgInput.setAttribute('rx', '2');
-    _svgInput.setAttribute('fill', '#fff');
-    _svgInput.setAttribute('stroke', '#767676');
-    _svgInput.setAttribute('stroke-width', '1.2');
+    const _inputRect = this._changeOriginCoordinates(_inputNode.getBoundingClientRect());
     if (_inputNode.checked) {
-      _svgInput.setAttribute('fill', '#1da1f2');
+      const svgChecked = this._parser.parseFromString(inputChecked, 'image/svg+xml').childNodes[0] as SVGElement;
+      setAttrSvgIcon(svgChecked, _inputRect.left, _inputRect.top, _inputRect.width, _inputRect.height);
+      this._payloadCache.group.appendChild(svgChecked);
+    } else {
+      const svgUnChecked = this._parser.parseFromString(inputUnchecked, 'image/svg+xml').childNodes[0] as SVGElement;
+      setAttrSvgIcon(svgUnChecked, _inputRect.left, _inputRect.top, _inputRect.width, _inputRect.height);
+      this._payloadCache.group.appendChild(svgUnChecked);
+    }
+  }
+
+  private _drawPin(pNode: Node) {
+    const _pinNode = pNode as HTMLElement;
+    const _pinRect = this._changeOriginCoordinates(_pinNode.getBoundingClientRect());
+    if (this._payloadCache.cellBoundingRect.width < _pinRect.width || this._payloadCache.cellBoundingRect.height < _pinRect.height) return;
+    if (_pinNode.className.includes('wj-state-pinned')) {
+      const _svgPinned = this._parser.parseFromString(pinned, 'image/svg+xml').childNodes[0] as SVGElement;
+      _svgPinned.setAttribute('fill', '#333');
+      setAttrSvgIcon(_svgPinned, _pinRect.left, _pinRect.top, _pinRect.width, _pinRect.height);
+      this._payloadCache.group.appendChild(_svgPinned);
+    } else {
+      const _svgUnpinned = this._parser.parseFromString(unpinned, 'image/svg+xml').childNodes[0] as SVGElement;
+      _svgUnpinned.setAttribute('fill', '#3333');
+      setAttrSvgIcon(_svgUnpinned, _pinRect.left, _pinRect.top, _pinRect.width, _pinRect.height);
+      this._payloadCache.group.appendChild(_svgUnpinned);
+    }
+  }
+
+  private _drawGroupBtn(pNode: Node) {
+    const _groupBtnNode = pNode as HTMLElement;
+    const _groupBtnRect = this._changeOriginCoordinates(_groupBtnNode.getBoundingClientRect());
+    const _panel = this._payloadCache.panel;
+    const _nCurrentRow = this._payloadCache.row;
+    if (!(_panel.rows[_nCurrentRow] instanceof GroupRow) || (this._payloadCache.cellBoundingRect.width < _groupBtnRect.width || this._payloadCache.cellBoundingRect.height < _groupBtnRect.height)) return;
+    if ((_panel.rows[_nCurrentRow] as GroupRow).isCollapsed) {
+      const _svgCollapse = this._parser.parseFromString(collapse, 'image/svg+xml').childNodes[0] as SVGElement;
+      setAttrSvgIcon(_svgCollapse, _groupBtnRect.left, _groupBtnRect.top, _groupBtnRect.width, _groupBtnRect.height);
+      this._payloadCache.group.appendChild(_svgCollapse);
+    } else {
+      const _svgexpand = this._parser.parseFromString(expand, 'image/svg+xml').childNodes[0] as SVGElement;
+      setAttrSvgIcon(_svgexpand, _groupBtnRect.left, _groupBtnRect.top, _groupBtnRect.width, _groupBtnRect.height);
+      this._payloadCache.group.appendChild(_svgexpand);
+    }
+  }
+  private _drawSortBtn(pNode: Node) {
+    const _sortBtnNode = pNode as HTMLElement;
+    const _sortBtnRect = this._changeOriginCoordinates(_sortBtnNode.getBoundingClientRect());
+    const _panel = this._payloadCache.panel;
+    if (_panel.cellType !== CellType.ColumnHeader || (this._payloadCache.cellBoundingRect.width < _sortBtnRect.width || this._payloadCache.cellBoundingRect.height < _sortBtnRect.height)) return;
+    if (_sortBtnNode.className.includes('wj-glyph-up')) {
+      const _svgArrowUp = this._parser.parseFromString(arrowUp, 'image/svg+xml').childNodes[0] as SVGElement;
+      setAttrSvgIcon(_svgArrowUp, _sortBtnRect.left, _sortBtnRect.top, _sortBtnRect.width, _sortBtnRect.height);
+      declareNamespaceSvg(_svgArrowUp);
+      this._payloadCache.group.appendChild(_svgArrowUp);
+    } else {
+      const _svgArrowDown = this._parser.parseFromString(arrowDown, 'image/svg+xml').childNodes[0] as SVGElement;
+      setAttrSvgIcon(_svgArrowDown, _sortBtnRect.left, _sortBtnRect.top, _sortBtnRect.width, _sortBtnRect.height);
+      this._payloadCache.group.appendChild(_svgArrowDown);
     }
   }
   //==========================================================================================================
@@ -671,7 +732,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           _cellBoundingRect.left += this.flexGrid.scrollPosition.x * (this.flexGrid.rightToLeft ? -1 : +1);
         }
         //kiểm tra xem liệu cell có phải là cell group hay không?
-        if (!_cellRange) {
+        if (!_cellRange || (_cellRange && _cellRange.isSingleCell)) {
           if (pPanel.rows[_nRowIndex].visibleIndex !== -1) {
             const _groupEl = this.startGroup();
             //!cache group
@@ -699,7 +760,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const _rect = this._payloadCache.cellBoundingRect;
     const _cellRange = this._payloadCache.cellRange;
     //trường hợp cell được merge hoặc gr thì kích thước của rectangle bằng tổng các cell
-    if (_cellRange) {
+    if (_cellRange && !_cellRange.isSingleCell) {
       for (let _nIndex = _cellRange.col + 1; _nIndex <= _cellRange.col2; _nIndex++) {
         _rect.width += _panel.columns[_nIndex].renderWidth; // total width of rectangle
       }
@@ -861,9 +922,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       const _textSvgEl = drawText(this._payloadCache.cellValue, this._payloadCache.behaviorText as BehaviorText, this._stylesTextSetup, 'preserve');
       _textSvgEl.setAttribute('x', '0');
       _textSvgEl.setAttribute('y', '0');
-      const payloadEvent = this._getPayloadEvent();
-      payloadEvent.svgDrew = _textSvgEl;
-      this.onDrewText(payloadEvent);
+      const _payloadEvent = this._getPayloadEvent();
+      _payloadEvent.svgDrew = _textSvgEl;
+      this.onDrewText(_payloadEvent);
       _svgWrapText.appendChild(_textSvgEl);
       this._payloadCache.group.appendChild(_svgWrapText);
       return _svgWrapText;
@@ -875,25 +936,27 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   /**
  * @description: Dùng để vẽ check box với những giá trị là boolean
  */
-  private _drawCheckboxRaw() {
+  private _drawCheckboxRaw(): void {
     const _rect = this._payloadCache.cellBoundingRect;
     let _nWidthCheckbox = 13;
     let _nHeightCheckbox = 13;
     let _nXCheckbox = _rect.left + _rect.width / 2 - _nWidthCheckbox / 2;
     let _nYCheckBox = _rect.top + _rect.height / 2 - _nHeightCheckbox / 2;
-    const _svgEl = this.drawRect(_nXCheckbox, _nYCheckBox, _nWidthCheckbox, _nHeightCheckbox);
-    _svgEl.setAttribute('rx', '2');
-    _svgEl.setAttribute('fill', '#fff');
-    _svgEl.setAttribute('stroke', '#767676');
-    _svgEl.setAttribute('stroke-width', '1.2');
+    if (_rect.width < _nWidthCheckbox || _rect.height < _nHeightCheckbox) return;
     if (this._payloadCache.cellValue === 'true' || this._payloadCache.cellValue === true) {
-      _svgEl.setAttribute('fill', '#1da1f2');
+      const svgChecked = this._parser.parseFromString(inputChecked, 'image/svg+xml').childNodes[0] as SVGElement;
+      setAttrSvgIcon(svgChecked, _nXCheckbox, _nYCheckBox, _nWidthCheckbox, _nHeightCheckbox);
+      this._payloadCache.group.appendChild(svgChecked);
+    } else {
+      const svgUnChecked = this._parser.parseFromString(inputUnchecked, 'image/svg+xml').childNodes[0] as SVGElement;
+      setAttrSvgIcon(svgUnChecked, _nXCheckbox, _nYCheckBox, _nWidthCheckbox, _nHeightCheckbox);
+      this._payloadCache.group.appendChild(svgUnChecked);
     }
   }
   /**
   * @description: Apply styles setup cho text, border, background rectangle
   */
-  private _applyStyleSetup() {
+  private _applyStyleSetup(): void {
     const _panel = this._payloadCache.panel;
     const _currentRow = this._payloadCache.row;
     const _currentCol = this._payloadCache.col;
