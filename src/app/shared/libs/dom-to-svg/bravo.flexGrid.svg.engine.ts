@@ -82,47 +82,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
   /**
-     * @desc: vẽ các cột bị pin hoặc đóng băng (frozen)
-     * @pram pPanel: GridPanel
-     * @return : SvgElement
-  */
-  private _drawCellPanelFrozen(pPanel: GridPanel) {
-    /*
-    ?Trường hợp cột bị pin hay đóng băng thì thay đổi lại view range của các cột nhìn thấy sang các cột bị đóng băng!
-    */
-    if (!this.flexGrid.frozenColumns) return;
-    const { row2: _nRow2, row: _nRow } = pPanel.viewRange;
-    const _viewRange = new CellRange(_nRow, 0, _nRow2, this.flexGrid.columns.frozen - 1);
-    this._drawCellPanel(pPanel, _viewRange);
-  }
-  /**
-    * @desc: vẽ border theo styles của cell trong flex
- */
-  private _drawBorderCell(payload: Payload) {
-    const { left: _nLeft, top: _nTop, bottom: _nBottom, right: _nRight } = payload.cellBoundingRect;
-    const _borders = getAcceptStylesBorderSvg(payload.cellStyles);
-    if (hasBorderBottom(payload.cellStyles)) {
-      const _lineSvgEl = this.drawLine(_nLeft, _nBottom, _nRight, _nBottom);
-      _lineSvgEl.setAttribute('stroke-width', _borders['borderBottomWidth']);
-      _lineSvgEl.setAttribute('stroke', _borders['borderBottomColor']);
-    }
-    if (hasBorderTop(payload.cellStyles)) {
-      const _lineSvgEl = this.drawLine(_nLeft, _nTop, _nRight, _nTop);
-      _lineSvgEl.setAttribute('stroke-width', _borders['borderTopWidth']);
-      _lineSvgEl.setAttribute('stroke', _borders['borderTopColor']);
-    }
-    if (hasBorderRight(payload.cellStyles)) {
-      const _lineSvgEl = this.drawLine(_nRight, _nTop, _nRight, _nBottom);
-      _lineSvgEl.setAttribute('stroke-width', _borders['borderRightWidth']);
-      _lineSvgEl.setAttribute('stroke', _borders['borderRightColor']);
-    }
-    if (hasBorderLeft(payload.cellStyles)) {
-      const _lineSvgEl = this.drawLine(_nLeft, _nTop, _nLeft, _nBottom);
-      _lineSvgEl.setAttribute('stroke-width', _borders['borderLeftWidth']);
-      _lineSvgEl.setAttribute('stroke', _borders['borderLeftColor']);
-    }
-  }
-  /**
   * @desc: dùng để vẽ theo cell Panel : cells, columnsHeader,columnsFooter,...
   * @pram pPanel: GridPanel, pViewRange(optional): CellRange
   */
@@ -169,7 +128,22 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
   /**
-     * @desc: dùng để vẽ rectangle svg theo kích thước và tọa độ của cell
+  * @desc: vẽ các cột bị pin hoặc đóng băng (frozen)
+  * @pram pPanel: GridPanel
+  * @return : SvgElement
+  */
+  private _drawCellPanelFrozen(pPanel: GridPanel) {
+    /*
+    ?Trường hợp cột bị pin hay đóng băng thì thay đổi lại view range của các cột nhìn thấy sang các cột bị đóng băng!
+    */
+    if (!this.flexGrid.frozenColumns) return;
+    const { row2: _nRow2, row: _nRow } = pPanel.viewRange;
+    const _viewRange = new CellRange(_nRow, 0, _nRow2, this.flexGrid.columns.frozen - 1);
+    this._drawCellPanel(pPanel, _viewRange);
+  }
+
+  /**
+  * @desc: dùng để vẽ rectangle svg theo kích thước và tọa độ của cell
   */
   private _drawRectCell(payload: Payload): void {
     const _cellBoundingRect = payload.cellBoundingRect;
@@ -183,8 +157,35 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this._scanCell(payload.cellElement, payload);
   }
   /**
-     * @desc: dùng để quét và vẽ các phần tử con theo các trường hợp tương ứng như image,button,text node,etc...
-     * @param pElScanned: Element (phần tử được quét)
+  * @desc: vẽ border theo styles của cell trong flex
+  */
+  private _drawBorderCell(payload: Payload) {
+    const { left: _nLeft, top: _nTop, bottom: _nBottom, right: _nRight } = payload.cellBoundingRect;
+    const _borders = getAcceptStylesBorderSvg(payload.cellStyles);
+    if (hasBorderBottom(payload.cellStyles)) {
+      const _lineSvgEl = this.drawLine(_nLeft, _nBottom, _nRight, _nBottom);
+      _lineSvgEl.setAttribute('stroke-width', _borders['borderBottomWidth']);
+      _lineSvgEl.setAttribute('stroke', _borders['borderBottomColor']);
+    }
+    if (hasBorderTop(payload.cellStyles)) {
+      const _lineSvgEl = this.drawLine(_nLeft, _nTop, _nRight, _nTop);
+      _lineSvgEl.setAttribute('stroke-width', _borders['borderTopWidth']);
+      _lineSvgEl.setAttribute('stroke', _borders['borderTopColor']);
+    }
+    if (hasBorderRight(payload.cellStyles)) {
+      const _lineSvgEl = this.drawLine(_nRight, _nTop, _nRight, _nBottom);
+      _lineSvgEl.setAttribute('stroke-width', _borders['borderRightWidth']);
+      _lineSvgEl.setAttribute('stroke', _borders['borderRightColor']);
+    }
+    if (hasBorderLeft(payload.cellStyles)) {
+      const _lineSvgEl = this.drawLine(_nLeft, _nTop, _nLeft, _nBottom);
+      _lineSvgEl.setAttribute('stroke-width', _borders['borderLeftWidth']);
+      _lineSvgEl.setAttribute('stroke', _borders['borderLeftColor']);
+    }
+  }
+  /**
+  * @desc: dùng để quét và vẽ các phần tử con theo các trường hợp tương ứng như image,button,text node,etc...
+  * @param pElScanned: Element (phần tử được quét)
   */
   private _scanCell(pElScanned: Element, payload: Payload) {
     if (pElScanned.hasChildNodes()) {
@@ -327,7 +328,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     try {
       const { parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, payload);
       payload.behaviorText = this._calculateBehaviorTextNode(pTextNode, payload) as BehaviorText;
-
       let _nWidthTextNode = payload.dimensionText?.width || 0;
       /*
       ? Trường hợp không phải text node duy nhất hoặc là thẻ inline wrap text node
@@ -351,7 +351,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       if (!this.isFirstNode(pTextNode, Node.TEXT_NODE)) {
         _zTextContent = ' '.concat(_zTextContent);
       }
-      const _textSvgEl = drawText((_zTextContent as string), payload.behaviorText, _parentStyles, 'preserve');
+      //fix case special character : &nbsp;
+      payload.panel.cellType === CellType.ColumnHeader && (_zTextContent = _zTextContent.trimEnd().concat(' '));
+      const _textSvgEl = drawText(_zTextContent, payload.behaviorText, _parentStyles, 'preserve');
       return _textSvgEl;
     } catch (error) {
       console.error(error);
@@ -392,11 +394,13 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       _rectSvg.y = payload.behaviorText.point.y;
       const _svgWrapText = creatorSVG(_rectSvg, true);
       //draw text
-      let _ztextContent = pTextNode.textContent || '';
+      let _zTextContent = pTextNode.textContent || '';
       if (!this.isFirstNode(pTextNode, Node.TEXT_NODE)) {
-        _ztextContent = ' '.concat(_ztextContent);
+        _zTextContent = ' '.concat(_zTextContent);
       }
-      const _textSvgEl = drawText(_ztextContent, payload.behaviorText as BehaviorText, _parentStyles, 'preserve');
+      //fix case special character : &nbsp;
+      _zTextContent = _zTextContent.trimEnd().concat(' ');
+      const _textSvgEl = drawText(_zTextContent, payload.behaviorText as BehaviorText, _parentStyles, 'preserve');
       _textSvgEl.setAttribute('x', '0');
       _textSvgEl.setAttribute('y', '0');
       _svgWrapText.appendChild(_textSvgEl);
@@ -568,7 +572,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     if (_sortBtnNode.className.includes('wj-glyph-up')) {
       const _svgArrowUp = this._parser.parseFromString(arrowUp, 'image/svg+xml').childNodes[0] as SVGElement;
       setAttrSvgIcon(_svgArrowUp, _sortBtnRect.left, _sortBtnRect.top, _sortBtnRect.width, _sortBtnRect.height);
-      declareNamespaceSvg(_svgArrowUp);
       payload.group.appendChild(_svgArrowUp);
     } else {
       const _svgArrowDown = this._parser.parseFromString(arrowDown, 'image/svg+xml').childNodes[0] as SVGElement;
@@ -852,7 +855,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       const _behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(_nXTextDefault, _yTextDefault), textAnchor: 'start' };
       const _font = new Font(this._stylesTextSetup['fontFamily'], this._stylesTextSetup['fontSize'], this._stylesTextSetup['fontWeight']);
       const _dimensionOfText = BravoGraphicsRenderer.measureString(_cellValue, _font, _cellBoundingRect.width, false);
-      let _bIsFitContent: boolean = (_dimensionOfText?.width || 0) <= (_cellBoundingRect.width - _nPaddingLeft - _nPaddingRight);
+      let _bIsFitContent: boolean = (_dimensionOfText?.width || 0) < (_cellBoundingRect.width - _nPaddingLeft - _nPaddingRight);
       switch (_zAlginText) {
         case TextAlign.Left:
         case TextAlign.Start:

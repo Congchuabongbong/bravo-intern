@@ -573,10 +573,10 @@ export class ControlGridDataLayoutPanelComponent
     stylesSetup.set(CellStyleEnum.Frozen, frozenStyles);
     stylesSetup.set(CellStyleEnum.RowHeader, rowsHeaderStyles);
     this.svgEngine.stylesSetup = stylesSetup;
-    const svg = this.svgEngine.renderFlexSvgRaw();
+    const svg = this.svgEngine.renderFlexSvgVisible();
     this.svgContainer.nativeElement.style.display = 'block';
 
-
+    //
     const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
     const alink = document.createElement('a');
     const event = new MouseEvent('click');
