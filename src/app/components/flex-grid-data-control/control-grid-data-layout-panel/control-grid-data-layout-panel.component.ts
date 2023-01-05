@@ -585,8 +585,4 @@ export class ControlGridDataLayoutPanelComponent
     alink.dispatchEvent(event);
     console.timeEnd("Second call");
   }
-
-
-
-
 }

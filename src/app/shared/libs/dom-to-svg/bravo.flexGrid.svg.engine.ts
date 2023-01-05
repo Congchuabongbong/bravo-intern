@@ -87,11 +87,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   */
   private _drawCellPanel(pPanel: GridPanel, pViewRange?: CellRange) {
     const { row: _nRowStart, row2: _nRowEnd, col: _nColStart, col2: _nColEnd } = pViewRange || pPanel.viewRange;
-    const payload: Payload = {} as Payload;
-    payload.panel = pPanel;
+    const _payload: Payload = {} as Payload;
+    _payload.panel = pPanel;
     for (let _nColIndex = _nColStart; _nColIndex <= _nColEnd; _nColIndex++) {
       for (let _nRowIndex = _nRowStart; _nRowIndex <= _nRowEnd; _nRowIndex++) {
-        let _cellEl = pPanel.getCellElement(_nRowIndex, _nColIndex);
+        const _cellEl = pPanel.getCellElement(_nRowIndex, _nColIndex);
         if (!_cellEl) continue;
         if ((_cellEl.className.includes('wj-group') || _cellEl.className.includes('wj-header') || _cellEl.className.includes('wj-footer')) && (pPanel.cellType === CellType.Cell || pPanel.cellType === CellType.ColumnHeader || pPanel.cellType === CellType.ColumnFooter)) {
           const cellRange = this.flexGrid.getMergedRange(pPanel, _nRowIndex, _nColIndex);
@@ -116,22 +116,18 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         /*
         ?Save lại các dữ liệu trong một quy trình vẽ theo cell panel;
         */
-        payload.cellElement = _cellEl;
-        payload.cellStyles = getComputedStyle(_cellEl);
-        payload.cellBoundingRect = this._changeOriginCoordinates(_cellEl.getBoundingClientRect());
-        payload.row = _nRowIndex;
-        payload.col = _nColIndex;
-        payload.group = _groupSvgEl;
-        this._drawRectCell(payload);
+        _payload.cellElement = _cellEl;
+        _payload.cellStyles = getComputedStyle(_cellEl);
+        _payload.cellBoundingRect = this._changeOriginCoordinates(_cellEl.getBoundingClientRect());
+        _payload.row = _nRowIndex;
+        _payload.col = _nColIndex;
+        _payload.group = _groupSvgEl;
+        this._drawRectCell(_payload);
         this.endGroup();
       }
     }
   }
-  /**
-  * @desc: vẽ các cột bị pin hoặc đóng băng (frozen)
-  * @pram pPanel: GridPanel
-  * @return : SvgElement
-  */
+
   private _drawCellPanelFrozen(pPanel: GridPanel) {
     /*
     ?Trường hợp cột bị pin hay đóng băng thì thay đổi lại view range của các cột nhìn thấy sang các cột bị đóng băng!
@@ -142,9 +138,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this._drawCellPanel(pPanel, _viewRange);
   }
 
-  /**
-  * @desc: dùng để vẽ rectangle svg theo kích thước và tọa độ của cell
-  */
   private _drawRectCell(payload: Payload): void {
     const _cellBoundingRect = payload.cellBoundingRect;
     const _cellStyles = payload.cellStyles;
@@ -156,9 +149,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     */
     this._scanCell(payload.cellElement, payload);
   }
-  /**
-  * @desc: vẽ border theo styles của cell trong flex
-  */
+
   private _drawBorderCell(payload: Payload) {
     const { left: _nLeft, top: _nTop, bottom: _nBottom, right: _nRight } = payload.cellBoundingRect;
     const _borders = getAcceptStylesBorderSvg(payload.cellStyles);
@@ -183,10 +174,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       _lineSvgEl.setAttribute('stroke', _borders['borderLeftColor']);
     }
   }
-  /**
-  * @desc: dùng để quét và vẽ các phần tử con theo các trường hợp tương ứng như image,button,text node,etc...
-  * @param pElScanned: Element (phần tử được quét)
-  */
+
   private _scanCell(pElScanned: Element, payload: Payload) {
     if (pElScanned.hasChildNodes()) {
       pElScanned.childNodes.forEach((pNode: Node) => {
@@ -221,11 +209,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
   //*Handle and draw Text Here:
-  /**
-    * @desc: expensive function dùng để tính toán hành vi (tọa độ, điểm vẽ, hướng vẽ,...) của text node dựa trên tọa độ, kích thước của phần tử cha
-    * @param pTextNode: Text
-    * @returns: BehaviorText
-  */
   private _calculateBehaviorTextNode(pTextNode: Text, payload: Payload): BehaviorText {
     try {
       const { parentBoundingRect: _parentBoundingRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, payload);
@@ -286,7 +269,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   };
   /**
    * @description: Kiểm tra xem liệu chiều rộng của text node có vừa với chiều rộng của node chứa nó hay không
-   * @param: pTextNode: Text, pbBreakWords: boolean
+   * @param: pTextNode: Text, payload: Payload
    * @return: boolean
   */
   private _isTextNodeFitWidthCell(pTextNode: Text, payload: Payload): boolean {
@@ -319,11 +302,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Occurs when calculate  width of the text content!');
     }
   }
-  /**
-   * @description: Dùng để vẽ text node trong cell dựa trên behavior của text node
-   * @param: pTextNode: Text
-   * @return: SVGElement | null
-  */
+
   private _drawTextNodeInCell(pTextNode: Text, payload: Payload): SVGElement | null {
     try {
       const { parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, payload);
@@ -362,7 +341,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
   /**
   * @description: Dùng để bọc svg bên ngoài text svg trong trường hợp width cửa text dài hơn chiều rộng của phần tử chứa
-  * @param: pTextNode: Text
+  * @param: pTextNode: Text, payload: Payload
   * @return: SVGElement | null
  */
   private _wrapTextNodeIntoSvg(pTextNode: Text, payload: Payload): SVGElement | null {
@@ -433,11 +412,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     return _nTotalWidth;
   }
 
-  /**
-  * @description: Lấy tổng chiều rộng của các phần tử anh em nằm bên trái và phải của node
-  * @param: node: Node
-  * @return: {  rightTotalSiblingsWidth,leftTotalSiblingsWidth}
-  */
   private _getTotalWidthSiblingNode(pNode: Node, payload: Payload) {
     let _nRightTotalSiblingsWidth = 0;
     let _nLeftTotalSiblingsWidth = 0;
@@ -453,7 +427,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   /**
   * @description: Dùng để lấy thông tin của node cha (rect, styles, element)
-  * @param: node: Node
+  * @param: node: Node, payload: Payload
   * @return:{parentNode,parentBoundingRect,parentStyles};
   */
   private _getInformationParentNode(pNode: Node, payload: Payload) {
@@ -477,11 +451,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
   //*Handle and draw image
-  /**
-  * @description: Dùng để vẽ Image trong trường hợp nếu node có typle là HTMLImageElement
-  * @param: imageNode: HTMLImageElement, parentNode: Element
-  * @return:SVGElement
-  */
   private _drawImageInCell(pImageNode: HTMLImageElement, payload: Payload): SVGElement {
     const _imageBoundingRect = this._changeOriginCoordinates(pImageNode.getBoundingClientRect());
     let parentBoundingRect = payload.cellBoundingRect;
@@ -495,7 +464,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   /**
   * @description: Dùng để bọc svg bên ngoài của image svg trong trường hợp kích thước của image to hơn phần tử chứa
-  * @param: imageNode: HTMLImageElement, parentNode: Element
+  * @param: imageNode: HTMLImageElement, payload: Payload
   * @return:SVGElement
   */
   private _wrapImageIntoSvg(pImageEl: HTMLImageElement, payload: Payload): SVGElement {
@@ -512,11 +481,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     return _svgWrapImage;
   }
 
-  /**
-    * @description: Dùng để vẽ trường hợp node là input check box
-    * @param:node: Node
-    * @return:SVGElement
-    */
   private _drawCheckBox(pNode: Node, payload: Payload) {
     const _inputNode = pNode as HTMLInputElement;
     const _inputRect = this._changeOriginCoordinates(_inputNode.getBoundingClientRect());
@@ -597,47 +561,29 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   public drewTextHandler = new wjEven<FlexGridSvgEngine, IPayloadEvent>();
   //*method raise event here:
 
-  /**
-  * @description: raise ra event drew rectangle (sau khi vẽ)
-  * @param:pPayloadEvent: IPayloadEvent
-  */
   public onDrewRect(pPayloadEvent: IPayloadEvent) {
     this.drewRectHandler.raise(this, pPayloadEvent);
   }
 
-  /**
-  * @description: raise ra event drawing text (trước khi vẽ)
-  * @param:pPayloadEvent: IPayloadEvent
-  */
   public onDrawingText(pPayloadEvent: IPayloadEvent) {
     this.drawingTextHandler.raise(this, pPayloadEvent);
   }
 
-  /**
-  * @description: raise ra event drew text (sau khi vẽ)
-  * @param:pPayloadEvent: IPayloadEvent
-  */
   public onDrewText(pPayloadEvent: IPayloadEvent) {
     this.drewTextHandler.raise(this, pPayloadEvent);
   }
 
-  /**
-  * @description: raise ra event drew border right (sau khi vẽ)
-  * @param:pPayloadEvent: IPayloadEvent
-  */
   public onDrewBorderRight(pPayloadEvent: IPayloadEvent) {
     this.drewBorderRightHandler.raise(this, pPayloadEvent);
   }
-  /**
-  * @description: raise ra event drew border bottom (sau khi vẽ)
-  * @param:pPayloadEvent: IPayloadEvent
-  */
+
   public onDrewBorderBottom(pPayloadEvent: IPayloadEvent) {
     this.drewBorderBottomHandler.raise(this, pPayloadEvent);
   }
 
   /**
-  * @description: lấy ra data cần trong stylesCache để gửi đi cùng với event
+  * @description: lấy ra data cần trong payload để gửi đi cùng với event
+  * @param: payload: Payload
   * @return: IPayloadEvent
   */
   private _getPayloadEvent(payload: Payload): IPayloadEvent {
@@ -742,9 +688,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       }
     }
   }
-  /**
-  * @desc: vẽ rectangle svg theo thông số của cell.
-  */
+
   private _drawRawRectCell(payload: Payload): void {
     const _panel = payload.panel;
     const _rect = payload.cellBoundingRect;
@@ -768,9 +712,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this._drawContentInCell(payload);
   }
 
-  /**
-  * @desc: vẽ border bằng line svg theo thông số của styles setup .
-  */
   private _drawRawBorderCell(payload: Payload) {
     const _rect = payload.cellBoundingRect;
     const _payloadEvent = this._getPayloadEvent(payload);
@@ -788,9 +729,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.onDrewBorderRight(_payloadEvent);//raise event drew border right here
   }
 
-  /**
-  * @desc: Vẽ nội dung trong cell theo cell type(cells,columnsHeader,...) và value cell bao gồm string,boolean,....
-  */
   private _drawContentInCell(payload: Payload) {
     const _cellValue = payload.cellValue;
     const _panel = payload.panel;
@@ -806,10 +744,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       this._drawTextRawInCell(payload);
     }
   }
-  /**
-     * @description: Dùng để vẽ text node trong cell dựa trên behavior
-     * @return: SVGElement | null
-    */
+
   private _drawTextRawInCell(payload: Payload): SVGElement | null {
     const _textBehavior = this._calculateBehaviorTextRaw(payload);
     const _cellValue = payload.cellValue;
@@ -827,6 +762,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
   /**
   * @desc: expensive function dùng để tính toán hành vi (tọa độ, điểm vẽ, hướng vẽ,...) của text node dựa trên tọa độ, kích thước của rect cell raw
+  * @param payload: Payload
   * @returns: BehaviorText
  */
   private _calculateBehaviorTextRaw(payload: Payload): BehaviorText {
@@ -842,15 +778,15 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       let _nXTextDefault = _cellBoundingRect.left + _nPaddingLeft;
       let _bisRowGroup = payload.isRowGroup;
       const _yTextDefault = _cellBoundingRect.top + _paddingTop;
-      let _zAlginText = _panel.columns[_nCurrentCol].align || 'left'; //default left
+      let _zAlginText = _panel.columns[_nCurrentCol].align || 'left';
       if (_panel.columns[_nCurrentCol].dataType === DataType.Boolean) {
-        _zAlginText = _panel.columns[_nCurrentCol].align || 'center'; //default center for data type is boolean
+        _zAlginText = _panel.columns[_nCurrentCol].align || 'center';
       }
       //Case indent for row group
       if (_bisRowGroup) {
         _nXTextDefault += (_panel.rows[_nCurrentRow] as GroupRow).level * this.flexGrid.treeIndent;
         _nPaddingLeft += (_panel.rows[_nCurrentRow] as GroupRow).level * this.flexGrid.treeIndent;
-        _zAlginText = _panel.rows[_nCurrentRow].align || 'left';//default left
+        _zAlginText = _panel.rows[_nCurrentRow].align || 'left';
       }
       const _behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(_nXTextDefault, _yTextDefault), textAnchor: 'start' };
       const _font = new Font(this._stylesTextSetup['fontFamily'], this._stylesTextSetup['fontSize'], this._stylesTextSetup['fontWeight']);
@@ -893,6 +829,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   /**
   * @description: Dùng để bọc svg bên ngoài text svg trong trường hợp width cửa text dài hơn chiều rộng của cell
+  * @param payload: Payload
   * @return: SVGElement | null
   */
   private _wrapTextRawIntoSvg(payload: Payload): SVGElement | null {
@@ -931,9 +868,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       throw new Error('Something wrong when wrap text raw in svg');
     }
   }
-  /**
- * @description: Dùng để vẽ check box với những giá trị là boolean
- */
+
   private _drawCheckboxRaw(payload: Payload): void {
     const _rect = payload.cellBoundingRect;
     const _cellValue = payload.cellValue;
@@ -954,6 +889,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
   /**
   * @description: Apply styles setup cho text, border, background rectangle
+  * @param: payload : Payload
   */
   private _applyStyleSetup(payload: Payload): void {
     const _panel = payload.panel;
@@ -966,89 +902,89 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     //styles normal
     if (!this.stylesCache.stylesNormal) {
       _stylesNormal = (this.stylesSetup.has(CellStyleEnum.Normal) && this.stylesSetup.get(CellStyleEnum.Normal)) ? { ...this._stylesBase, ...this.stylesSetup.get(CellStyleEnum.Normal) } : this._stylesBase;
-      this.stylesCache.stylesNormal = _stylesNormal; //cache styles normal
+      this.stylesCache.stylesNormal = _stylesNormal;
     } else {
       _stylesNormal = this.stylesCache.stylesNormal;
     }
     //styles alternate
     if (!this.stylesCache.stylesAlternate) {
       _stylesAlternate = (this.stylesSetup.has(CellStyleEnum.Alternate) && this.stylesSetup.get(CellStyleEnum.Alternate)) ? { ..._stylesNormal, ...this.stylesSetup.get(CellStyleEnum.Alternate) } : _stylesNormal;
-      this.stylesCache.stylesAlternate = _stylesAlternate; //cache styles alternate
+      this.stylesCache.stylesAlternate = _stylesAlternate;
     } else {
       _stylesAlternate = this.stylesCache.stylesAlternate;
     }
     //styles col header
     if (!this.stylesCache.stylesColsHeader) {
       _stylesColsHeader = (this.stylesSetup.has(CellStyleEnum.Fixed) && this.stylesSetup.get(CellStyleEnum.Fixed)) ? { ..._stylesNormal, ...this.stylesSetup.get(CellStyleEnum.Fixed) } : _stylesNormal;
-      this.stylesCache.stylesColsHeader = _stylesColsHeader; //cache styles cols header
+      this.stylesCache.stylesColsHeader = _stylesColsHeader;
     } else {
       _stylesColsHeader = this.stylesCache.stylesColsHeader;
     }
     //styles cols footer
     if (!this.stylesCache.stylesColsFooter) {
       _stylesColsFooter = (this.stylesSetup.has(CellStyleEnum.ColumnsFooter) && this.stylesSetup.get(CellStyleEnum.ColumnsFooter)) ? { ..._stylesColsHeader, ...this.stylesSetup.get(CellStyleEnum.ColumnsFooter) } : _stylesColsHeader;
-      this.stylesCache.stylesColsFooter = _stylesColsFooter; //cache styles cols footer
+      this.stylesCache.stylesColsFooter = _stylesColsFooter;
     } else {
       _stylesColsFooter = this.stylesCache.stylesColsFooter;
     }
     //styles row header
     if (!this.stylesCache.stylesRowsHeader) {
       _stylesRowsHeader = (this.stylesSetup.has(CellStyleEnum.RowHeader) && this.stylesSetup.get(CellStyleEnum.RowHeader)) ? { ..._stylesNormal, ... this.stylesSetup.get(CellStyleEnum.RowHeader) } : _stylesNormal;
-      this.stylesCache.stylesRowsHeader = _stylesRowsHeader; //cache styles rowsHeader
+      this.stylesCache.stylesRowsHeader = _stylesRowsHeader;
     } else {
       _stylesRowsHeader = this.stylesCache.stylesRowsHeader;
     }
     //frozen styles
     if (!this.stylesCache.stylesFrozen) {
       _stylesFrozen = (this.stylesSetup.has(CellStyleEnum.Frozen) && this.stylesSetup.get(CellStyleEnum.Frozen)) ? { ..._stylesAlternate, ...this.stylesSetup.get(CellStyleEnum.Frozen) } : _stylesAlternate;
-      this.stylesCache.stylesFrozen = _stylesFrozen; //cache styles frozen
+      this.stylesCache.stylesFrozen = _stylesFrozen;
     } else {
       _stylesFrozen = this.stylesCache.stylesFrozen;
     }
     //new row style
     if (!this.stylesCache.stylesNewRow) {
       _stylesNewRow = (this.stylesSetup.has(CellStyleEnum.NewRow) && this.stylesSetup.get(CellStyleEnum.NewRow)) ? { ..._stylesNormal, ...this.stylesSetup.get(CellStyleEnum.NewRow) } : _stylesNormal;
-      this.stylesCache.stylesNewRow = _stylesNewRow; //cache styles new row
+      this.stylesCache.stylesNewRow = _stylesNewRow;
     } else {
       _stylesNewRow = this.stylesCache.stylesNewRow;
     }
     //styles group (level)
     if (!this.stylesCache.stylesGroupLv0) {
       _stylesGroupLv0 = (this.stylesSetup.has(CellStyleEnum.Subtotal0) && this.stylesSetup.get(CellStyleEnum.Subtotal0)) ? { ..._stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal0) } : _stylesFrozen;
-      this.stylesCache.stylesGroupLv0 = _stylesGroupLv0;  //cache styles group level 0
+      this.stylesCache.stylesGroupLv0 = _stylesGroupLv0;
     } else {
       _stylesGroupLv0 = this.stylesCache.stylesGroupLv0;
     }
 
     if (!this.stylesCache.stylesGroupLv1) {
       _stylesGroupLv1 = (this.stylesSetup.has(CellStyleEnum.Subtotal1) && this.stylesSetup.get(CellStyleEnum.Subtotal1)) ? { ..._stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal1) } : _stylesFrozen;
-      this.stylesCache.stylesGroupLv1 = _stylesGroupLv1;  //cache styles group level 1
+      this.stylesCache.stylesGroupLv1 = _stylesGroupLv1;
     } else {
       _stylesGroupLv1 = this.stylesCache.stylesGroupLv1;
     }
 
     if (!this.stylesCache.stylesGroupLv2) {
       _stylesGroupLv2 = (this.stylesSetup.has(CellStyleEnum.Subtotal2) && this.stylesSetup.get(CellStyleEnum.Subtotal2)) ? { ..._stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal2) } : _stylesFrozen;
-      this.stylesCache.stylesGroupLv2 = _stylesGroupLv2;  //cache styles group level 2
+      this.stylesCache.stylesGroupLv2 = _stylesGroupLv2;
     } else {
       _stylesGroupLv2 = this.stylesCache.stylesGroupLv2;
     }
     if (!this.stylesCache.stylesGroupLv3) {
       _stylesGroupLv3 = (this.stylesSetup.has(CellStyleEnum.Subtotal3) && this.stylesSetup.get(CellStyleEnum.Subtotal3)) ? { ..._stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal3) } : _stylesFrozen;
-      this.stylesCache.stylesGroupLv3 = _stylesGroupLv3; //cache styles group level 3
+      this.stylesCache.stylesGroupLv3 = _stylesGroupLv3;
     } else {
       _stylesGroupLv3 = this.stylesCache.stylesGroupLv3;
     }
     if (!this.stylesCache.stylesGroupLv4) {
       _stylesGroupLv4 = (this.stylesSetup.has(CellStyleEnum.Subtotal4) && this.stylesSetup.get(CellStyleEnum.Subtotal4)) ? { ..._stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal4) } : _stylesFrozen;
-      this.stylesCache.stylesGroupLv4 = _stylesGroupLv4; //cache styles group level 4
+      this.stylesCache.stylesGroupLv4 = _stylesGroupLv4;
     } else {
       _stylesGroupLv4 = this.stylesCache.stylesGroupLv4;
     }
 
     if (!this.stylesCache.stylesGroupLv5) {
       _stylesGroupLv5 = (this.stylesSetup.has(CellStyleEnum.Subtotal5) && this.stylesSetup.get(CellStyleEnum.Subtotal5)) ? { ..._stylesFrozen, ...this.stylesSetup.get(CellStyleEnum.Subtotal5) } : _stylesFrozen;
-      this.stylesCache.stylesGroupLv5 = _stylesGroupLv5;  //cache styles group level 5
+      this.stylesCache.stylesGroupLv5 = _stylesGroupLv5;
     } else {
       _stylesGroupLv5 = this.stylesCache.stylesGroupLv5;
     }
@@ -1145,9 +1081,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         break;
     }
   }
-  /**
- * @description: Xóa tất các event handler sau khi render xong flex svg raw
- */
+
   public cleanEvents() {
     this.drewRectHandler.hasHandlers && this.drewRectHandler.removeAllHandlers();
     this.drewBorderRightHandler.hasHandlers && this.drewBorderRightHandler.removeAllHandlers();

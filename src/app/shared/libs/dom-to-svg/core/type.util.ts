@@ -1,7 +1,6 @@
-import { Point, Rect } from '@grapecity/wijmo';
+import { Point, Rect, Size as wjSize } from '@grapecity/wijmo';
 import { CellRange, GridPanel } from '@grapecity/wijmo.grid';
 import { BravoTextMetrics } from '../bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
-
 export const textAttributes = new Set([
   'color',
   'font-family',
@@ -38,21 +37,14 @@ export enum TextAlign {
 }
 
 export type DominantBaseline = 'auto' | 'middle' | 'hanging';
+
 export type TextAnchor = 'start' | 'middle' | 'end';
+
 export type BehaviorText = {
   point: Point;
   dominantBaseline: DominantBaseline,
   textAnchor: TextAnchor;
   isTextFitWidthCell: boolean;
-};
-
-export interface ISiblings {
-  leftSideCurrentNode: ChildNode[], rightSideCurrentNode: ChildNode[];
-}
-export interface IFont {
-  fontFamily: string;
-  fontSize: number | string;
-  fontStyle: string;
 };
 
 export type Payload = {
@@ -69,6 +61,7 @@ export type Payload = {
   cellValue: any;
   isRowGroup: boolean;
 };
+
 export type StylesCache = {
   stylesNormal: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesAlternate: Record<string, string> | CSSStyleDeclaration | undefined;
@@ -84,13 +77,25 @@ export type StylesCache = {
   stylesGroupLv4: Record<string, string> | CSSStyleDeclaration | undefined;
   stylesGroupLv5: Record<string, string> | CSSStyleDeclaration | undefined;
 };
+
 export type CellPadding = {
   paddingLeft: number;
   paddingRight: number;
   paddingTop: number;
   paddingBottom: number;
 };
+
+export interface ISize extends Pick<wjSize, 'height' | 'width'> { };
+
+export interface ISiblings {
+  leftSideCurrentNode: ChildNode[], rightSideCurrentNode: ChildNode[];
+}
+export interface IFont {
+  fontFamily: string;
+  fontSize: number | string;
+  fontStyle: string;
+};
+
 export interface IPayloadEvent extends Pick<Payload, 'panel' | 'row' | 'col' | 'cellValue'> {
   svgDrew?: Element;
 }
-

@@ -1,6 +1,7 @@
-export const isInline = (pStyles: CSSStyleDeclaration): boolean =>
-  pStyles.display === 'inline' || pStyles.display.startsWith('inline-');
+export const isInline = (pStyles: CSSStyleDeclaration): boolean => pStyles.display === 'inline' || pStyles.display.startsWith('inline-');
+
 export const isCenter = (pStyles: CSSStyleDeclaration): boolean => pStyles.display === 'flex' && pStyles.justifyContent === 'center' && pStyles.alignItems === 'center';
+
 export const isFlexDirectionRow = (pParentStyles: CSSStyleDeclaration) =>
   pParentStyles.display === 'flex' && pParentStyles.flexDirection === 'row';
 
@@ -29,13 +30,10 @@ export const hasBorderRight = (pStyles: CSSStyleDeclaration): boolean => !isTran
   pStyles.borderRightStyle !== 'inset' &&
   pStyles.borderRightStyle !== 'outset';
 
-export function isFloatLeft(pStyles: CSSStyleDeclaration): boolean {
-  return pStyles.float === 'left';
-}
+export const isFloatLeft = (pStyles: CSSStyleDeclaration): boolean => pStyles.float === 'left';
 
-export function isFloatRight(pStyles: CSSStyleDeclaration): boolean {
-  return pStyles.float === 'right';
-}
+export const isFloatRight = (pStyles: CSSStyleDeclaration): boolean => pStyles.float === 'right';
+
 export const isVisible = (pStyles: CSSStyleDeclaration): boolean =>
   pStyles.display !== 'none' &&
   pStyles.visibility !== 'hidden' &&

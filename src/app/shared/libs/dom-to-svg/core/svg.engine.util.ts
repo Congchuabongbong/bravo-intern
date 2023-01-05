@@ -1,28 +1,38 @@
-import { Size as wjSize } from '@grapecity/wijmo';
+
 import { SVG_NAMESPACE, XML_NAMESPACE, X_LINK_NAMESPACE } from './dom.util';
-import { BehaviorText, borderAttributes, textAttributes } from './type.util';
-export interface ISize extends Pick<wjSize, 'height' | 'width'> { };
-export function setViewportSizeSVG(pSvg: SVGElement, pSize: ISize) {
+import { BehaviorText, borderAttributes, ISize, textAttributes } from './type.util';
+
+export const setViewportSizeSVG = (pSvg: SVGElement, pSize: ISize): void => {
   pSvg.setAttribute('width', pSize.width.toString());
   pSvg.setAttribute('height', pSize.height.toString());
-}
-export function drawRect(pnX: number, pnY: number, pSize: ISize, pzClassName?: string, pStyle?: CSSStyleDeclaration, pzClipPath?: string): SVGElement {
-  var rect = document.createElementNS(SVG_NAMESPACE, 'rect') as SVGElement;
-  rect.setAttribute('x', pnX.toFixed(1));
-  rect.setAttribute('y', pnY.toFixed(1));
-  (pSize.width > 0 && pSize.width < 0.05) ? rect.setAttribute('width', '0.1') : rect.setAttribute('width', pSize.width.toFixed(1));
-  (pSize.height > 0 && pSize.height < 0.05) ? rect.setAttribute('height', '0.1') : rect.setAttribute('height', pSize.height.toFixed(1));
-  pzClipPath && rect.setAttribute('clip-path', 'url(#' + pzClipPath + ')');
-  pzClassName && rect.setAttribute('class', pzClassName);
-  pStyle && applyStyle(rect, pStyle);
-  return rect;
-}
-export function applyStyle(pEl: SVGElement, pStyle: CSSStyleDeclaration) {
-  for (var key in pStyle) {
-    pEl.setAttribute(deCase(key), pStyle[key]);
+};
+
+export const drawRect = (
+  pnX: number,
+  pnY: number,
+  pSize: ISize,
+  pzClassName?: string,
+  pStyle?: CSSStyleDeclaration,
+  pzClipPath?: string
+): SVGElement => {
+  var _rect = document.createElementNS(SVG_NAMESPACE, 'rect') as SVGElement;
+  _rect.setAttribute('x', pnX.toFixed(1));
+  _rect.setAttribute('y', pnY.toFixed(1));
+  (pSize.width > 0 && pSize.width < 0.05) ? _rect.setAttribute('width', '0.1') : _rect.setAttribute('width', pSize.width.toFixed(1));
+  (pSize.height > 0 && pSize.height < 0.05) ? _rect.setAttribute('height', '0.1') : _rect.setAttribute('height', pSize.height.toFixed(1));
+  pzClipPath && _rect.setAttribute('clip-path', 'url(#' + pzClipPath + ')');
+  pzClassName && _rect.setAttribute('class', pzClassName);
+  pStyle && applyStyle(_rect, pStyle);
+  return _rect;
+};
+
+export const applyStyle = (pEl: SVGElement, pStyle: CSSStyleDeclaration): void => {
+  for (var _zKey in pStyle) {
+    pEl.setAttribute(deCase(_zKey), pStyle[_zKey]);
   }
-}
-export function creatorSVG(pRect?: Partial<DOMRect>, pbIsDeclareNamespaceSvg?: boolean) {
+};
+
+export const creatorSVG = (pRect?: Partial<DOMRect>, pbIsDeclareNamespaceSvg?: boolean): SVGElement => {
   const _svg = document.createElementNS(SVG_NAMESPACE, 'svg') as SVGElement;
   if (pRect) {
     pRect.width && pRect.height && setViewportSize(_svg, pRect.width, pRect.height);
@@ -31,30 +41,41 @@ export function creatorSVG(pRect?: Partial<DOMRect>, pbIsDeclareNamespaceSvg?: b
   }
   pbIsDeclareNamespaceSvg && declareNamespaceSvg(_svg);
   return _svg;
-}
-export function setAttrSvgIcon(pSvg: SVGElement, pnX: number, pnY: number, pnWidth: number, pnHeight: number) {
+};
+
+export const setAttrSvgIcon = (
+  pSvg: SVGElement,
+  pnX: number,
+  pnY: number,
+  pnWidth: number,
+  pnHeight: number
+): void => {
   pSvg.setAttribute('width', pnWidth.toString());
   pSvg.setAttribute('height', pnHeight.toString());
   pSvg.setAttribute('x', pnX.toString());
   pSvg.setAttribute('y', pnY.toString());
-}
+};
 
-export function setViewportSize(pSvg: SVGElement, pnWidth: number, pnHeight: number) {
+export const setViewportSize = (
+  pSvg: SVGElement,
+  pnWidth: number,
+  pnHeight: number
+): void => {
   pSvg.setAttribute('width', pnWidth.toString());
   pSvg.setAttribute('height', pnHeight.toString());
-}
-export function appendMultipleChildren(pSvg: SVGElement, pChildren: SVGAElement[]): void {
-  pSvg.append(...pChildren);
-}
+};
+export const appendMultipleChildren = (pSvg: SVGElement, pChildren: SVGAElement[]): void => pSvg.append(...pChildren);
 
-export function deCase(pzName: string): string {
-  return pzName.replace(/[A-Z]/g, function (a) { return '-' + a.toLowerCase(); });
-}
-export function camelCase(pzName: string): string {
-  return pzName.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
-}
+export const deCase = (pzName: string): string => pzName.replace(/[A-Z]/g, function (a) { return '-' + a.toLowerCase(); });
 
-export function drawText(pzTextContent: string, pBehavior: BehaviorText, pStyles?: CSSStyleDeclaration | Record<string, string>, pWhiteSpace: 'default' | 'preserve' = 'default'): SVGElement {
+export const camelCase = (pzName: string): string => pzName.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+
+export const drawText = (
+  pzTextContent: string,
+  pBehavior: BehaviorText,
+  pStyles?: CSSStyleDeclaration | Record<string, string>,
+  pWhiteSpace: 'default' | 'preserve' = 'default'
+): SVGElement => {
   const _textEl = document.createElementNS(SVG_NAMESPACE, 'text') as SVGElement;
   _textEl.textContent = pzTextContent;
   _textEl.setAttribute('x', pBehavior.point.x.toString());
@@ -69,8 +90,8 @@ export function drawText(pzTextContent: string, pBehavior: BehaviorText, pStyles
     _textEl.setAttribute('fill', pStyles.color);
   } else if (pStyles) {
     for (const textProperty of textAttributes) {
-      const value = pStyles[camelCase(textProperty)] || '';
-      value && _textEl.setAttribute(textProperty, value);
+      const _zValue = pStyles[camelCase(textProperty)] || '';
+      _zValue && _textEl.setAttribute(textProperty, _zValue);
     }
     _textEl.setAttribute('fill', pStyles['color']);
   }
@@ -80,9 +101,16 @@ export function drawText(pzTextContent: string, pBehavior: BehaviorText, pStyles
     _textEl.setAttributeNS(XML_NAMESPACE, "xml:space", "preserve");
   }
   return _textEl;
-}
+};
 
-export function drawImage(pzImageHref: string, pnX: number, pnY: number, pnWidth: number, pnHeight: number, pzClipPath?: string): SVGElement {
+export const drawImage = (
+  pzImageHref: string,
+  pnX: number,
+  pnY: number,
+  pnWidth: number,
+  pnHeight: number,
+  pzClipPath?: string
+): SVGElement => {
   var _img = document.createElementNS(SVG_NAMESPACE, 'image') as SVGElement;
   _img.setAttributeNS(X_LINK_NAMESPACE, 'href', pzImageHref);
   _img.setAttribute('x', pnX.toFixed(1));
@@ -93,13 +121,15 @@ export function drawImage(pzImageHref: string, pnX: number, pnY: number, pnWidth
     _img.setAttribute('clip-path', 'url(#' + pzClipPath + ')');
   }
   return _img;
-}
-export function declareNamespaceSvg(pSvg: SVGElement): SVGElement {
+};
+
+export const declareNamespaceSvg = (pSvg: SVGElement): SVGElement => {
   pSvg.setAttribute('xmlns', SVG_NAMESPACE);
   pSvg.setAttribute('xmlns:xlink', X_LINK_NAMESPACE);
   return pSvg;
-}
-export function getBgRectFromStylesSetup(pStyles: Record<string, string> | CSSStyleDeclaration): string {
+};
+
+export const getBgRectFromStylesSetup = (pStyles: Record<string, string> | CSSStyleDeclaration): string => {
   let _zBg = 'none';
   if (pStyles instanceof CSSStyleDeclaration) {
     _zBg = pStyles.getPropertyValue('background-color');
@@ -107,9 +137,9 @@ export function getBgRectFromStylesSetup(pStyles: Record<string, string> | CSSSt
     _zBg = pStyles['backgroundColor'] || 'none';
   }
   return _zBg;
-}
+};
 
-export function getBgRectFormStylesSetup(pStyles: Record<string, string> | CSSStyleDeclaration): Record<string, string> {
+export const getBgRectFormStylesSetup = (pStyles: Record<string, string> | CSSStyleDeclaration): Record<string, string> => {
   let _borders = { borderRightColor: 'none', borderRightWidth: 'none', borderBottomColor: 'none', borderBottomWidth: 'none' };
   if (pStyles instanceof CSSStyleDeclaration) {
     _borders.borderRightColor = pStyles.getPropertyValue('borderRightColor');
@@ -122,10 +152,10 @@ export function getBgRectFormStylesSetup(pStyles: Record<string, string> | CSSSt
     _borders.borderBottomColor = pStyles['borderBottomColor'] || 'none';
   }
   return _borders;
-}
+};
 
-export function getAcceptStylesBorderSvg(pStyles: CSSStyleDeclaration | Record<string, string>): Record<string, string> {
-  const borders: Record<string, string> = {};
+export const getAcceptStylesBorderSvg = (pStyles: CSSStyleDeclaration | Record<string, string>): Record<string, string> => {
+  const _borders: Record<string, string> = {};
   for (const borderProperty of borderAttributes) {
     let _zValue = '';
     if (pStyles instanceof CSSStyleDeclaration) {
@@ -134,14 +164,14 @@ export function getAcceptStylesBorderSvg(pStyles: CSSStyleDeclaration | Record<s
       _zValue = pStyles[camelCase(borderProperty)] || '';
     }
     if (_zValue) {
-      borders[camelCase(borderProperty)] = _zValue;
+      _borders[camelCase(borderProperty)] = _zValue;
     }
   }
-  return borders;
-}
+  return _borders;
+};
 
-export function getAcceptStylesTextSvg(pStyles: CSSStyleDeclaration | Record<string, string>): Record<string, string> {
-  const stylesText: Record<string, string> = {};
+export const getAcceptStylesTextSvg = (pStyles: CSSStyleDeclaration | Record<string, string>): Record<string, string> => {
+  const _stylesText: Record<string, string> = {};
   for (const textProperty of textAttributes) {
     let _zValue = '';
     if (pStyles instanceof CSSStyleDeclaration) {
@@ -150,8 +180,8 @@ export function getAcceptStylesTextSvg(pStyles: CSSStyleDeclaration | Record<str
       _zValue = pStyles[camelCase(textProperty)] || '';
     }
     if (_zValue) {
-      stylesText[camelCase(textProperty)] = _zValue;
+      _stylesText[camelCase(textProperty)] = _zValue;
     }
   }
-  return stylesText;
-}
+  return _stylesText;
+};
