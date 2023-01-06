@@ -18,7 +18,8 @@ export const textAttributes = new Set([
   'unicode-bidi',
   'word-spacing',
   'writing-mode',
-  'user-select', 'white-space'
+  'user-select', 'white-space',
+  'text-align'
 ] as const);
 
 export const borderAttributes = new Set([
@@ -34,6 +35,18 @@ export enum TextAlign {
   Right = 'right',
   Start = 'start',
   End = 'end',
+  CenterCenter = 'center-center',
+  LeftTop = 'left-top',
+  LeftCenter = 'left-center',
+  LeftBottom = 'left-bottom',
+  CenterTop = 'center-top',
+  CenterBottom = 'center-bottom',
+  RightTop = 'right-top',
+  RightCenter = 'right-center',
+  RightBottom = 'right-bottom',
+  GeneralTop = 'general-top',
+  GeneralCenter = 'general-center',
+  GeneralBottom = 'general-bottom',
 }
 
 export type DominantBaseline = 'auto' | 'middle' | 'hanging';

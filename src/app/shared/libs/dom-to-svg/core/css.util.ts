@@ -1,7 +1,80 @@
 export const isInline = (pStyles: CSSStyleDeclaration): boolean => pStyles.display === 'inline' || pStyles.display.startsWith('inline-');
+//TODO: by me not complete
+//#Center
+export const isCenterTop = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'center' && pStyles.alignItems === 'flex-start';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'center' && pStyles['alignItems'] === 'flex-start';
+  }
+};
 
-export const isCenter = (pStyles: CSSStyleDeclaration): boolean => pStyles.display === 'flex' && pStyles.justifyContent === 'center' && pStyles.alignItems === 'center';
+export const isCenterCenter = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'center' && pStyles.alignItems === 'center';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'center' && pStyles['alignItems'] === 'center';
+  }
+};
 
+export const isCenterBottom = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'center' && pStyles.alignItems === 'flex-end';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'center' && pStyles['alignItems'] === 'flex-end';
+  }
+};
+
+//#Left
+export const isLeftTop = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flexStart' && pStyles.alignItems === 'flex-start';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flexStart' && pStyles['alignItems'] === 'flex-start';
+  }
+};
+
+export const isLeftCenter = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flexStart' && pStyles.alignItems === 'center';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flexStart' && pStyles['alignItems'] === 'center';
+  }
+};
+
+export const isLeftBottom = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flexStart' && pStyles.alignItems === 'flex-end';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flexStart' && pStyles['alignItems'] === 'flex-end';
+  }
+};
+
+//#Right
+export const isRightTop = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flex-end' && pStyles.alignItems === 'flex-start';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flex-end' && pStyles['alignItems'] === 'flex-start';
+  }
+};
+
+export const isRightCenter = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flex-end' && pStyles.alignItems === 'center';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flex-end' && pStyles['alignItems'] === 'center';
+  }
+};
+
+export const isRightBottom = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
+  if (pStyles instanceof CSSStyleDeclaration) {
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flexStart' && pStyles.alignItems === 'flex-end';
+  } else {
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flexStart' && pStyles['alignItems'] === 'flex-end';
+  }
+};
+//end
 export const isFlexDirectionRow = (pParentStyles: CSSStyleDeclaration) =>
   pParentStyles.display === 'flex' && pParentStyles.flexDirection === 'row';
 

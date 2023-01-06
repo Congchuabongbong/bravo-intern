@@ -9,7 +9,12 @@ export const normalStyles: Record<string, string> = {
   fontFamily: 'Segoe UI,Tahoma,Geneva,Verdana,sans-serif',
   fontWeight: 'normal',
   fontSize: '16px',
+  textAlign: 'left',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
 };
+
 
 export const alternateStyles: Record<string, string> = {
   backgroundColor: '#b7c4cf',
@@ -19,6 +24,9 @@ export const alternateStyles: Record<string, string> = {
 export const subtotal0Styles: Record<string, string> = {
   fontWeight: '500',
   backgroundColor: '#FFF6BD',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
 };
 export const subtotal1Styles: Record<string, string> = {
   fontWeight: '600',
@@ -29,11 +37,15 @@ export const subtotal1Styles: Record<string, string> = {
 export const frozenStyles: Record<string, string> = {
   backgroundColor: '#b3ffae',
   fontWeight: '400',
+
 };
 
 export const fixedStyles: Record<string, string> = {
   backgroundColor: '#dfe3e8',
   fontWeight: 'bold',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
 };
 
 export const rowsHeaderStyles: Record<string, string> = {

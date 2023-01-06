@@ -105,7 +105,7 @@ export class ControlGridDataLayoutPanelComponent
       col.allowMerging = true;
       panel.setCellData(0, col.index, col.header);
     });
-    //
+
     // center-align merged header cells
     flexGrid.formatItem.addHandler(function (s: FlexGrid, e: FormatItemEventArgs) {
       if (e.panel == s.columnHeaders && e.range.rowSpan > 1) {
@@ -573,16 +573,16 @@ export class ControlGridDataLayoutPanelComponent
     stylesSetup.set(CellStyleEnum.Frozen, frozenStyles);
     stylesSetup.set(CellStyleEnum.RowHeader, rowsHeaderStyles);
     this.svgEngine.stylesSetup = stylesSetup;
-    const svg = this.svgEngine.renderFlexSvgVisible();
+    const svg = this.svgEngine.renderFlexSvgRaw();
     this.svgContainer.nativeElement.style.display = 'block';
 
     //
-    const base64doc = window.btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    const alink = document.createElement('a');
-    const event = new MouseEvent('click');
-    alink.download = 'download.svg';
-    alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    alink.dispatchEvent(event);
-    console.timeEnd("Second call");
+    // const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    // const alink = document.createElement('a');
+    // const event = new MouseEvent('click');
+    // alink.download = 'download.svg';
+    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    // alink.dispatchEvent(event);
+    // console.timeEnd("Second call");
   }
 }
