@@ -78,8 +78,8 @@ export const drawText = (
 ): SVGElement => {
   const _textEl = document.createElementNS(SVG_NAMESPACE, 'text') as SVGElement;
   _textEl.textContent = pzTextContent;
-  _textEl.setAttribute('x', pBehavior.point.x.toString());
-  _textEl.setAttribute('y', (pBehavior.point.y).toString());
+  pBehavior.point.x && _textEl.setAttribute('x', pBehavior.point.x.toString());
+  pBehavior.point.y && _textEl.setAttribute('y', (pBehavior.point.y).toString());
   if (pStyles && pStyles instanceof CSSStyleDeclaration) {
     for (const textProperty of textAttributes) {
       const _zValue = pStyles.getPropertyValue(textProperty);
@@ -95,8 +95,8 @@ export const drawText = (
     }
     _textEl.setAttribute('fill', pStyles['color']);
   }
-  _textEl.setAttribute('dominant-baseline', pBehavior.dominantBaseline.toString());
-  _textEl.setAttribute('text-anchor', pBehavior.textAnchor.toString());
+  pBehavior.dominantBaseline && _textEl.setAttribute('dominant-baseline', pBehavior.dominantBaseline);
+  pBehavior.textAnchor && _textEl.setAttribute('text-anchor', pBehavior.textAnchor);
   if (pWhiteSpace === 'preserve') {
     _textEl.setAttributeNS(XML_NAMESPACE, "xml:space", "preserve");
   }

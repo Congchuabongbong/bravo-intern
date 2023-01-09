@@ -28,25 +28,25 @@ export const isCenterBottom = (pStyles: CSSStyleDeclaration | Record<string, str
 //#Left
 export const isLeftTop = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
   if (pStyles instanceof CSSStyleDeclaration) {
-    return pStyles.display === 'flex' && pStyles.justifyContent === 'flexStart' && pStyles.alignItems === 'flex-start';
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flex-start' && pStyles.alignItems === 'flex-start';
   } else {
-    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flexStart' && pStyles['alignItems'] === 'flex-start';
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flex-start' && pStyles['alignItems'] === 'flex-start';
   }
 };
 
 export const isLeftCenter = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
   if (pStyles instanceof CSSStyleDeclaration) {
-    return pStyles.display === 'flex' && pStyles.justifyContent === 'flexStart' && pStyles.alignItems === 'center';
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flex-start' && pStyles.alignItems === 'center';
   } else {
-    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flexStart' && pStyles['alignItems'] === 'center';
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flex-start' && pStyles['alignItems'] === 'center';
   }
 };
 
 export const isLeftBottom = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
   if (pStyles instanceof CSSStyleDeclaration) {
-    return pStyles.display === 'flex' && pStyles.justifyContent === 'flexStart' && pStyles.alignItems === 'flex-end';
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flex-start' && pStyles.alignItems === 'flex-end';
   } else {
-    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flexStart' && pStyles['alignItems'] === 'flex-end';
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flex-start' && pStyles['alignItems'] === 'flex-end';
   }
 };
 
@@ -69,9 +69,9 @@ export const isRightCenter = (pStyles: CSSStyleDeclaration | Record<string, stri
 
 export const isRightBottom = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
   if (pStyles instanceof CSSStyleDeclaration) {
-    return pStyles.display === 'flex' && pStyles.justifyContent === 'flexStart' && pStyles.alignItems === 'flex-end';
+    return pStyles.display === 'flex' && pStyles.justifyContent === 'flex-end' && pStyles.alignItems === 'flex-end';
   } else {
-    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flexStart' && pStyles['alignItems'] === 'flex-end';
+    return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flex-end' && pStyles['alignItems'] === 'flex-end';
   }
 };
 //end

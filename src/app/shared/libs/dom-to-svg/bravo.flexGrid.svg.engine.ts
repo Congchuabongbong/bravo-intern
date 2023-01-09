@@ -5,7 +5,7 @@ import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer'
 import { Font } from './bravo-graphics/font';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
 import { BravoSvgEngine } from './bravo.svg.engine';
-import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent, isCenterCenter } from './core/css.util';
+import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent, isCenterCenter, isCenterTop, isCenterBottom, isLeftTop, isRightTop, isRightCenter, isRightBottom } from './core/css.util';
 import { isElement, isHTMLButtonElement, isHTMLImageElement, isHTMLInputElement, isHTMLSpanElement, isTextNode } from './core/dom.util';
 import { arrowDown, arrowUp, collapse, expand, inputChecked, inputUnchecked, pinned, unpinned } from './core/icons.svg';
 import { creatorSVG, declareNamespaceSvg, drawImage, drawText, getAcceptStylesBorderSvg, getAcceptStylesTextSvg, getBgRectFromStylesSetup, setAttrSvgIcon } from './core/svg.engine.util';
@@ -565,7 +565,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   private _stylesBase!: CSSStyleDeclaration;
   private _stylesTextSetup!: Record<string, string>;
   private _stylesBorderSetup!: Record<string, string>;
-  private _bIsCenterCenter!: boolean;
+  private _zTextAglin!: string;
   private _zBgColorSetup!: string;
   private _bIsRawValue: boolean = false;
   set isRawValue(value: boolean) {
@@ -683,7 +683,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         if (pPanel.cellType === CellType.Cell || pPanel.cellType === CellType.ColumnFooter || pPanel.cellType === CellType.ColumnHeader) {
           _cellBoundingRect.left += this.flexGrid.rowHeaders.width;
         }
-        //?Case Pin
+        //?Trường hợp Pin
         if (_nColIndex < pPanel.columns.frozen) {
           _cellBoundingRect.left += this.flexGrid.scrollPosition.x * (this.flexGrid.rightToLeft ? -1 : +1);
         }
@@ -712,7 +712,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     const _panel = payload.panel;
     const _rect = payload.cellBoundingRect;
     const _cellRange = payload.cellRange;
-    //trường hợp cell được merge hoặc gr thì kích thước của rectangle bằng tổng các cell
+    //trường hợp cell được merge hoặc gr thì kích thước của rectangle bằng tổng các cell cộng lại
     if (_cellRange && !_cellRange.isSingleCell) {
       for (let _nIndex = _cellRange.col + 1; _nIndex <= _cellRange.col2; _nIndex++) {
         _rect.width += _panel.columns[_nIndex].renderWidth; // total width of rectangle
@@ -779,6 +779,39 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     payload.group.appendChild(_textSvgEl);
     return _textSvgEl as SVGElement;
   }
+
+  //?Tạm thời để đây!
+  private _getAlignText(styles: CSSStyleDeclaration | Record<string, string>, pPayload: Payload): TextAlign {
+    const _panel = pPayload.panel;
+    let _nCurrentCol = pPayload.col;
+    //#Center
+    if (isCenterTop(styles)) {
+      return TextAlign.CenterTop;
+    } else if (isCenterCenter(styles)) {
+      return TextAlign.CenterCenter;
+    } else if (isCenterBottom(styles)) {
+      return TextAlign.CenterBottom;
+    }
+    //#Left
+    if (isLeftTop(styles)) {
+      return TextAlign.LeftTop;
+    } else if (isCenterCenter(styles)) {
+      return TextAlign.CenterCenter;
+    } else if (isCenterBottom(styles)) {
+      return TextAlign.CenterBottom;
+    }
+    //#Right
+    if (isRightTop(styles)) {
+      return TextAlign.LeftTop;
+    } else if (isRightCenter(styles)) {
+      return TextAlign.CenterCenter;
+    } else if (isRightBottom(styles)) {
+      return TextAlign.CenterBottom;
+    }
+    //Mặc định nằm left top! Với trường hợp cell type là boolean nằm center center
+    if (_panel.columns[_nCurrentCol].dataType === DataType.Boolean) return TextAlign.CenterCenter;
+    else return TextAlign.LeftTop;
+  }
   /**
   * @desc: expensive function dùng để tính toán hành vi (tọa độ, điểm vẽ, hướng vẽ,...) của text node dựa trên tọa độ, kích thước của rect cell raw
   * @param payload: Payload
@@ -789,72 +822,118 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       const _panel = pPayload.panel;
       const _nCurrentCol = pPayload.col;
       const _nCurrentRow = pPayload.row;
-      const _cellValue = pPayload.cellValue;
+      let _cellValue = pPayload.cellValue;
       const _cellBoundingRect = pPayload.cellBoundingRect;
       let _nPaddingLeft = this.cellPadding.paddingLeft;
       let _nPaddingRight = this.cellPadding.paddingRight;
       let _nPaddingTop = this.cellPadding.paddingTop;
       let _nPaddingBottom = this.cellPadding.paddingBottom;
-      let _nXTextDefault = _cellBoundingRect.left + _nPaddingLeft;
+      let _nXTextDefault = _cellBoundingRect.left;
       let _bisRowGroup = pPayload.isRowGroup;
-      const _yTextDefault = _cellBoundingRect.top + _nPaddingTop;
-      let _zAlginText = this._stylesTextSetup['textAlign'] || 'left';
+      let _yTextDefault = _cellBoundingRect.top;
+      const _font = new Font(this._stylesTextSetup['fontFamily'], this._stylesTextSetup['fontSize'], this._stylesTextSetup['fontWeight']);
+      pPayload.dimensionText = BravoGraphicsRenderer.measureString(_cellValue, _font, _cellBoundingRect.width, false);
+      let _nWidthText = pPayload.dimensionText?.width || 0;
+      let _nHeightText = pPayload.dimensionText?.height || 0;
+      let _bIsFitWidth = _nWidthText < (_cellBoundingRect.width - _nPaddingLeft - _nPaddingRight);
+      let _bIsFitHeight = _nHeightText < (_cellBoundingRect.height - _nPaddingBottom - _nPaddingTop);
+      let _bIsFitContent = _bIsFitWidth && _bIsFitHeight;
+      let _zAlginText = this._zTextAglin || 'left';
       if (_panel.columns[_nCurrentCol].dataType === DataType.Boolean) {
-        _zAlginText = this._stylesTextSetup['textAlign'] || 'center';
-      }
-      if (this._bIsCenterCenter) {
-        _zAlginText = 'center-center';
+        _zAlginText = this._zTextAglin || 'center';
       }
       //Case indent for row group
+      /*
+      !chưa check trường hợp nếu group nằm bên phải trừ paddingRight
+      */
       if (_bisRowGroup) {
         _nXTextDefault += (_panel.rows[_nCurrentRow] as GroupRow).level * this.flexGrid.treeIndent;
         _nPaddingLeft += (_panel.rows[_nCurrentRow] as GroupRow).level * this.flexGrid.treeIndent;
       }
-      const _behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(_nXTextDefault, _yTextDefault), textAnchor: 'start' };
-      const _font = new Font(this._stylesTextSetup['fontFamily'], this._stylesTextSetup['fontSize'], this._stylesTextSetup['fontWeight']);
-      pPayload.dimensionText = BravoGraphicsRenderer.measureString(_cellValue, _font, _cellBoundingRect.width, false);
-      let _bIsFitWidth = (pPayload.dimensionText?.width || 0) < (_cellBoundingRect.width - _nPaddingLeft - _nPaddingRight);
-      let _bIsFitHeight = ((pPayload.dimensionText?.height || 0) < (_cellBoundingRect.height - _nPaddingBottom - _nPaddingTop));
-      let _bIsFitContent = _bIsFitWidth && _bIsFitHeight;
+
+      const _behaviorTextBase: Partial<BehaviorText> = { point: new Point(_nXTextDefault, _yTextDefault), textAnchor: 'start' };
+      _behaviorTextBase.isTextFitWidthCell = _bIsFitContent; // fix
       switch (_zAlginText) {
         case TextAlign.Left:
         case TextAlign.Start:
+        case TextAlign.LeftTop:
+          _behaviorTextBase.point!.x += _nPaddingLeft;
+          _behaviorTextBase.point!.y += _nPaddingTop;
           _behaviorTextBase.textAnchor = 'start';
-          _behaviorTextBase.isTextFitWidthCell = _bIsFitContent;
+          _behaviorTextBase.dominantBaseline = 'hanging';
           return (_behaviorTextBase as BehaviorText);
         case TextAlign.Center:
+        case TextAlign.CenterTop:
           if (_bIsFitContent) {
-            _behaviorTextBase.point!.x += (_cellBoundingRect.width) / 2 - _nPaddingLeft;
+            _behaviorTextBase.point!.x += (_cellBoundingRect.width) / 2;
+            _behaviorTextBase.point!.y += _nPaddingTop;
             _behaviorTextBase.textAnchor = 'middle';
-            _behaviorTextBase.isTextFitWidthCell = true;
+            _behaviorTextBase.dominantBaseline = 'hanging';
             return (_behaviorTextBase as BehaviorText);
           }
-          _behaviorTextBase.isTextFitWidthCell = false;
+          //case center và center-top không vừa mặc định vẽ theo hành vi của left-top và left
+          //!need to Optimize
+          _behaviorTextBase.point!.x += _nPaddingLeft;
+          _behaviorTextBase.point!.y += _nPaddingTop;
+          _behaviorTextBase.textAnchor = 'start';
+          _behaviorTextBase.dominantBaseline = 'hanging';
           return (_behaviorTextBase as BehaviorText);
         case TextAlign.Right:
+        case TextAlign.RightTop:
         case TextAlign.End:
           if (_bIsFitContent) {
-            _behaviorTextBase.point!.x += (_cellBoundingRect.width - _nPaddingRight - _nPaddingLeft);
+            _behaviorTextBase.point!.x += (_cellBoundingRect.width - _nPaddingRight);
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.isTextFitWidthCell = true;
             return (_behaviorTextBase as BehaviorText);
           }
           _behaviorTextBase.isTextFitWidthCell = false;
           return (_behaviorTextBase as BehaviorText);
+        //!Special case
+        //?#Center
+        case TextAlign.CenterBottom:
+          if (_bIsFitContent) {
+            _behaviorTextBase.point!.x += (_cellBoundingRect.width) / 2;
+            _behaviorTextBase.point!.y += (_cellBoundingRect.height) - _nPaddingBottom;
+            _behaviorTextBase.textAnchor = 'middle';
+            _behaviorTextBase.dominantBaseline = 'auto';
+          } else {
+            _behaviorTextBase.point!.x += _nPaddingLeft;
+            // _behaviorTextBase.point!.y += _bIsFitHeight ? ((_cellBoundingRect.height) - _nPaddingBottom) : ((_nPaddingBottom + _nPaddingTop + _nHeightText) - _nPaddingBottom);
+            _behaviorTextBase.point!.y += (_cellBoundingRect.height) - _nPaddingBottom;
+            _behaviorTextBase.isTextFitWidthCell = false;
+          }
+          return (_behaviorTextBase as BehaviorText);
         case TextAlign.CenterCenter:
           if (_bIsFitContent) {
-            _behaviorTextBase.point!.x += (_cellBoundingRect.width) / 2 - _nPaddingLeft;
-            _behaviorTextBase.point!.y += (_cellBoundingRect.height) / 2 - _nPaddingTop;
+            _behaviorTextBase.point!.x += (_cellBoundingRect.width) / 2;
+            _behaviorTextBase.point!.y += (_cellBoundingRect.height) / 2;
             _behaviorTextBase.textAnchor = 'middle';
             _behaviorTextBase.dominantBaseline = 'middle';
             _behaviorTextBase.isTextFitWidthCell = true;
             return (_behaviorTextBase as BehaviorText);
           } else {
+            _behaviorTextBase.point!.x += _nPaddingLeft;
+            //_behaviorTextBase.point!.y += _bIsFitHeight ? ((_cellBoundingRect.height) / 2) : ((_nPaddingBottom + _nPaddingTop + _nHeightText) / 2);
+            _behaviorTextBase.point!.y += (_cellBoundingRect.height) / 2;
             _behaviorTextBase.isTextFitWidthCell = false;
             return (_behaviorTextBase as BehaviorText);
           }
+        //?#Left
+        case TextAlign.LeftCenter:
+          return (_behaviorTextBase as BehaviorText);
+        case TextAlign.LeftBottom:
+          return (_behaviorTextBase as BehaviorText);
+        //?#Right
+        case TextAlign.RightCenter:
+          return (_behaviorTextBase as BehaviorText);
+        case TextAlign.RightBottom:
+          return (_behaviorTextBase as BehaviorText);
         default:
-          _behaviorTextBase.isTextFitWidthCell = true;
+          _behaviorTextBase.textAnchor = 'start';
+          _behaviorTextBase.point!.x += _nPaddingLeft;
+          _behaviorTextBase.point!.y += _nPaddingTop;
+          _behaviorTextBase.isTextFitWidthCell = _bIsFitContent;
           return (_behaviorTextBase as BehaviorText);
       }
     } catch (error) {
@@ -880,36 +959,123 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       let _nPaddingTop = this.cellPadding.paddingTop;
       let _nPaddingBottom = this.cellPadding.paddingBottom;
       let _bIsRowGroup = pPayload.isRowGroup;
-      //Case indent for row group
+      let _nWidthText = pPayload.dimensionText?.width || 0;
+      let _nHeightText = pPayload.dimensionText?.height || 0;
+      let _bIsFitWidth = _nWidthText < (_cellRect.width - _nPaddingLeft - _nPaddingRight);
+      let _bIsFitHeight = _nHeightText < (_cellRect.height - _nPaddingBottom - _nPaddingTop);
+      /*
+      thụt lề cho row group
+      !trường hợp padding right chưa check
+      */
       if (_bIsRowGroup) {
         _nPaddingLeft += (_panel.rows[_nRow] as GroupRow).level * this.flexGrid.treeIndent;
       }
 
+      /*
+      trong trường hợp warpper svg có thể do hành vi thay đổi kích thước do người dùng kéo thay đổi kích thước row và column.
+      hành vi kéo thay đổi kích thước chỉ xảy ra từ phải kéo vào trái đối với width và từ dưới lên trên đối với height.
+      Tính toán lại padding bottom thực tế và padding right thực tế để tính chính xác tọa độ của text nằm trong svg wrapper
+      và chiều cao thực tế!
+      */
+      if (_bIsFitHeight) {
+        _nPaddingBottom = this.cellPadding.paddingBottom;
+      } else {
+        let actualPaddingBottom = _cellRect.height - _nHeightText - _nPaddingTop - 1;
+        _nPaddingBottom = actualPaddingBottom > 0 ? actualPaddingBottom : 0;
+      }
+      // if (_bIsFitWidth) {
+      //   _nPaddingRight = this.cellPadding.paddingRight;
+      // } else {
+      //   let actualPaddingRight = _cellRect.width - _nWidthText - _nPaddingLeft - 1;
+      //   _nPaddingRight = actualPaddingRight > 0 ? actualPaddingRight : 0;
+      // }
+
+      /*
+      Tính toán width và height của rect svg wrapper dựa vào padding left và right,bottom,top thực tế.
+      Nếu width hoặc height nhỏ hơn 0 thì return null ko vẽ!
+      */
       _rectSvg.width = _cellRect.width - _nPaddingLeft - _nPaddingRight;
-      _rectSvg.height = (_cellRect.height - this.cellPadding.paddingTop - this.cellPadding.paddingBottom) || 0;
+      _rectSvg.height = (_cellRect.height - _nPaddingTop - _nPaddingBottom) || 0;
       if (_rectSvg.width <= 0 || _rectSvg.height <= 0) {
         return null;
       }
-      let _bIsFitWidth = (pPayload.dimensionText?.width || 0) < (_cellRect.width - _nPaddingLeft - _nPaddingRight);
-      let _bIsFitHeight = ((pPayload.dimensionText?.height || 0) < (_cellRect.height - _nPaddingBottom - _nPaddingTop));
-      _rectSvg.x = _textBehavior.point.x;
-      _rectSvg.y = _textBehavior.point.y;
-      const _svgWrapText = creatorSVG(_rectSvg, true);
       const _textSvgEl = drawText(pPayload.cellValue, _textBehavior, this._stylesTextSetup, 'preserve');
-      _textSvgEl.setAttribute('x', '0');
-      _textSvgEl.setAttribute('y', '0');
       /*
-        Trường hợp nếu chỉ không vừa height hoặc width tính toán tọa độ lại của x và y của text theo wrapper svg theo từng trường hợp.
-        -Không trừ pading top và left vì tọa độ của svg đang nằm theo text đã được tính toán behaivior cách top và left một khoảng default
+      Tính toán lại tọa độ của svg wrapper! tọa độ x luôn giữ nguyên! điểm vẽ luôn = padding left
+      Tọa độ y của svg wrapper tính toán phụ thuộc vào alignment của text
+      Tính toán lại behavior của text theo svg wrapper!
       */
-      if ((_bIsFitHeight)) {
-        _textSvgEl.setAttribute('y', (_rectSvg.height / 2).toString());
-        _textSvgEl.setAttribute('dominant-baseline', 'middle');
+      switch (this._zTextAglin) {
+        case TextAlign.Left:
+        case TextAlign.Start:
+        case TextAlign.LeftTop:
+        case TextAlign.Center:
+        case TextAlign.CenterTop:
+        case TextAlign.Right:
+        case TextAlign.RightTop:
+        case TextAlign.End:
+          _rectSvg.x = _textBehavior.point.x;
+          _rectSvg.y = _textBehavior.point.y;
+          _textSvgEl.setAttribute('x', '0');
+          _textSvgEl.setAttribute('y', '0');
+          _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          _textSvgEl.setAttribute('text-anchor', 'start');
+          break;
+        /* Trong trường hợp Center bottom,left bottom,right bottom nếu chiều dài của text vừa
+        thì cộng height của svg thêm padding bottom để text ko bị lẹm đi do hành vi
+          vẽ của text là dominant-baseline = auto
+        */
+        case TextAlign.CenterBottom:
+          _rectSvg.x = _textBehavior.point.x;
+          //case fit width?
+          if (_bIsFitWidth) {
+            _textSvgEl.setAttribute('x', (_rectSvg.width / 2).toString());
+            _textSvgEl.setAttribute('text-anchor', 'middle');
+          } else {
+            _textSvgEl.setAttribute('x', '0');
+            _textSvgEl.setAttribute('text-anchor', 'start');
+          }
+          //case fit height?
+          if (_bIsFitHeight) {
+            _rectSvg.height += _nPaddingBottom;
+            _rectSvg.y = _textBehavior.point.y - (_rectSvg.height - _nPaddingBottom);
+            _textSvgEl.setAttribute('y', (_rectSvg.height - _nPaddingBottom).toString());
+            _textSvgEl.setAttribute('dominant-baseline', 'auto');
+          } else {
+            _rectSvg.y = _cellRect.top + _nPaddingTop;
+            _textSvgEl.setAttribute('y', '0');
+            _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          }
+          break;
+        case TextAlign.CenterCenter:
+          _rectSvg.x = _textBehavior.point.x;
+          //case fit width?
+          if (_bIsFitWidth) {
+            _textSvgEl.setAttribute('x', (_rectSvg.width / 2).toString());
+            _textSvgEl.setAttribute('text-anchor', 'middle');
+          } else {
+            _textSvgEl.setAttribute('x', '0');
+            _textSvgEl.setAttribute('text-anchor', 'start');
+          }
+          //case fit height?
+          if (_bIsFitHeight) {
+            _rectSvg.y = _textBehavior.point.y - (_rectSvg.height / 2);
+            _textSvgEl.setAttribute('y', (_rectSvg.height / 2).toString());
+            _textSvgEl.setAttribute('dominant-baseline', 'middle');
+          } else {
+            _rectSvg.y = _cellRect.top + _nPaddingTop;
+            _textSvgEl.setAttribute('y', '0');
+            _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          }
+          break;
+        default:
+          _rectSvg.x = _textBehavior.point.x;
+          _rectSvg.y = _textBehavior.point.y;
+          _textSvgEl.setAttribute('x', '0');
+          _textSvgEl.setAttribute('y', '0');
+          break;
       }
-      if (_bIsFitWidth) {
-        _textSvgEl.setAttribute('x', (_rectSvg.width / 2).toString());
-        _textSvgEl.setAttribute('text-anchor', 'middle');
-      }
+      const _svgWrapText = creatorSVG(_rectSvg, true);
       const _payloadEvent = this._getPayloadEvent(pPayload);
       _payloadEvent.svgDrew = _textSvgEl;
       this.onDrewText(_payloadEvent);
@@ -1046,6 +1212,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesNormal);
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesNormal);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesNormal);
+        this._zTextAglin = this._getAlignText(_stylesNormal, pPayload);
         //case alternating row
         if (this.flexGrid.showAlternatingRows) {
           let _bIsAlternate = false;
@@ -1057,7 +1224,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesAlternate);
             this._stylesTextSetup = getAcceptStylesTextSvg(_stylesAlternate);
             this._zBgColorSetup = getBgRectFromStylesSetup(_stylesAlternate);
-            this._bIsCenterCenter = isCenterCenter(_stylesAlternate);
+            this._zTextAglin = this._getAlignText(_stylesAlternate, pPayload);
           }
         }
         //case frozen
@@ -1065,14 +1232,14 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesFrozen);
           this._zBgColorSetup = getBgRectFromStylesSetup(_stylesFrozen);
           this._stylesTextSetup = getAcceptStylesTextSvg(_stylesFrozen);
-          this._bIsCenterCenter = isCenterCenter(_stylesFrozen);
+          this._zTextAglin = this._getAlignText(_stylesFrozen, pPayload);
         }
         //case new row
         if (_panel.rows[_currentRow] instanceof _NewRowTemplate) {
           this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesNewRow);
           this._zBgColorSetup = getBgRectFromStylesSetup(_stylesNewRow);
           this._stylesTextSetup = getAcceptStylesTextSvg(_stylesNewRow);
-          this._bIsCenterCenter = isCenterCenter(_stylesNewRow);
+          this._zTextAglin = this._getAlignText(_stylesNewRow, pPayload);
         }
         //case row group by level
         if (pPayload.isRowGroup) {
@@ -1081,43 +1248,43 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv0);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv0);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv0);
-              this._bIsCenterCenter = isCenterCenter(_stylesGroupLv0);
+              this._zTextAglin = this._getAlignText(_stylesGroupLv0, pPayload);
               break;
             case 1:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv1);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv1);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv1);
-              this._bIsCenterCenter = isCenterCenter(_stylesGroupLv1);
+              this._zTextAglin = this._getAlignText(_stylesGroupLv1, pPayload);
               break;
             case 2:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv2);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv2);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv2);
-              this._bIsCenterCenter = isCenterCenter(_stylesGroupLv2);
+              this._zTextAglin = this._getAlignText(_stylesGroupLv2, pPayload);
               break;
             case 3:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv3);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv3);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv3);
-              this._bIsCenterCenter = isCenterCenter(_stylesGroupLv3);
+              this._zTextAglin = this._getAlignText(_stylesGroupLv3, pPayload);
               break;
             case 4:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv4);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv4);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv4);
-              this._bIsCenterCenter = isCenterCenter(_stylesGroupLv4);
+              this._zTextAglin = this._getAlignText(_stylesGroupLv4, pPayload);
               break;
             case 5:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv5);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv5);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv5);
-              this._bIsCenterCenter = isCenterCenter(_stylesGroupLv5);
+              this._zTextAglin = this._getAlignText(_stylesGroupLv5, pPayload);
               break;
             default:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesFrozen);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesFrozen);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesFrozen);
-              this._bIsCenterCenter = isCenterCenter(_stylesFrozen);
+              this._zTextAglin = this._getAlignText(_stylesFrozen, pPayload);
           }
         }
         break;
@@ -1125,26 +1292,26 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesColsHeader);
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesColsHeader);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesColsHeader);
-        this._bIsCenterCenter = isCenterCenter(_stylesColsHeader);
+        this._zTextAglin = this._getAlignText(_stylesColsHeader, pPayload);
         break;
       case CellType.ColumnFooter:
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesColsFooter);
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesColsFooter);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesColsFooter);
-        this._bIsCenterCenter = isCenterCenter(_stylesColsFooter);
+        this._zTextAglin = this._getAlignText(_stylesColsFooter, pPayload);
         break;
       case CellType.RowHeader:
       case CellType.TopLeft:
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesRowsHeader);
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesRowsHeader);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesRowsHeader);
-        this._bIsCenterCenter = isCenterCenter(_stylesRowsHeader);
+        this._zTextAglin = this._getAlignText(_stylesRowsHeader, pPayload);
         break;
       default:
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesNormal);
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesNormal);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesNormal);
-        this._bIsCenterCenter = isCenterCenter(_stylesNormal);
+        this._zTextAglin = this._getAlignText(_stylesNormal, pPayload);
         break;
     }
   }

@@ -35,15 +35,19 @@ export enum TextAlign {
   Right = 'right',
   Start = 'start',
   End = 'end',
+
+  CenterTop = 'center-top',
   CenterCenter = 'center-center',
+  CenterBottom = 'center-bottom',
+
   LeftTop = 'left-top',
   LeftCenter = 'left-center',
   LeftBottom = 'left-bottom',
-  CenterTop = 'center-top',
-  CenterBottom = 'center-bottom',
+
   RightTop = 'right-top',
   RightCenter = 'right-center',
   RightBottom = 'right-bottom',
+
   GeneralTop = 'general-top',
   GeneralCenter = 'general-center',
   GeneralBottom = 'general-bottom',
