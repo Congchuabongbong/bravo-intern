@@ -10,8 +10,8 @@ export const normalStyles: Record<string, string> = {
   fontWeight: 'normal',
   fontSize: '16px',
   display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center'
+  justifyContent: 'flex-start',
+  alignItems: 'flex-start'
 };
 
 
@@ -40,7 +40,7 @@ export const fixedStyles: Record<string, string> = {
   backgroundColor: '#dfe3e8',
   fontWeight: 'bold',
   display: 'flex',
-  justifyContent: 'center',
+  justifyContent: 'flex-end',
   alignItems: 'flex-end'
 };
 
