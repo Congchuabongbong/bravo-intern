@@ -1,3 +1,5 @@
+import { TextAlign } from "./type.util";
+
 export const isInline = (pStyles: CSSStyleDeclaration): boolean => pStyles.display === 'inline' || pStyles.display.startsWith('inline-');
 //TODO: by me not complete
 //#Center
@@ -112,3 +114,30 @@ export const isVisible = (pStyles: CSSStyleDeclaration): boolean =>
   pStyles.visibility !== 'hidden' &&
   pStyles.opacity !== '0';
 
+export const getAlignText = (pStyles: CSSStyleDeclaration | Record<string, string>): TextAlign => {
+  //#Center
+  if (isCenterTop(pStyles)) {
+    return TextAlign.CenterTop;
+  } else if (isCenterCenter(pStyles)) {
+    return TextAlign.CenterCenter;
+  } else if (isCenterBottom(pStyles)) {
+    return TextAlign.CenterBottom;
+  }
+  //#Left
+  if (isLeftTop(pStyles)) {
+    return TextAlign.LeftTop;
+  } else if (isLeftCenter(pStyles)) {
+    return TextAlign.LeftCenter;
+  } else if (isLeftBottom(pStyles)) {
+    return TextAlign.LeftBottom;
+  }
+  //#Right
+  if (isRightTop(pStyles)) {
+    return TextAlign.RightTop;
+  } else if (isRightCenter(pStyles)) {
+    return TextAlign.RightCenter;
+  } else if (isRightBottom(pStyles)) {
+    return TextAlign.RightBottom;
+  }
+  else return TextAlign.LeftTop;
+};

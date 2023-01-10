@@ -168,12 +168,15 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
   public scanSiblingsNode(pNode: Node): ISiblings {
     const _leftSideCurrentNode: ChildNode[] = [];
     const _rightSideCurrentNode: ChildNode[] = [];
-    if (!pNode.parentNode) return { leftSideCurrentNode: _leftSideCurrentNode, rightSideCurrentNode: _rightSideCurrentNode };
+    const _parenNode = <Element>pNode.parentNode;
+    if (!_parenNode) return { leftSideCurrentNode: _leftSideCurrentNode, rightSideCurrentNode: _rightSideCurrentNode };
     const parentStyles = getComputedStyle(pNode.parentNode as Element);
     let _nextSibling = pNode.nextSibling;
     let _previousSibling = pNode.previousSibling;
+    let _parentRect = _parenNode.getBoundingClientRect();
+
     //case next sibling pNode
-    if (pNode.parentNode.lastChild !== pNode) {
+    if (_parenNode.lastChild !== pNode) {
       while (_nextSibling) {
         switch (_nextSibling.nodeType) {
           case Node.COMMENT_NODE:
@@ -182,6 +185,9 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
             _rightSideCurrentNode.push(_nextSibling);
             break;
           case Node.ELEMENT_NODE:
+            const _nextSiblingRect = (_nextSibling as Element).getBoundingClientRect();
+            /* Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua*/
+            if (((_parentRect.left + _parentRect.width) < _nextSiblingRect.left) || ((_parentRect.top + _parentRect.height) < _nextSiblingRect.top) || _parentRect.left > _nextSiblingRect.left || _parentRect.top > _nextSiblingRect.top) break;
             const computedNode = getComputedStyle(_nextSibling as Element);
             if (isInFlow(computedNode) || isFlexDirectionRow(parentStyles) || isInline(computedNode)) {
               isFloatLeft(computedNode) ? _leftSideCurrentNode.push(_nextSibling) : _rightSideCurrentNode.push(_nextSibling);
@@ -194,7 +200,7 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
       }
     }
     //case previous sibling node
-    if (pNode.parentNode.firstChild !== pNode) {
+    if (_parenNode.firstChild !== pNode) {
       while (_previousSibling) {
         switch (_previousSibling.nodeType) {
           case Node.COMMENT_NODE:
@@ -203,6 +209,9 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
             _leftSideCurrentNode.push(_previousSibling);
             break;
           case Node.ELEMENT_NODE:
+            const _previousSiblingRect = (_previousSibling as Element).getBoundingClientRect();
+            /* Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua*/
+            if (((_parentRect.left + _parentRect.width) < _previousSiblingRect.left) || ((_parentRect.top + _parentRect.height) < _previousSiblingRect.top) || _parentRect.left > _previousSiblingRect.left || _parentRect.top > _previousSiblingRect.top) break;
             const computedNode = getComputedStyle(_previousSibling as Element);
             if (isInFlow(computedNode) || isFlexDirectionRow(parentStyles) || isInline(computedNode)) {
               isFloatRight(computedNode) ? _rightSideCurrentNode.push(_previousSibling) : _leftSideCurrentNode.push(_previousSibling);

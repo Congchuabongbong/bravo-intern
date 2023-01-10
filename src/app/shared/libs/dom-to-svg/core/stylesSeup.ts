@@ -10,8 +10,8 @@ export const normalStyles: Record<string, string> = {
   fontWeight: 'normal',
   fontSize: '16px',
   display: 'flex',
-  justifyContent: 'flex-start',
-  alignItems: 'flex-start'
+  justifyContent: 'center',
+  alignItems: 'center'
 };
 
 
@@ -23,10 +23,16 @@ export const alternateStyles: Record<string, string> = {
 export const subtotal0Styles: Record<string, string> = {
   fontWeight: '500',
   backgroundColor: '#FFF6BD',
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'flex-start',
 };
 export const subtotal1Styles: Record<string, string> = {
   fontWeight: '600',
-  backgroundColor: '#FBC252'
+  backgroundColor: '#FBC252',
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'flex-start',
 };
 
 
@@ -40,8 +46,8 @@ export const fixedStyles: Record<string, string> = {
   backgroundColor: '#dfe3e8',
   fontWeight: 'bold',
   display: 'flex',
-  justifyContent: 'flex-end',
-  alignItems: 'flex-end'
+  justifyContent: 'center',
+  alignItems: 'center'
 };
 
 export const rowsHeaderStyles: Record<string, string> = {
@@ -49,7 +55,6 @@ export const rowsHeaderStyles: Record<string, string> = {
 };
 
 export const newRowStyes: Record<string, string> = {
-
 };
 
 

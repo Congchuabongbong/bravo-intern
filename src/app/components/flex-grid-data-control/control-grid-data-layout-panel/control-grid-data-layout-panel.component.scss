@@ -83,3 +83,8 @@
 //   transform: scale(3);
 //   transition: all 600ms;
 // }
+::ng-deep .wj-flexgrid .wj-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}

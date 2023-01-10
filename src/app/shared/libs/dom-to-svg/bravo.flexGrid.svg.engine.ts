@@ -5,7 +5,7 @@ import { BravoGraphicsRenderer } from './bravo-graphics/bravo.graphics.renderer'
 import { Font } from './bravo-graphics/font';
 import { BravoTextMetrics } from './bravo-graphics/measure-text-canvas/bravo.canvas.measure.text';
 import { BravoSvgEngine } from './bravo.svg.engine';
-import { hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent, isCenterCenter, isCenterTop, isCenterBottom, isLeftTop, isRightTop, isRightCenter, isRightBottom, isLeftCenter, isLeftBottom } from './core/css.util';
+import { getAlignText, hasBorderBottom, hasBorderLeft, hasBorderRight, hasBorderTop, isInline, isTransparent } from './core/css.util';
 import { isElement, isHTMLButtonElement, isHTMLImageElement, isHTMLInputElement, isHTMLSpanElement, isTextNode } from './core/dom.util';
 import { arrowDown, arrowUp, collapse, expand, inputChecked, inputUnchecked, pinned, unpinned } from './core/icons.svg';
 import { creatorSVG, declareNamespaceSvg, drawImage, drawText, getAcceptStylesBorderSvg, getAcceptStylesTextSvg, getBgRectFromStylesSetup, setAttrSvgIcon } from './core/svg.engine.util';
@@ -144,111 +144,120 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this._drawCellPanel(pPanel, _viewRange);
   }
 
-  private _drawRectCell(payload: Payload): void {
-    const _cellBoundingRect = payload.cellBoundingRect;
-    const _cellStyles = payload.cellStyles;
+  private _drawRectCell(pPayload: Payload): void {
+    const _cellBoundingRect = pPayload.cellBoundingRect;
+    const _cellStyles = pPayload.cellStyles;
     const _rectSvgEl = this.drawRect(_cellBoundingRect.left, _cellBoundingRect.top, _cellBoundingRect.width, _cellBoundingRect.height);
     _cellStyles.backgroundColor && !isTransparent(_cellStyles.backgroundColor) && _rectSvgEl.setAttribute('fill', _cellStyles.backgroundColor || 'rgba(0, 0, 0, 0)');
-    this._drawBorderCell(payload);
+    this._drawBorderCell(pPayload);
     /*
     ?Sau khi vẽ xong rectangle bắt đầu quét các phần tử bên trong cell và draw theo các trường hợp image,button,text node,...
     */
-    this._scanCell(payload.cellElement, payload);
+    this._scanCell(pPayload.cellElement, pPayload);
   }
 
-  private _drawBorderCell(payload: Payload) {
-    const { left: _nLeft, top: _nTop, bottom: _nBottom, right: _nRight } = payload.cellBoundingRect;
-    const _borders = getAcceptStylesBorderSvg(payload.cellStyles);
-    if (hasBorderBottom(payload.cellStyles)) {
+  private _drawBorderCell(pPayload: Payload) {
+    const { left: _nLeft, top: _nTop, bottom: _nBottom, right: _nRight } = pPayload.cellBoundingRect;
+    const _borders = getAcceptStylesBorderSvg(pPayload.cellStyles);
+    if (hasBorderBottom(pPayload.cellStyles)) {
       const _lineSvgEl = this.drawLine(_nLeft, _nBottom, _nRight, _nBottom);
       _lineSvgEl.setAttribute('stroke-width', _borders['borderBottomWidth']);
       _lineSvgEl.setAttribute('stroke', _borders['borderBottomColor']);
     }
-    if (hasBorderTop(payload.cellStyles)) {
+    if (hasBorderTop(pPayload.cellStyles)) {
       const _lineSvgEl = this.drawLine(_nLeft, _nTop, _nRight, _nTop);
       _lineSvgEl.setAttribute('stroke-width', _borders['borderTopWidth']);
       _lineSvgEl.setAttribute('stroke', _borders['borderTopColor']);
     }
-    if (hasBorderRight(payload.cellStyles)) {
+    if (hasBorderRight(pPayload.cellStyles)) {
       const _lineSvgEl = this.drawLine(_nRight, _nTop, _nRight, _nBottom);
       _lineSvgEl.setAttribute('stroke-width', _borders['borderRightWidth']);
       _lineSvgEl.setAttribute('stroke', _borders['borderRightColor']);
     }
-    if (hasBorderLeft(payload.cellStyles)) {
+    if (hasBorderLeft(pPayload.cellStyles)) {
       const _lineSvgEl = this.drawLine(_nLeft, _nTop, _nLeft, _nBottom);
       _lineSvgEl.setAttribute('stroke-width', _borders['borderLeftWidth']);
       _lineSvgEl.setAttribute('stroke', _borders['borderLeftColor']);
     }
   }
 
-  private _scanCell(pElScanned: Element, payload: Payload) {
+  private _scanCell(pElScanned: Element, pPayload: Payload) {
     if (pElScanned.hasChildNodes()) {
       pElScanned.childNodes.forEach((pNode: Node) => {
         //?case text node;
         if (isTextNode(pNode)) {
-          const _svgEl = this._drawTextNodeInCell(pNode, payload);
-          _svgEl && payload.group.appendChild(_svgEl as Node);
+          const _svgEl = this._drawTextNodeInCell(pNode, pPayload);
+          _svgEl && pPayload.group.appendChild(_svgEl as Node);
         }
         //?case image;
         if (isHTMLImageElement(pNode as HTMLElement)) {
-          const _svgEl = this._drawImageInCell(pNode as HTMLImageElement, payload);
-          _svgEl && payload.group.appendChild(_svgEl as Node);
+          const _svgEl = this._drawImageInCell(pNode as HTMLImageElement, pPayload);
+          _svgEl && pPayload.group.appendChild(_svgEl as Node);
         }
         //?case input checkbox
         if (isHTMLInputElement(pNode as Element)) { // case input checkbox
-          this._drawCheckBox(pNode, payload);
+          this._drawCheckBox(pNode, pPayload);
         };
         //?case button pin
         if (this.flexGrid.allowPinning && isHTMLButtonElement(pNode as Element) && (pNode as Element).className.includes('wj-elem-pin')) {
-          this._drawPin(pNode, payload);
+          this._drawPin(pNode, pPayload);
         }
         //?case collapse/expand
         if (isHTMLButtonElement(pNode as Element) && (pNode as Element).className.includes('wj-elem-collapse')) {
-          this._drawGroupBtn(pNode, payload);
+          this._drawGroupBtn(pNode, pPayload);
         }
         //?case btn sort
         if (this.flexGrid.allowSorting && isHTMLSpanElement(pNode as Element) && ((pNode as Element).className.includes('wj-glyph-up') || (pNode as Element).className.includes('wj-glyph-down'))) {
-          this._drawSortBtn(pNode, payload);
+          this._drawSortBtn(pNode, pPayload);
         }
-
-        this._scanCell(pNode as Element, payload);
+        this._scanCell(pNode as Element, pPayload);
       });
     }
   }
   //*Handle and draw Text Here:
-  private _calculateBehaviorTextNode(pTextNode: Text, payload: Payload): BehaviorText {
+  private _calculateBehaviorTextNode(pTextNode: Text, pPayload: Payload): BehaviorText {
     try {
-      const { parentBoundingRect: _parentBoundingRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, payload);
+      const { parentBoundingRect: _parentRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, pPayload);
       let _nDeviationHeight = 0;
-      payload.dimensionText = this._measureTextNode(pTextNode, payload);
+      pPayload.dimensionText = this._measureTextNode(pTextNode, pPayload);
       //?kiểm tra trường hợp nếu là inline element tính độ chênh lệch chiều cao nội dung bên trong và thẻ chứa nội dung
       if (isInline(_parentStyles)) {
-        let _heightOfText = payload.dimensionText?.lineHeight || 0;
-        _nDeviationHeight = (_parentBoundingRect.height - _heightOfText) / 2;
+        let _heightOfText = pPayload.dimensionText?.lineHeight || 0;
+        _nDeviationHeight = (_parentRect.height - _heightOfText) / 2;
       }
-      const _zAlginText = _parentStyles.textAlign;
-      const { leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth, rightTotalSiblingsWidth: _nRightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode, payload);
-      const _nPaddingLeft = +_parentStyles.paddingLeft.replace('px', '');
-      const _nPaddingTop = +_parentStyles.paddingTop.replace('px', '');
-      const _nPaddingRight = +_parentStyles.paddingRight.replace('px', '');
-      const _nXTextDefault = _parentBoundingRect.left + _nPaddingLeft;
-      const _nYTextDefault = _parentBoundingRect.top + _nPaddingTop + _nDeviationHeight;
+      this._zTextAlign = getAlignText(_parentStyles) || 'left';
+
+      let { leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth, rightTotalSiblingsWidth: _nRightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode, pPayload);
+      let _nPaddingLeft = +_parentStyles.paddingLeft.replace('px', '');
+      let _nPaddingTop = +_parentStyles.paddingTop.replace('px', '');
+      let _nPaddingRight = +_parentStyles.paddingRight.replace('px', '');
+      let _nPaddingBottom = +_parentStyles.paddingBottom.replace('px', '');
+      const _nXTextDefault = _parentRect.left;
+      const _nYTextDefault = _parentRect.top + _nDeviationHeight;
       /*
       ?tạo default behavior text base.
       ?default text alignment left and dominant baseline 'hanging', textAnchor: 'start'
       */
       let _behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(_nXTextDefault, _nYTextDefault), textAnchor: 'start' };
-      let _bIsFitContent: boolean = this._isTextNodeFitWidthCell(pTextNode, payload);
-      switch (_zAlginText) {
+      let _bIsFitWidthContent = this._isTextNodeFitWidthCell(pTextNode, pPayload);
+      let _bIsFitHeightContent = this._isTextNodeFitHeightCell(pTextNode, pPayload);
+      let _bIsFitContent: boolean = _bIsFitHeightContent && _bIsFitWidthContent;
+      _behaviorTextBase.isTextFitWidthCell = _bIsFitContent;
+      console.log(_bIsFitContent);
+      switch (this._zTextAlign) {
         case TextAlign.Left:
         case TextAlign.Start:
-          _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth;
+        case TextAlign.LeftTop:
+          _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
+          _behaviorTextBase.point!.y += _nPaddingTop;
           _behaviorTextBase.textAnchor = 'start';
           _behaviorTextBase.isTextFitWidthCell = _bIsFitContent;
           return (_behaviorTextBase as BehaviorText);
         case TextAlign.Center:
+        case TextAlign.CenterTop:
           if (_bIsFitContent) {
-            _behaviorTextBase.point!.x += (_parentBoundingRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth) / 2 - _nPaddingLeft;
+            _behaviorTextBase.point!.x += (_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth) / 2;
+            _behaviorTextBase.point!.y += _nPaddingTop;
             _behaviorTextBase.textAnchor = 'middle';
             _behaviorTextBase.isTextFitWidthCell = true;
             return (_behaviorTextBase as BehaviorText);
@@ -257,13 +266,75 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           return (_behaviorTextBase as BehaviorText);
         case TextAlign.Right:
         case TextAlign.End:
+        case TextAlign.RightTop:
           if (_bIsFitContent) {
-            _behaviorTextBase.point!.x += (_parentBoundingRect.width - _nPaddingRight - _nPaddingLeft) - _nRightTotalSiblingsWidth;
+            _behaviorTextBase.point!.x += _parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth;
+            _behaviorTextBase.point!.y += _nPaddingTop;
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.isTextFitWidthCell = true;
             return (_behaviorTextBase as BehaviorText);
           }
           _behaviorTextBase.isTextFitWidthCell = false;
+          return (_behaviorTextBase as BehaviorText);
+        //!Special case
+        //?#Center
+        case TextAlign.CenterCenter:
+          _behaviorTextBase.point!.y += _parentRect.height / 2;
+          if (_bIsFitContent) {
+            _behaviorTextBase.point!.x += (_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth) / 2;
+            _behaviorTextBase.textAnchor = 'middle';
+            _behaviorTextBase.dominantBaseline = 'middle';
+          } else {
+            _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
+          }
+          return (_behaviorTextBase as BehaviorText);
+        case TextAlign.CenterBottom:
+          _behaviorTextBase.point!.y += (_parentRect.height) - _nPaddingBottom;
+          if (_bIsFitContent) {
+            _behaviorTextBase.point!.x += (_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth) / 2;
+            _behaviorTextBase.textAnchor = 'middle';
+            _behaviorTextBase.dominantBaseline = 'auto';
+          } else {
+            _behaviorTextBase.point!.x += _nPaddingLeft;
+          }
+          return (_behaviorTextBase as BehaviorText);
+        //?#Left
+        case TextAlign.LeftCenter:
+          _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
+          _behaviorTextBase.point!.y += _parentRect.height / 2;
+          if (_bIsFitContent) {
+            _behaviorTextBase.textAnchor = 'start';
+            _behaviorTextBase.dominantBaseline = 'middle';
+          }
+          return (_behaviorTextBase as BehaviorText);
+        case TextAlign.LeftBottom:
+          _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
+          _behaviorTextBase.point!.y += _parentRect.height - _nPaddingBottom;
+          if (_bIsFitContent) {
+            _behaviorTextBase.textAnchor = 'start';
+            _behaviorTextBase.dominantBaseline = 'auto';
+          }
+          return (_behaviorTextBase as BehaviorText);
+        //?#Right
+        case TextAlign.RightCenter:
+          _behaviorTextBase.point!.y += _parentRect.height / 2;
+          if (_bIsFitContent) {
+            _behaviorTextBase.point!.x += _parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth;
+            _behaviorTextBase.textAnchor = 'end';
+            _behaviorTextBase.dominantBaseline = 'middle';
+          } else {
+            _behaviorTextBase.point!.x += _nPaddingLeft;
+          }
+          return (_behaviorTextBase as BehaviorText);
+        case TextAlign.RightBottom:
+          _behaviorTextBase.point!.y += _parentRect.height - _nPaddingBottom;
+          if (_bIsFitContent) {
+            _behaviorTextBase.point!.x += _parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth;
+            _behaviorTextBase.textAnchor = 'end';
+            _behaviorTextBase.dominantBaseline = 'auto';
+          } else {
+            _behaviorTextBase.point!.x += _nPaddingLeft;
+          }
           return (_behaviorTextBase as BehaviorText);
         default:
           _behaviorTextBase.isTextFitWidthCell = true;
@@ -275,31 +346,257 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   };
   /**
-   * @description: Kiểm tra xem liệu chiều rộng của text node có vừa với chiều rộng của node chứa nó hay không
-   * @param: pTextNode: Text, payload: Payload
-   * @return: boolean
+   * @description: Dùng để bọc svg bên ngoài text svg trong trường hợp width cửa text dài hơn chiều rộng của phần tử chứa
+   * @param: pTextNode: Text, pPayload: Payload
+   * @return: SVGElement | null
   */
-  private _isTextNodeFitWidthCell(pTextNode: Text, payload: Payload): boolean {
+  private _wrapTextNodeIntoSvg(pTextNode: Text, pPayload: Payload): SVGElement | null {
     try {
-      const { parentBoundingRect: _parentBoundingRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, payload);
+      const { parentStyles: _parentStyles, parentNode: _parentNode, parentBoundingRect: _parentRect } = this._getInformationParentNode(pTextNode, pPayload);
+      const _rectSvg: Partial<DOMRect> = {};
+      const { leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth, rightTotalSiblingsWidth: _nRightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode, pPayload);
+      let _nPaddingLeft = +pPayload.cellStyles.paddingLeft.replace('px', '') || 0;
+      let _nPaddingRight = +pPayload.cellStyles.paddingRight.replace('px', '') || 0;
+      let _nPaddingTop = +pPayload.cellStyles.paddingTop.replace('px', '') || 0;
+      let _nPaddingBottom = +pPayload.cellStyles.paddingBottom.replace('px', '') || 0;
+      const _textBehavior = pPayload.behaviorText;
+      let _nWidthText = pPayload.dimensionText?.width || 0;
+      let _nHeightText = pPayload.dimensionText?.height || 0;
+      let _bIsFitWidth = _nWidthText < (_parentRect.width - _nPaddingLeft - _nPaddingRight - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth);
+      let _bIsFitHeight = _nHeightText < (_parentRect.height - _nPaddingBottom - _nPaddingTop);
+      /*
+      trong trường hợp warpper svg có thể do hành vi thay đổi kích thước do người dùng kéo thay đổi kích thước row và column.
+      hành vi kéo thay đổi kích thước chỉ xảy ra từ phải kéo vào trái đối với width và từ dưới lên trên đối với height.
+      Tính toán lại padding bottom thực tế và padding right thực tế để tính chính xác tọa độ của text nằm trong svg wrapper
+      và chiều cao thực tế!
+      */
+      if (_bIsFitHeight) {
+        _nPaddingBottom = this.cellPadding.paddingBottom;
+      } else {
+        let actualPaddingBottom = _parentRect.height - _nHeightText - _nPaddingTop - 1;
+        _nPaddingBottom = actualPaddingBottom > 0 ? actualPaddingBottom : 0;
+      }
+
+      /*
+      ?case 1 inline wrap text: width svg = phần còn lại của width trừ đi tổng chiều rộng các phần tử anh em nằm bên trái và padding left và phải
+      ?case 2 nếu là text node duy nhất thì trừ đi cả chiều rộng của các phần tử nằm bên phải!.
+      ?case 3 nếu là ko là text node duy nhất thì không trừ chiều rộng của các phần tử bên phải(trừ sẽ bị âm)
+      */
+      if (isInline(_parentStyles)) {
+        let { leftTotalSiblingsWidth: _leftTotalSiblingsWidth } = this._getTotalWidthSiblingNode(_parentNode, pPayload);
+        _rectSvg.width = _parentRect.width - _leftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight - 1;
+      } else {
+        _rectSvg.width = _parentRect.width - _nLeftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight - 1;
+        if (this.isOnlyNode(pTextNode, Node.TEXT_NODE)) {
+          _rectSvg.width -= _nRightTotalSiblingsWidth;
+        }
+      }
+      // _rectSvg.height = pPayload.cellElement.clientHeight || 0;
+      _rectSvg.height = (_parentRect.height - _nPaddingTop - _nPaddingBottom) || 0;
+      if (_rectSvg.width <= 0 || _rectSvg.height <= 0) {
+        return null;
+      }
+      //draw text
+      let _zTextContent = pTextNode.textContent || '';
+      if (!this.isFirstNode(pTextNode, Node.TEXT_NODE)) {
+        _zTextContent = ' '.concat(_zTextContent);
+      }
+      //fix case special character : &nbsp;
+      _zTextContent = _zTextContent.trimEnd().concat(' ');
+      const _textSvgEl = drawText(_zTextContent, pPayload.behaviorText as BehaviorText, _parentStyles, 'preserve');
+      switch (this._zTextAlign) {
+        case TextAlign.Left:
+        case TextAlign.Start:
+        case TextAlign.LeftTop:
+        case TextAlign.Right:
+        case TextAlign.RightTop:
+        case TextAlign.End:
+          _rectSvg.x = _textBehavior.point.x;
+          _rectSvg.y = _textBehavior.point.y;
+          _textSvgEl.setAttribute('x', '0');
+          _textSvgEl.setAttribute('y', '0');
+          _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          _textSvgEl.setAttribute('text-anchor', 'start');
+          break;
+        case TextAlign.Center:
+        case TextAlign.CenterTop:
+          _rectSvg.x = _textBehavior.point.x;
+          _rectSvg.y = _textBehavior.point.y;
+          if (_bIsFitWidth) {
+            _textSvgEl.setAttribute('x', (_rectSvg.width / 2).toString());
+            _textSvgEl.setAttribute('text-anchor', 'middle');
+          } else {
+            _textSvgEl.setAttribute('x', '0');
+            _textSvgEl.setAttribute('text-anchor', 'start');
+          }
+          _textSvgEl.setAttribute('y', '0');
+          _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          break;
+        /* Trong trường hợp Center bottom,left bottom,right bottom nếu chiều dài của text vừa
+        thì cộng height của svg thêm padding bottom để text ko bị lẹm đi do hành vi
+          vẽ của text là dominant-baseline = auto
+        */
+        case TextAlign.CenterBottom:
+          _rectSvg.x = _textBehavior.point.x;
+          //case fit width?
+          if (_bIsFitWidth) {
+            _textSvgEl.setAttribute('x', (_rectSvg.width / 2).toString());
+            _textSvgEl.setAttribute('text-anchor', 'middle');
+          } else {
+            _textSvgEl.setAttribute('x', '0');
+            _textSvgEl.setAttribute('text-anchor', 'start');
+          }
+          //case fit height?
+          if (_bIsFitHeight) {
+            _rectSvg.height += _nPaddingBottom;
+            _rectSvg.y = _textBehavior.point.y - (_rectSvg.height - _nPaddingBottom);
+            _textSvgEl.setAttribute('y', (_rectSvg.height - _nPaddingBottom).toString());
+            _textSvgEl.setAttribute('dominant-baseline', 'auto');
+          } else {
+            _rectSvg.y = _parentRect.top + _nPaddingTop;
+            _textSvgEl.setAttribute('y', '0');
+            _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          }
+          break;
+        case TextAlign.CenterCenter:
+          _rectSvg.x = _textBehavior.point.x;
+          //case fit width?
+          if (_bIsFitWidth) {
+            _textSvgEl.setAttribute('x', (_rectSvg.width / 2).toString());
+            _textSvgEl.setAttribute('text-anchor', 'middle');
+          } else {
+            _textSvgEl.setAttribute('x', '0');
+            _textSvgEl.setAttribute('text-anchor', 'start');
+          }
+          //case fit height?
+          if (_bIsFitHeight) {
+            _rectSvg.y = _textBehavior.point.y - (_rectSvg.height / 2);
+            _textSvgEl.setAttribute('y', (_rectSvg.height / 2).toString());
+            _textSvgEl.setAttribute('dominant-baseline', 'middle');
+          } else {
+            _rectSvg.y = _parentRect.top + _nPaddingTop;
+            _textSvgEl.setAttribute('y', '0');
+            _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          }
+          break;
+        case TextAlign.LeftCenter:
+          _rectSvg.x = _textBehavior.point.x;
+          _textSvgEl.setAttribute('x', '0');
+          _textSvgEl.setAttribute('text-anchor', 'start');
+          //case fit height?
+          if (_bIsFitHeight) {
+            _rectSvg.y = _textBehavior.point.y - (_rectSvg.height / 2);
+            _textSvgEl.setAttribute('y', (_rectSvg.height / 2).toString());
+            _textSvgEl.setAttribute('dominant-baseline', 'middle');
+          } else {
+            _rectSvg.y = _parentRect.top + _nPaddingTop;
+            _textSvgEl.setAttribute('y', '0');
+            _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          }
+          break;
+        case TextAlign.LeftBottom:
+          _rectSvg.x = _textBehavior.point.x;
+          _textSvgEl.setAttribute('x', '0');
+          _textSvgEl.setAttribute('text-anchor', 'start');
+          //case fit height?
+          if (_bIsFitHeight) {
+            _rectSvg.height += _nPaddingBottom;
+            _rectSvg.y = _textBehavior.point.y - (_rectSvg.height - _nPaddingBottom);
+            _textSvgEl.setAttribute('y', (_rectSvg.height - _nPaddingBottom).toString());
+            _textSvgEl.setAttribute('dominant-baseline', 'auto');
+          } else {
+            _rectSvg.y = _parentRect.top + _nPaddingTop;
+            _textSvgEl.setAttribute('y', '0');
+            _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          }
+          break;
+        case TextAlign.RightCenter:
+          _rectSvg.x = _textBehavior.point.x;
+          //case fit width?
+          if (_bIsFitWidth) {
+            _textSvgEl.setAttribute('x', (_rectSvg.width - _nPaddingRight).toString());
+            _textSvgEl.setAttribute('text-anchor', 'end');
+          } else {
+            _textSvgEl.setAttribute('x', '0');
+            _textSvgEl.setAttribute('text-anchor', 'start');
+          }
+          //case fit height?
+          if (_bIsFitHeight) {
+            _rectSvg.y = _textBehavior.point.y - (_rectSvg.height / 2);
+            _textSvgEl.setAttribute('y', (_rectSvg.height / 2).toString());
+            _textSvgEl.setAttribute('dominant-baseline', 'middle');
+          } else {
+            _rectSvg.y = _parentRect.top + _nPaddingTop;
+            _textSvgEl.setAttribute('y', '0');
+            _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          }
+          break;
+        case TextAlign.RightBottom:
+          _rectSvg.x = _textBehavior.point.x;
+          if (_bIsFitWidth) {
+            _textSvgEl.setAttribute('x', (_rectSvg.width - _nPaddingRight).toString());
+            _textSvgEl.setAttribute('text-anchor', 'end');
+          } else {
+            _textSvgEl.setAttribute('x', '0');
+            _textSvgEl.setAttribute('text-anchor', 'start');
+          }
+          //case fit height?
+          if (_bIsFitHeight) {
+            _rectSvg.height += _nPaddingBottom;
+            _rectSvg.y = _textBehavior.point.y - (_rectSvg.height - _nPaddingBottom);
+            _textSvgEl.setAttribute('y', (_rectSvg.height - _nPaddingBottom).toString());
+            _textSvgEl.setAttribute('dominant-baseline', 'auto');
+          } else {
+            _rectSvg.y = _parentRect.top + _nPaddingTop;
+            _textSvgEl.setAttribute('y', '0');
+            _textSvgEl.setAttribute('dominant-baseline', 'hanging');
+          }
+          break;
+        default:
+          _rectSvg.x = _textBehavior.point.x;
+          _rectSvg.y = _textBehavior.point.y;
+          _textSvgEl.setAttribute('x', '0');
+          _textSvgEl.setAttribute('y', '0');
+          break;
+      }
+      const _svgWrapText = creatorSVG(_rectSvg, true);
+      _svgWrapText.appendChild(_textSvgEl);
+      pPayload.group.appendChild(_svgWrapText);
+      return _svgWrapText;
+    } catch (error) {
+      console.error(error);
+      throw new Error('Something wrong when wrap text in svg');
+    }
+  }
+  private _isTextNodeFitWidthCell(pTextNode: Text, pPayload: Payload): boolean {
+    try {
+      const { parentBoundingRect: _parentBoundingRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, pPayload);
       const _nPaddingLeft = +_parentStyles.paddingLeft.replace('px', '');
       const _nPaddingRight = +_parentStyles.paddingRight.replace('px', '');
-      const { leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth, rightTotalSiblingsWidth: _nRightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode, payload);
-      const _nTextWidth = payload.dimensionText?.width || 0;
+      const { leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth, rightTotalSiblingsWidth: _nRightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode, pPayload);
+      const _nTextWidth = pPayload.dimensionText?.width || 0;
       return _nTextWidth <= (_parentBoundingRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight);
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when check the width of the text content to see if it fits the width of the parent!');
     }
   }
-  /**
-    * @description: một expensive function, dùng để tính toán kích thước của text node dựa trến content của text node và font và kích thước của phần tử chá
-    * @param: pTextNode: Text, pbBreakWords: boolean
-    * @return: BravoTextMetrics | undefined
-   */
-  private _measureTextNode(pTextNode: Text, payload: Payload, pbBreakWords: boolean = false): BravoTextMetrics | undefined {
+  private _isTextNodeFitHeightCell(pTextNode: Text, pPayload: Payload): boolean {
     try {
-      const { parentNode: _parentNode, parentStyles: _parentStyles, parentBoundingRect: _parentBoundingRect } = this._getInformationParentNode(pTextNode, payload);
+      const { parentBoundingRect: _parentBoundingRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, pPayload);
+      const _nPaddingTop = +_parentStyles.paddingTop.replace('px', '');
+      const _nPaddingBottom = +_parentStyles.paddingBottom.replace('px', '');
+      const _nTextHeight = pPayload.dimensionText?.height || 0;
+      return _nTextHeight <= (_parentBoundingRect.height - _nPaddingTop - _nPaddingBottom);
+    } catch (error) {
+      console.error(error);
+      throw new Error('Occurs when check the width of the text content to see if it fits the width of the parent!');
+    }
+  }
+
+  private _measureTextNode(pTextNode: Text, pPayload: Payload, pbBreakWords: boolean = false): BravoTextMetrics | undefined {
+    try {
+      const { parentNode: _parentNode, parentStyles: _parentStyles, parentBoundingRect: _parentBoundingRect } = this._getInformationParentNode(pTextNode, pPayload);
       if (!_parentNode) return undefined;
       const _font = new Font(_parentStyles.fontFamily, _parentStyles.fontSize, _parentStyles.fontWeight);
       const _dimensionOfText = BravoGraphicsRenderer.measureString(pTextNode.textContent as string, _font, _parentBoundingRect.width, pbBreakWords);
@@ -310,26 +607,26 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
 
-  private _drawTextNodeInCell(pTextNode: Text, payload: Payload): SVGElement | null {
+  private _drawTextNodeInCell(pTextNode: Text, pPayload: Payload): SVGElement | null {
     try {
-      const { parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, payload);
-      payload.behaviorText = this._calculateBehaviorTextNode(pTextNode, payload) as BehaviorText;
-      let _nWidthTextNode = payload.dimensionText?.width || 0;
+      const { parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, pPayload);
+      pPayload.behaviorText = this._calculateBehaviorTextNode(pTextNode, pPayload) as BehaviorText;
+      let _nWidthTextNode = pPayload.dimensionText?.width || 0;
       /*
       ? Trường hợp không phải text node duy nhất hoặc là thẻ inline wrap text node
       ?Nếu width của cell nhỏ hơn tọa độ x của text return null ko draw
       ?Nếu width của cell nằm trong tọa độ x đến right thì thay đổi isTextFitWidthCell = false và switch case wrap svg
       */
       if (!this.isOnlyNode(pTextNode, Node.TEXT_NODE) || isInline(_parentStyles)) {
-        if (payload.cellBoundingRect.width < payload.behaviorText.point.x) {
+        if (pPayload.cellBoundingRect.width < pPayload.behaviorText.point.x) {
           return null;
-        } else if (payload.cellBoundingRect.width > payload.behaviorText.point.x && payload.cellElement.offsetWidth < payload.behaviorText.point.x + _nWidthTextNode) {
-          payload.behaviorText.isTextFitWidthCell = false;
+        } else if (pPayload.cellBoundingRect.width > pPayload.behaviorText.point.x && pPayload.cellElement.offsetWidth < pPayload.behaviorText.point.x + _nWidthTextNode) {
+          pPayload.behaviorText.isTextFitWidthCell = false;
         }
       }
       //?case swap text by svg
-      if (!payload.behaviorText.isTextFitWidthCell) {
-        const _svgWrap = this._wrapTextNodeIntoSvg(pTextNode, payload);
+      if (!pPayload.behaviorText.isTextFitWidthCell) {
+        const _svgWrap = this._wrapTextNodeIntoSvg(pTextNode, pPayload);
         return _svgWrap;
       }
       let _zTextContent = pTextNode.textContent || '';
@@ -338,75 +635,25 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         _zTextContent = ' '.concat(_zTextContent);
       }
       //fix case special character : &nbsp;
-      payload.panel.cellType === CellType.ColumnHeader && (_zTextContent = _zTextContent.trimEnd().concat(' '));
-      const _textSvgEl = drawText(_zTextContent, payload.behaviorText, _parentStyles, 'preserve');
+      pPayload.panel.cellType === CellType.ColumnHeader && (_zTextContent = _zTextContent.trimEnd().concat(' '));
+      const _textSvgEl = drawText(_zTextContent, pPayload.behaviorText, _parentStyles, 'preserve');
       return _textSvgEl;
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when draw text in cell!!');
     }
   }
-  /**
-  * @description: Dùng để bọc svg bên ngoài text svg trong trường hợp width cửa text dài hơn chiều rộng của phần tử chứa
-  * @param: pTextNode: Text, payload: Payload
-  * @return: SVGElement | null
- */
-  private _wrapTextNodeIntoSvg(pTextNode: Text, payload: Payload): SVGElement | null {
-    try {
-      const { parentStyles: _parentStyles, parentNode: _parentNode } = this._getInformationParentNode(pTextNode, payload);
-      const _rectSvg: Partial<DOMRect> = {};
-      const { leftTotalSiblingsWidth: _leftTotalSiblingsWidth, rightTotalSiblingsWidth: _rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode, payload);
-      const _nPaddingLeft = +payload.cellStyles.paddingLeft.replace('px', '') || 0;
-      const _nPaddingRight = +payload.cellStyles.paddingRight.replace('px', '') || 0;
-      /*
-      ?case 1 inline wrap text: width svg = phần còn lại của width trừ đi tổng chiều rộng các phần tử anh em nằm bên trái và padding left và phải
-      ?case 2 nếu là text node duy nhất thì trừ đi cả chiều rộng của các phần tử nằm bên phải!.
-      ?case 3 nếu là ko là text node duy nhất thì không trừ chiều rộng của các phần tử bên phải(trừ sẽ bị âm)
-      */
-      if (isInline(_parentStyles)) {
-        let { leftTotalSiblingsWidth: _leftTotalSiblingsWidth } = this._getTotalWidthSiblingNode(_parentNode, payload);
-        _rectSvg.width = payload.cellBoundingRect.width - _leftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight;
-      } else {
-        _rectSvg.width = payload.cellBoundingRect.width - _leftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight;
-        if (this.isOnlyNode(pTextNode, Node.TEXT_NODE)) {
-          _rectSvg.width -= _rightTotalSiblingsWidth;
-        }
-      }
-      _rectSvg.height = payload.cellElement.clientHeight || 0;
-      if (_rectSvg.width <= 0 || _rectSvg.height <= 0) {
-        return null;
-      }
-      _rectSvg.x = payload.behaviorText.point.x;
-      _rectSvg.y = payload.behaviorText.point.y;
-      const _svgWrapText = creatorSVG(_rectSvg, true);
-      //draw text
-      let _zTextContent = pTextNode.textContent || '';
-      if (!this.isFirstNode(pTextNode, Node.TEXT_NODE)) {
-        _zTextContent = ' '.concat(_zTextContent);
-      }
-      //fix case special character : &nbsp;
-      _zTextContent = _zTextContent.trimEnd().concat(' ');
-      const _textSvgEl = drawText(_zTextContent, payload.behaviorText as BehaviorText, _parentStyles, 'preserve');
-      _textSvgEl.setAttribute('x', '0');
-      _textSvgEl.setAttribute('y', '0');
-      _svgWrapText.appendChild(_textSvgEl);
-      payload.group.appendChild(_svgWrapText);
-      return _svgWrapText;
-    } catch (error) {
-      console.error(error);
-      throw new Error('Something wrong when wrap text in svg');
-    }
-  }
+
   //*util methods
   /**
     * @description:(expensive funtion) dùng để tính toán tổng chiều rộng của các phần tử anh chị em bên trái hoặc bên phải
     * @param: pSiblings: ChildNode[]
     * @return:number
    */
-  private _calculateTotalWidthSiblings(pSiblings: ChildNode[], payload: Payload): number {
+  private _calculateTotalWidthSiblings(pSiblings: ChildNode[], pPayload: Payload): number {
     let _nTotalWidth: number = pSiblings.reduce((pnAcc, pNode) => {
       if (isTextNode(pNode)) {
-        const _dimensionOfText = this._measureTextNode(pNode, payload, false);
+        const _dimensionOfText = this._measureTextNode(pNode, pPayload, false);
         if (_dimensionOfText) {
           pnAcc += _dimensionOfText.width;
         }
@@ -419,13 +666,13 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     return _nTotalWidth;
   }
 
-  private _getTotalWidthSiblingNode(pNode: Node, payload: Payload) {
+  private _getTotalWidthSiblingNode(pNode: Node, pPayload: Payload) {
     let _nRightTotalSiblingsWidth = 0;
     let _nLeftTotalSiblingsWidth = 0;
     const _siblings: ISiblings = this.scanSiblingsNode(pNode);
     if (_siblings.leftSideCurrentNode.length === 0 && _siblings.rightSideCurrentNode.length === 0) return { rightTotalSiblingsWidth: _nRightTotalSiblingsWidth, leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth };
-    _nLeftTotalSiblingsWidth = this._calculateTotalWidthSiblings(_siblings.leftSideCurrentNode, payload);
-    _nRightTotalSiblingsWidth = this._calculateTotalWidthSiblings(_siblings.rightSideCurrentNode, payload);
+    _nLeftTotalSiblingsWidth = this._calculateTotalWidthSiblings(_siblings.leftSideCurrentNode, pPayload);
+    _nRightTotalSiblingsWidth = this._calculateTotalWidthSiblings(_siblings.rightSideCurrentNode, pPayload);
     return {
       rightTotalSiblingsWidth: _nRightTotalSiblingsWidth,
       leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth
@@ -434,17 +681,17 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   /**
   * @description: Dùng để lấy thông tin của node cha (rect, styles, element)
-  * @param: node: Node, payload: Payload
+  * @param: node: Node, pPayload: Payload
   * @return:{parentNode,parentBoundingRect,parentStyles};
   */
-  private _getInformationParentNode(pNode: Node, payload: Payload) {
+  private _getInformationParentNode(pNode: Node, pPayload: Payload) {
     let _parentNode: Element;
     let _parentBoundingRect: Rect;
     let _parentStyles: CSSStyleDeclaration;
-    if (pNode.parentElement === payload.cellElement) {
-      _parentNode = payload.cellElement;
-      _parentStyles = payload.cellStyles;
-      _parentBoundingRect = payload.cellBoundingRect;
+    if (pNode.parentElement === pPayload.cellElement) {
+      _parentNode = pPayload.cellElement;
+      _parentStyles = pPayload.cellStyles;
+      _parentBoundingRect = pPayload.cellBoundingRect;
     } else {
       _parentNode = pNode.parentElement as Element;
       _parentStyles = getComputedStyle(_parentNode);
@@ -458,11 +705,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
   //*Handle and draw image
-  private _drawImageInCell(pImageNode: HTMLImageElement, payload: Payload): SVGElement {
+  private _drawImageInCell(pImageNode: HTMLImageElement, pPayload: Payload): SVGElement {
     const _imageBoundingRect = this._changeOriginCoordinates(pImageNode.getBoundingClientRect());
-    let parentBoundingRect = payload.cellBoundingRect;
+    let parentBoundingRect = pPayload.cellBoundingRect;
     if ((parentBoundingRect.height < _imageBoundingRect.height) || (parentBoundingRect.width < _imageBoundingRect.width)) {
-      const _svgWrap = this._wrapImageIntoSvg(pImageNode, payload);
+      const _svgWrap = this._wrapImageIntoSvg(pImageNode, pPayload);
       return _svgWrap;
     }
     const _imageSvgEl = this.drawImage(pImageNode.src, _imageBoundingRect.left, _imageBoundingRect.top, _imageBoundingRect.width, _imageBoundingRect.height);
@@ -471,12 +718,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   /**
   * @description: Dùng để bọc svg bên ngoài của image svg trong trường hợp kích thước của image to hơn phần tử chứa
-  * @param: imageNode: HTMLImageElement, payload: Payload
+  * @param: imageNode: HTMLImageElement, pPayload: Payload
   * @return:SVGElement
   */
-  private _wrapImageIntoSvg(pImageEl: HTMLImageElement, payload: Payload): SVGElement {
+  private _wrapImageIntoSvg(pImageEl: HTMLImageElement, pPayload: Payload): SVGElement {
     const _rectSvgEl: Partial<Rect> = {};
-    const _parentBoundingRect = payload.cellBoundingRect;
+    const _parentBoundingRect = pPayload.cellBoundingRect;
     _rectSvgEl.width = _parentBoundingRect.width;
     _rectSvgEl.height = _parentBoundingRect.height;
     _rectSvgEl.left = _parentBoundingRect.left;
@@ -488,69 +735,79 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     return _svgWrapImage;
   }
 
-  private _drawCheckBox(pNode: Node, payload: Payload) {
+  private _drawCheckBox(pNode: Node, pPayload: Payload) {
     const _inputNode = pNode as HTMLInputElement;
     const _inputRect = this._changeOriginCoordinates(_inputNode.getBoundingClientRect());
     if (_inputNode.checked) {
       const svgChecked = this._parser.parseFromString(inputChecked, 'image/svg+xml').childNodes[0] as SVGElement;
       setAttrSvgIcon(svgChecked, _inputRect.left, _inputRect.top, _inputRect.width, _inputRect.height);
-      payload.group.appendChild(svgChecked);
+      pPayload.group.appendChild(svgChecked);
     } else {
       const svgUnChecked = this._parser.parseFromString(inputUnchecked, 'image/svg+xml').childNodes[0] as SVGElement;
       setAttrSvgIcon(svgUnChecked, _inputRect.left, _inputRect.top, _inputRect.width, _inputRect.height);
-      payload.group.appendChild(svgUnChecked);
+      pPayload.group.appendChild(svgUnChecked);
     }
   }
 
-  private _drawPin(pNode: Node, payload: Payload) {
+  private _drawPin(pNode: Node, pPayload: Payload) {
     const _pinNode = pNode as HTMLElement;
     const _pinRect = this._changeOriginCoordinates(_pinNode.getBoundingClientRect());
-    if (payload.cellBoundingRect.width < _pinRect.width || payload.cellBoundingRect.height < _pinRect.height) return;
+    const cellRect = pPayload.cellBoundingRect;
+    let callPaddingTop = +pPayload.cellStyles.paddingTop.replace('px', '');
+    /* Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua*/
+    if (cellRect.width < _pinRect.width || cellRect.height < _pinRect.height || ((cellRect.left + cellRect.width) < _pinRect.left) || ((cellRect.top + cellRect.height) < _pinRect.top) || cellRect.left > _pinRect.left || (cellRect.top + callPaddingTop) > _pinRect.top) return;
     if (_pinNode.className.includes('wj-state-pinned')) {
       const _svgPinned = this._parser.parseFromString(pinned, 'image/svg+xml').childNodes[0] as SVGElement;
       _svgPinned.setAttribute('fill', '#333');
       setAttrSvgIcon(_svgPinned, _pinRect.left, _pinRect.top, _pinRect.width, _pinRect.height);
-      payload.group.appendChild(_svgPinned);
+      pPayload.group.appendChild(_svgPinned);
     } else {
       const _svgUnpinned = this._parser.parseFromString(unpinned, 'image/svg+xml').childNodes[0] as SVGElement;
       _svgUnpinned.setAttribute('fill', '#3333');
       setAttrSvgIcon(_svgUnpinned, _pinRect.left, _pinRect.top, _pinRect.width, _pinRect.height);
-      payload.group.appendChild(_svgUnpinned);
+      pPayload.group.appendChild(_svgUnpinned);
     }
   }
 
-  private _drawGroupBtn(pNode: Node, payload: Payload) {
+  private _drawGroupBtn(pNode: Node, pPayload: Payload) {
     const _groupBtnNode = pNode as HTMLElement;
     const _groupBtnRect = this._changeOriginCoordinates(_groupBtnNode.getBoundingClientRect());
-    const _panel = payload.panel;
-    const _nCurrentRow = payload.row;
-    if (!(_panel.rows[_nCurrentRow] instanceof GroupRow) || (payload.cellBoundingRect.width < _groupBtnRect.width || payload.cellBoundingRect.height < _groupBtnRect.height)) return;
+    const _panel = pPayload.panel;
+    const _nCurrentRow = pPayload.row;
+    const cellRect = pPayload.cellBoundingRect;
+    let callPaddingTop = +pPayload.cellStyles.paddingTop.replace('px', '');
+
+    /* Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua*/
+    if (!(_panel.rows[_nCurrentRow] instanceof GroupRow) || cellRect.width < _groupBtnRect.width || cellRect.height < _groupBtnRect.height || ((cellRect.left + cellRect.width) < _groupBtnRect.left) || ((cellRect.top + cellRect.height) < _groupBtnRect.top) || cellRect.left > _groupBtnRect.left || (cellRect.top + callPaddingTop) > _groupBtnRect.top) return;
     if ((_panel.rows[_nCurrentRow] as GroupRow).isCollapsed) {
       const _svgCollapse = this._parser.parseFromString(collapse, 'image/svg+xml').childNodes[0] as SVGElement;
       setAttrSvgIcon(_svgCollapse, _groupBtnRect.left, _groupBtnRect.top, _groupBtnRect.width, _groupBtnRect.height);
-      payload.group.appendChild(_svgCollapse);
+      pPayload.group.appendChild(_svgCollapse);
     } else {
       const _svgexpand = this._parser.parseFromString(expand, 'image/svg+xml').childNodes[0] as SVGElement;
       setAttrSvgIcon(_svgexpand, _groupBtnRect.left, _groupBtnRect.top, _groupBtnRect.width, _groupBtnRect.height);
-      payload.group.appendChild(_svgexpand);
+      pPayload.group.appendChild(_svgexpand);
     }
   }
-  private _drawSortBtn(pNode: Node, payload: Payload) {
+  private _drawSortBtn(pNode: Node, pPayload: Payload) {
     const _sortBtnNode = pNode as HTMLElement;
     const _sortBtnRect = this._changeOriginCoordinates(_sortBtnNode.getBoundingClientRect());
-    const _panel = payload.panel;
+    const _panel = pPayload.panel;
     let _zColor = window.getComputedStyle(_sortBtnNode).color || '';
-    if (_panel.cellType !== CellType.ColumnHeader || (payload.cellBoundingRect.width < _sortBtnRect.width || payload.cellBoundingRect.height < _sortBtnRect.height)) return;
+    let callPaddingTop = +pPayload.cellStyles.paddingTop.replace('px', '');
+    const cellRect = pPayload.cellBoundingRect;
+    /* Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua*/
+    if (_panel.cellType !== CellType.ColumnHeader || cellRect.width < _sortBtnRect.width || cellRect.height < _sortBtnRect.height || ((cellRect.left + cellRect.width) < _sortBtnRect.left) || ((cellRect.top + cellRect.height) < _sortBtnRect.top) || cellRect.left > _sortBtnRect.left || (cellRect.top + callPaddingTop) > _sortBtnRect.top) return;
     if (_sortBtnNode.className.includes('wj-glyph-up')) {
       const _svgArrowUp = this._parser.parseFromString(arrowUp, 'image/svg+xml').childNodes[0] as SVGElement;
       _svgArrowUp.setAttribute('fill', _zColor);
       setAttrSvgIcon(_svgArrowUp, _sortBtnRect.left, _sortBtnRect.top, _sortBtnRect.width, _sortBtnRect.height);
-      payload.group.appendChild(_svgArrowUp);
+      pPayload.group.appendChild(_svgArrowUp);
     } else {
       const _svgArrowDown = this._parser.parseFromString(arrowDown, 'image/svg+xml').childNodes[0] as SVGElement;
       _svgArrowDown.setAttribute('fill', _zColor);
       setAttrSvgIcon(_svgArrowDown, _sortBtnRect.left, _sortBtnRect.top, _sortBtnRect.width, _sortBtnRect.height);
-      payload.group.appendChild(_svgArrowDown);
+      pPayload.group.appendChild(_svgArrowDown);
     }
   }
   /*-----------------------------------------------*
@@ -565,7 +822,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   private _stylesBase!: CSSStyleDeclaration;
   private _stylesTextSetup!: Record<string, string>;
   private _stylesBorderSetup!: Record<string, string>;
-  private _zTextAglin!: string;
+  private _zTextAlign!: string;
   private _zBgColorSetup!: string;
   private _bIsRawValue: boolean = false;
   set isRawValue(value: boolean) {
@@ -601,16 +858,16 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   }
 
   /**
-  * @description: lấy ra data cần trong payload để gửi đi cùng với event
-  * @param: payload: Payload
+  * @description: lấy ra data cần trong pPayload để gửi đi cùng với event
+  * @param: pPayload: Payload
   * @return: IPayloadEvent
   */
-  private _getPayloadEvent(payload: Payload): IPayloadEvent {
+  private _getPayloadEvent(pPayload: Payload): IPayloadEvent {
     const _payloadEvent: IPayloadEvent = {} as IPayloadEvent;
-    _payloadEvent.col = payload.col;
-    _payloadEvent.row = payload.row;
-    _payloadEvent.panel = payload.panel;
-    _payloadEvent.cellValue = payload.cellValue;
+    _payloadEvent.col = pPayload.col;
+    _payloadEvent.row = pPayload.row;
+    _payloadEvent.panel = pPayload.panel;
+    _payloadEvent.cellValue = pPayload.cellValue;
     return _payloadEvent as IPayloadEvent;
   }
 
@@ -657,21 +914,21 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
  * @return : SvgElement
  */
   private _drawRawCellPanel(pPanel: GridPanel) {
-    //!initialize payload object
-    const payload = {} as Payload;
-    payload.panel = pPanel;
+    //!initialize pPayload object
+    const pPayload = {} as Payload;
+    pPayload.panel = pPanel;
     for (let _nColIndex = 0; _nColIndex < pPanel.columns.length; _nColIndex++) {
       for (let _nRowIndex = 0; _nRowIndex < pPanel.rows.length; _nRowIndex++) {
         const _cellRange = this.flexGrid.getMergedRange(pPanel, _nRowIndex, _nColIndex, false);
         const _cellBoundingRect = pPanel.getCellBoundingRect(_nRowIndex, _nColIndex, true);
         let _cellValue = pPanel.getCellData(_nRowIndex, _nColIndex, this._bIsRawValue);
-        payload.col = _nColIndex;
-        payload.row = _nRowIndex;
-        payload.cellBoundingRect = _cellBoundingRect;
-        payload.cellRange = _cellRange;
-        payload.cellValue = _cellValue;
-        payload.isRowGroup = pPanel.rows[_nRowIndex] instanceof GroupRow;
-        this._applyStyleSetup(payload);
+        pPayload.col = _nColIndex;
+        pPayload.row = _nRowIndex;
+        pPayload.cellBoundingRect = _cellBoundingRect;
+        pPayload.cellRange = _cellRange;
+        pPayload.cellValue = _cellValue;
+        pPayload.isRowGroup = pPanel.rows[_nRowIndex] instanceof GroupRow;
+        this._applyStyleSetup(pPayload);
         //?cộng tọa độ y và x của header và body and footer với chiều cao tương ứng
         if (pPanel.cellType === CellType.Cell) {
           _cellBoundingRect.top += this.flexGrid.columnHeaders.height;
@@ -691,16 +948,16 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         if (!_cellRange || (_cellRange && _cellRange.isSingleCell)) {
           if (pPanel.rows[_nRowIndex].visibleIndex !== -1) {
             const _groupEl = this.startGroup();
-            payload.group = _groupEl;
-            this._drawRawRectCell(payload);
+            pPayload.group = _groupEl;
+            this._drawRawRectCell(pPayload);
             this.endGroup();
           }
         } else {
           //trường hợp cell group hoặc merge chỉ vẻ lần đầu tiên! tránh trường hợp draw nhiều lần!
           if ((_nRowIndex == _cellRange.row && _nColIndex === _cellRange.col && pPanel.rows[_nRowIndex].visibleIndex !== -1)) {
             const _groupEl = this.startGroup();
-            payload.group = _groupEl;
-            this._drawRawRectCell(payload);
+            pPayload.group = _groupEl;
+            this._drawRawRectCell(pPayload);
             this.endGroup();
           }
         }
@@ -708,10 +965,10 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
 
-  private _drawRawRectCell(payload: Payload): void {
-    const _panel = payload.panel;
-    const _rect = payload.cellBoundingRect;
-    const _cellRange = payload.cellRange;
+  private _drawRawRectCell(pPayload: Payload): void {
+    const _panel = pPayload.panel;
+    const _rect = pPayload.cellBoundingRect;
+    const _cellRange = pPayload.cellRange;
     //trường hợp cell được merge hoặc gr thì kích thước của rectangle bằng tổng các cell cộng lại
     if (_cellRange && !_cellRange.isSingleCell) {
       for (let _nIndex = _cellRange.col + 1; _nIndex <= _cellRange.col2; _nIndex++) {
@@ -722,18 +979,18 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       }
     }
     const _rectSvgEl = this.drawRect(_rect.left, _rect.top, _rect.width, _rect.height);
-    const _payloadEvent = this._getPayloadEvent(payload);
+    const _payloadEvent = this._getPayloadEvent(pPayload);
     _payloadEvent.svgDrew = _rectSvgEl;
     _rectSvgEl.setAttribute('fill', this._zBgColorSetup);
     this.onDrewRect(_payloadEvent);
     //?Draw border and content in cell here!
-    this._drawRawBorderCell(payload);
-    this._drawContentInCell(payload);
+    this._drawRawBorderCell(pPayload);
+    this._drawContentInCell(pPayload);
   }
 
-  private _drawRawBorderCell(payload: Payload) {
-    const _rect = payload.cellBoundingRect;
-    const _payloadEvent = this._getPayloadEvent(payload);
+  private _drawRawBorderCell(pPayload: Payload) {
+    const _rect = pPayload.cellBoundingRect;
+    const _payloadEvent = this._getPayloadEvent(pPayload);
     //border bottom
     const _lineBottomSvgEl = this.drawLine(_rect.left, _rect.bottom, _rect.right, _rect.bottom);
     _lineBottomSvgEl.setAttribute('stroke-width', this._stylesBorderSetup['borderBottomWidth']);
@@ -748,73 +1005,40 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.onDrewBorderRight(_payloadEvent);//raise event drew border right here
   }
 
-  private _drawContentInCell(payload: Payload) {
-    const _cellValue = payload.cellValue;
-    const _panel = payload.panel;
-    const _nCol = payload.col;
-    if (_panel.cellType === CellType.Cell && _panel.columns[_nCol].dataType === DataType.Boolean && !payload.isRowGroup) {
-      this._drawCheckboxRaw(payload);
+  private _drawContentInCell(pPayload: Payload) {
+    const _cellValue = pPayload.cellValue;
+    const _panel = pPayload.panel;
+    const _nCol = pPayload.col;
+    if (_panel.cellType === CellType.Cell && _panel.columns[_nCol].dataType === DataType.Boolean && !pPayload.isRowGroup) {
+      this._drawCheckboxRaw(pPayload);
     } else if (_cellValue) {
-      const _payloadEvent = this._getPayloadEvent(payload);
+      const _payloadEvent = this._getPayloadEvent(pPayload);
       this.onDrawingText(_payloadEvent);//raise event drawing text
-      if (payload.cellValue !== payload.cellValue) {
-        payload.cellValue = payload.cellValue;
+      if (pPayload.cellValue !== pPayload.cellValue) {
+        pPayload.cellValue = pPayload.cellValue;
       }
-      this._drawTextRawInCell(payload);
+      this._drawTextRawInCell(pPayload);
     }
   }
 
-  private _drawTextRawInCell(payload: Payload): SVGElement | null {
-    const _textBehavior = this._calculateBehaviorTextRaw(payload);
-    const _cellValue = payload.cellValue;
-    payload.behaviorText = _textBehavior;
+  private _drawTextRawInCell(pPayload: Payload): SVGElement | null {
+    const _textBehavior = this._calculateBehaviorTextRaw(pPayload);
+    const _cellValue = pPayload.cellValue;
+    pPayload.behaviorText = _textBehavior;
     if (!_textBehavior.isTextFitWidthCell) {
-      const _svgEl = this._wrapTextRawIntoSvg(payload);
+      const _svgEl = this._wrapTextRawIntoSvg(pPayload);
       return _svgEl;
     }
     const _textSvgEl = drawText(_cellValue, _textBehavior as BehaviorText, this._stylesTextSetup);
-    const _payloadEvent = this._getPayloadEvent(payload);
+    const _payloadEvent = this._getPayloadEvent(pPayload);
     _payloadEvent.svgDrew = _textSvgEl;
     this.onDrewText(_payloadEvent);
-    payload.group.appendChild(_textSvgEl);
+    pPayload.group.appendChild(_textSvgEl);
     return _textSvgEl as SVGElement;
-  }
-
-  //?Tạm thời để đây!
-  private _getAlignText(styles: CSSStyleDeclaration | Record<string, string>, pPayload: Payload): TextAlign {
-    const _panel = pPayload.panel;
-    let _nCurrentCol = pPayload.col;
-    //#Center
-    if (isCenterTop(styles)) {
-      return TextAlign.CenterTop;
-    } else if (isCenterCenter(styles)) {
-      return TextAlign.CenterCenter;
-    } else if (isCenterBottom(styles)) {
-      return TextAlign.CenterBottom;
-    }
-    //#Left
-    if (isLeftTop(styles)) {
-      return TextAlign.LeftTop;
-    } else if (isLeftCenter(styles)) {
-      return TextAlign.LeftCenter;
-    } else if (isLeftBottom(styles)) {
-      return TextAlign.LeftBottom;
-    }
-    //#Right
-    if (isRightTop(styles)) {
-      return TextAlign.RightTop;
-    } else if (isRightCenter(styles)) {
-      return TextAlign.RightCenter;
-    } else if (isRightBottom(styles)) {
-      return TextAlign.RightBottom;
-    }
-    //Mặc định nằm left top! Với trường hợp cell type là boolean nằm center center
-    if (_panel.columns[_nCurrentCol].dataType === DataType.Boolean) return TextAlign.CenterCenter;
-    else return TextAlign.LeftTop;
   }
   /**
   * @desc: expensive function dùng để tính toán hành vi (tọa độ, điểm vẽ, hướng vẽ,...) của text node dựa trên tọa độ, kích thước của rect cell raw
-  * @param payload: Payload
+  * @param pPayload: Payload
   * @returns: BehaviorText
  */
   private _calculateBehaviorTextRaw(pPayload: Payload): BehaviorText {
@@ -835,9 +1059,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       pPayload.dimensionText = BravoGraphicsRenderer.measureString(_cellValue, _font, _cellBoundingRect.width, false);
       let _nWidthText = pPayload.dimensionText?.width || 0;
       let _nHeightText = pPayload.dimensionText?.height || 0;
-      //Case indent for row group
+      /*
+      Case indent for row group
+      Cộng thêm indent level trong trường hợp text nằm ở bên trái hoặc phải
+       */
       if (_bIsRowGroup) {
-        switch (this._zTextAglin) {
+        switch (this._zTextAlign) {
           case TextAlign.LeftTop:
           case TextAlign.LeftBottom:
           case TextAlign.LeftCenter:
@@ -853,9 +1080,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       let _bIsFitWidth = _nWidthText < (_cellBoundingRect.width - _nPaddingLeft - _nPaddingRight);
       let _bIsFitHeight = _nHeightText < (_cellBoundingRect.height - _nPaddingBottom - _nPaddingTop);
       let _bIsFitContent = _bIsFitWidth && _bIsFitHeight;
-      let _zAlginText = this._zTextAglin || 'left';
+      let _zAlginText = this._zTextAlign || 'left';
       if (_panel.columns[_nCurrentCol].dataType === DataType.Boolean) {
-        _zAlginText = this._zTextAglin || 'center';
+        _zAlginText = this._zTextAlign || 'center';
       }
       const _behaviorTextBase: Partial<BehaviorText> = { point: new Point(_nXTextDefault, _yTextDefault), textAnchor: 'start' };
       _behaviorTextBase.isTextFitWidthCell = _bIsFitContent;
@@ -969,7 +1196,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   /**
   * @description: Dùng để bọc svg bên ngoài text svg trong trường hợp width cửa text dài hơn chiều rộng của cell
-  * @param payload: Payload
+  * @param pPayload: Payload
   * @return: SVGElement | null
   */
   private _wrapTextRawIntoSvg(pPayload: Payload): SVGElement | null {
@@ -988,7 +1215,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       let _nHeightText = pPayload.dimensionText?.height || 0;
       //thụt lề cho row group.Trường hợp padding right chưa check
       if (_bIsRowGroup) {
-        switch (this._zTextAglin) {
+        switch (this._zTextAlign) {
           case TextAlign.LeftTop:
           case TextAlign.LeftBottom:
           case TextAlign.LeftCenter:
@@ -1011,10 +1238,13 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       */
       if (_bIsFitHeight) {
         _nPaddingBottom = this.cellPadding.paddingBottom;
+
       } else {
         let actualPaddingBottom = _cellRect.height - _nHeightText - _nPaddingTop - 1;
         _nPaddingBottom = actualPaddingBottom > 0 ? actualPaddingBottom : 0;
       }
+
+
       // if (_bIsFitWidth) {
       //   _nPaddingRight = this.cellPadding.paddingRight;
       // } else {
@@ -1036,7 +1266,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       Tọa độ y của svg wrapper tính toán phụ thuộc vào alignment của text
       Tính toán lại behavior của text theo svg wrapper!
       */
-      switch (this._zTextAglin) {
+      switch (this._zTextAlign) {
         case TextAlign.Left:
         case TextAlign.Start:
         case TextAlign.LeftTop:
@@ -1205,9 +1435,9 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     }
   }
 
-  private _drawCheckboxRaw(payload: Payload): void {
-    const _rect = payload.cellBoundingRect;
-    const _cellValue = payload.cellValue;
+  private _drawCheckboxRaw(pPayload: Payload): void {
+    const _rect = pPayload.cellBoundingRect;
+    const _cellValue = pPayload.cellValue;
     let _nWidthCheckbox = 13;
     let _nHeightCheckbox = 13;
     let _nXCheckbox = _rect.left + _rect.width / 2 - _nWidthCheckbox / 2;
@@ -1216,16 +1446,16 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     if (_cellValue === 'true' || _cellValue === true) {
       const _svgChecked = this._parser.parseFromString(inputChecked, 'image/svg+xml').childNodes[0] as SVGElement;
       setAttrSvgIcon(_svgChecked, _nXCheckbox, _nYCheckBox, _nWidthCheckbox, _nHeightCheckbox);
-      payload.group.appendChild(_svgChecked);
+      pPayload.group.appendChild(_svgChecked);
     } else {
       const _svgUnChecked = this._parser.parseFromString(inputUnchecked, 'image/svg+xml').childNodes[0] as SVGElement;
       setAttrSvgIcon(_svgUnChecked, _nXCheckbox, _nYCheckBox, _nWidthCheckbox, _nHeightCheckbox);
-      payload.group.appendChild(_svgUnChecked);
+      pPayload.group.appendChild(_svgUnChecked);
     }
   }
   /**
   * @description: Apply styles setup cho text, border, background rectangle
-  * @param: payload : Payload
+  * @param: pPayload : Payload
   */
   private _applyStyleSetup(pPayload: Payload): void {
     const _panel = pPayload.panel;
@@ -1329,7 +1559,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesNormal);
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesNormal);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesNormal);
-        this._zTextAglin = this._getAlignText(_stylesNormal, pPayload);
+        this._zTextAlign = getAlignText(_stylesNormal);
         //case alternating row
         if (this.flexGrid.showAlternatingRows) {
           let _bIsAlternate = false;
@@ -1341,7 +1571,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesAlternate);
             this._stylesTextSetup = getAcceptStylesTextSvg(_stylesAlternate);
             this._zBgColorSetup = getBgRectFromStylesSetup(_stylesAlternate);
-            this._zTextAglin = this._getAlignText(_stylesAlternate, pPayload);
+            this._zTextAlign = getAlignText(_stylesAlternate);
           }
         }
         //case frozen
@@ -1349,14 +1579,14 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesFrozen);
           this._zBgColorSetup = getBgRectFromStylesSetup(_stylesFrozen);
           this._stylesTextSetup = getAcceptStylesTextSvg(_stylesFrozen);
-          this._zTextAglin = this._getAlignText(_stylesFrozen, pPayload);
+          this._zTextAlign = getAlignText(_stylesFrozen);
         }
         //case new row
         if (_panel.rows[_currentRow] instanceof _NewRowTemplate) {
           this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesNewRow);
           this._zBgColorSetup = getBgRectFromStylesSetup(_stylesNewRow);
           this._stylesTextSetup = getAcceptStylesTextSvg(_stylesNewRow);
-          this._zTextAglin = this._getAlignText(_stylesNewRow, pPayload);
+          this._zTextAlign = getAlignText(_stylesNewRow);
         }
         //case row group by level
         if (pPayload.isRowGroup) {
@@ -1365,43 +1595,43 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv0);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv0);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv0);
-              this._zTextAglin = this._getAlignText(_stylesGroupLv0, pPayload);
+              this._zTextAlign = getAlignText(_stylesGroupLv0);
               break;
             case 1:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv1);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv1);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv1);
-              this._zTextAglin = this._getAlignText(_stylesGroupLv1, pPayload);
+              this._zTextAlign = getAlignText(_stylesGroupLv1);
               break;
             case 2:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv2);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv2);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv2);
-              this._zTextAglin = this._getAlignText(_stylesGroupLv2, pPayload);
+              this._zTextAlign = getAlignText(_stylesGroupLv2);
               break;
             case 3:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv3);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv3);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv3);
-              this._zTextAglin = this._getAlignText(_stylesGroupLv3, pPayload);
+              this._zTextAlign = getAlignText(_stylesGroupLv3);
               break;
             case 4:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv4);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv4);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv4);
-              this._zTextAglin = this._getAlignText(_stylesGroupLv4, pPayload);
+              this._zTextAlign = getAlignText(_stylesGroupLv4);
               break;
             case 5:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesGroupLv5);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesGroupLv5);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesGroupLv5);
-              this._zTextAglin = this._getAlignText(_stylesGroupLv5, pPayload);
+              this._zTextAlign = getAlignText(_stylesGroupLv5);
               break;
             default:
               this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesFrozen);
               this._zBgColorSetup = getBgRectFromStylesSetup(_stylesFrozen);
               this._stylesTextSetup = getAcceptStylesTextSvg(_stylesFrozen);
-              this._zTextAglin = this._getAlignText(_stylesFrozen, pPayload);
+              this._zTextAlign = getAlignText(_stylesFrozen);
           }
         }
         break;
@@ -1409,26 +1639,26 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesColsHeader);
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesColsHeader);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesColsHeader);
-        this._zTextAglin = this._getAlignText(_stylesColsHeader, pPayload);
+        this._zTextAlign = getAlignText(_stylesColsHeader);
         break;
       case CellType.ColumnFooter:
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesColsFooter);
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesColsFooter);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesColsFooter);
-        this._zTextAglin = this._getAlignText(_stylesColsFooter, pPayload);
+        this._zTextAlign = getAlignText(_stylesColsFooter);
         break;
       case CellType.RowHeader:
       case CellType.TopLeft:
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesRowsHeader);
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesRowsHeader);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesRowsHeader);
-        this._zTextAglin = this._getAlignText(_stylesRowsHeader, pPayload);
+        this._zTextAlign = getAlignText(_stylesRowsHeader);
         break;
       default:
         this._stylesBorderSetup = getAcceptStylesBorderSvg(_stylesNormal);
         this._zBgColorSetup = getBgRectFromStylesSetup(_stylesNormal);
         this._stylesTextSetup = getAcceptStylesTextSvg(_stylesNormal);
-        this._zTextAglin = this._getAlignText(_stylesNormal, pPayload);
+        this._zTextAlign = getAlignText(_stylesNormal);
         break;
     }
   }

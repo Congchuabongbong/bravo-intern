@@ -574,7 +574,7 @@ export class ControlGridDataLayoutPanelComponent
     stylesSetup.set(CellStyleEnum.Frozen, frozenStyles);
     stylesSetup.set(CellStyleEnum.RowHeader, rowsHeaderStyles);
     this.svgEngine.stylesSetup = stylesSetup;
-    const svg = this.svgEngine.renderFlexSvgRaw();
+    const svg = this.svgEngine.renderFlexSvgVisible();
     this.svgContainer.nativeElement.style.display = 'block';
 
     //
