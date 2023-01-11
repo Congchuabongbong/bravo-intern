@@ -36,8 +36,8 @@ export const creatorSVG = (pRect?: Partial<DOMRect>, pbIsDeclareNamespaceSvg?: b
   const _svg = document.createElementNS(SVG_NAMESPACE, 'svg') as SVGElement;
   if (pRect) {
     pRect.width && pRect.height && setViewportSize(_svg, pRect.width, pRect.height);
-    pRect.x && _svg.setAttribute('x', pRect.x.toString());
-    pRect.y && _svg.setAttribute('y', pRect.y.toString());
+    pRect.x && _svg.setAttribute('x', pRect.x.toFixed(1));
+    pRect.y && _svg.setAttribute('y', pRect.y.toFixed(1));
   }
   pbIsDeclareNamespaceSvg && declareNamespaceSvg(_svg);
   return _svg;

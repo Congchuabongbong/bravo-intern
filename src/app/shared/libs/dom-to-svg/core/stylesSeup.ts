@@ -10,8 +10,8 @@ export const normalStyles: Record<string, string> = {
   fontWeight: 'normal',
   fontSize: '16px',
   display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center'
+  justifyContent: 'flex-start',
+  alignItems: 'flex-start'
 };
 
 
@@ -21,7 +21,7 @@ export const alternateStyles: Record<string, string> = {
 };
 
 export const subtotal0Styles: Record<string, string> = {
-  fontWeight: '500',
+  fontWeight: '600',
   backgroundColor: '#FFF6BD',
   display: 'flex',
   justifyContent: 'flex-start',
@@ -39,7 +39,6 @@ export const subtotal1Styles: Record<string, string> = {
 export const frozenStyles: Record<string, string> = {
   backgroundColor: '#b3ffae',
   fontWeight: '400',
-
 };
 
 export const fixedStyles: Record<string, string> = {
