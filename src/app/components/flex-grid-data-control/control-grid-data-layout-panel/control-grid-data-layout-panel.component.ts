@@ -132,7 +132,7 @@ export class ControlGridDataLayoutPanelComponent
       );
     }
     flexGrid.headersVisibility = 3;
-    // flexGrid.groupHeaderFormat = '{name} : {value} {count} items';
+    flexGrid.groupHeaderFormat = '{name} : {value} {count} items';
     //event formatItem
     flexGrid.formatItem.addHandler(this.onHandelFormatItem, this);
     //autoSizedColumn
@@ -579,12 +579,12 @@ export class ControlGridDataLayoutPanelComponent
     this.svgContainer.nativeElement.style.display = 'block';
 
     //
-    const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    const alink = document.createElement('a');
-    const event = new MouseEvent('click');
-    alink.download = 'download.svg';
-    alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    alink.dispatchEvent(event);
-    console.timeEnd("Second call");
+    // const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    // const alink = document.createElement('a');
+    // const event = new MouseEvent('click');
+    // alink.download = 'download.svg';
+    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    // alink.dispatchEvent(event);
+    // console.timeEnd("Second call");
   }
 }

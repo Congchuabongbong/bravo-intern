@@ -184,11 +184,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   private _scanCell(pElScanned: Element, pPayload: Payload) {
     if (pElScanned.hasChildNodes()) {
       pElScanned.childNodes.forEach((pNode: Node) => {
-        //?case text node;
-        if (isTextNode(pNode)) {
-          const _svgEl = this._drawTextNodeInCell(pNode, pPayload);
-          _svgEl && pPayload.group.appendChild(_svgEl as Node);
-        }
+
         //?case image;
         if (isHTMLImageElement(pNode as HTMLElement)) {
           const _svgEl = this._drawImageInCell(pNode as HTMLImageElement, pPayload);
@@ -210,6 +206,11 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         if (this.flexGrid.allowSorting && isHTMLSpanElement(pNode as Element) && ((pNode as Element).className.includes('wj-glyph-up') || (pNode as Element).className.includes('wj-glyph-down'))) {
           this._drawSortBtn(pNode, pPayload);
         }
+        //?case text node;
+        if (isTextNode(pNode)) {
+          const _svgEl = this._drawTextNodeInCell(pNode, pPayload);
+          _svgEl && pPayload.group.appendChild(_svgEl as Node);
+        }
         this._scanCell(pNode as Element, pPayload);
       });
     }
@@ -217,149 +218,144 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   //*Handle and draw Text Here:
   private _calculateBehaviorTextNode(pTextNode: Text, pPayload: Payload): BehaviorText {
     try {
-      const { parentBoundingRect: _parentRect, parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, pPayload);
+      const { parentBoundingRect: _parentRect, parentStyles: _parentStyles, parentNode } = this._getInformationParentNode(pTextNode, pPayload);
       let _nDeviationHeight = 0;
       pPayload.dimensionText = this._measureTextNode(pTextNode, pPayload);
-      //?kiểm tra trường hợp nếu là inline element tính độ chênh lệch chiều cao nội dung bên trong và thẻ chứa nội dung
-      if (isInline(_parentStyles)) {
-        let _heightOfText = pPayload.dimensionText?.lineHeight || 0;
-        _nDeviationHeight = (_parentRect.height - _heightOfText) / 2;
-      }
 
-      this._zTextAlign = getAlignText(_parentStyles) || 'left';
       let { leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth, rightTotalSiblingsWidth: _nRightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode, pPayload);
-      let _nPaddingLeft = +_parentStyles.paddingLeft.replace('px', '');
-      let _nPaddingTop = +_parentStyles.paddingTop.replace('px', '');
-      let _nPaddingRight = +_parentStyles.paddingRight.replace('px', '');
-      let _nPaddingBottom = +_parentStyles.paddingBottom.replace('px', '');
+      let _nPaddingLeft = +_parentStyles.paddingLeft.replace('px', '') || 0;
+      let _nPaddingTop = +_parentStyles.paddingTop.replace('px', '') || 0;
+      let _nPaddingRight = +_parentStyles.paddingRight.replace('px', '') || 0;
+      let _nPaddingBottom = +_parentStyles.paddingBottom.replace('px', '') || 0;
       const _panel = pPayload.panel;
       let _nCol = pPayload.col;
       let _nRow = pPayload.row;
       let _nIndentGroup = 0;
       let _bIsGroup = _panel.rows[_nRow] instanceof GroupRow;
+      const _nXTextDefault = _parentRect.left;
+      const _nYTextDefault = _parentRect.top;
+      this._zTextAlign = getAlignText(_parentStyles);
+      //?kiểm tra trường hợp nếu là inline element tính độ chênh lệch chiều cao nội dung bên trong và thẻ chứa nội dung
+      if (isInline(_parentStyles, parentNode)) {
+        let _heightOfText = pPayload.dimensionText?.lineHeight || 0;
+        _nDeviationHeight = (_parentRect.height - _heightOfText) / 2;
+      }
       if (_bIsGroup) {
         _nIndentGroup = (_panel.rows[_nRow] as GroupRow).level * this.flexGrid.treeIndent;
       }
-      const _nXTextDefault = _parentRect.left;
-      const _nYTextDefault = _parentRect.top;
-      /*
-      ?tạo default behavior text base.
-      ?default text alignment left and dominant baseline 'hanging', textAnchor: 'start'
-      */
-      let _behaviorTextBase: Partial<BehaviorText> = { dominantBaseline: 'hanging', point: new Point(_nXTextDefault, _nYTextDefault), textAnchor: 'start' };
+      let _behaviorTextBase: Partial<BehaviorText> = { point: new Point(_nXTextDefault, _nYTextDefault) };
       let _bIsFitWidthContent = this._isTextNodeFitWidthCell(pTextNode, pPayload);
       let _bIsFitHeightContent = this._isTextNodeFitHeightCell(pTextNode, pPayload);
       let _bIsFitContent: boolean = _bIsFitHeightContent && _bIsFitWidthContent;
-      _behaviorTextBase.isTextFitWidthCell = _bIsFitContent;
+      //switch
       switch (this._zTextAlign) {
         case TextAlign.Left:
         case TextAlign.Start:
         case TextAlign.LeftTop:
-          _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
-          _behaviorTextBase.point!.y += _nPaddingTop;
+        default:
+          _behaviorTextBase.point!.x += (_nLeftTotalSiblingsWidth + _nPaddingLeft);
+          _behaviorTextBase.point!.y += (_nPaddingTop + _nDeviationHeight);
           _behaviorTextBase.textAnchor = 'start';
-          return (_behaviorTextBase as BehaviorText);
+          _behaviorTextBase.dominantBaseline = 'hanging';
+          break;
         case TextAlign.Center:
         case TextAlign.CenterTop:
           if (_bIsFitContent) {
             if (_nCol === 0 && _panel.cellType === CellType.Cell && !_bIsGroup) {
-              _behaviorTextBase.point!.x += (_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth + _nPaddingLeft - _nPaddingRight) / 2;
+              _behaviorTextBase.point!.x += ((_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth + _nPaddingLeft - _nPaddingRight) / 2);
             } else {
-              _behaviorTextBase.point!.x += (_parentRect.width + _nLeftTotalSiblingsWidth + _nIndentGroup) / 2;
+              _behaviorTextBase.point!.x += ((_parentRect.width + _nLeftTotalSiblingsWidth + _nIndentGroup - _nRightTotalSiblingsWidth) / 2);
             }
-            _behaviorTextBase.point!.y += _nPaddingTop;
             _behaviorTextBase.textAnchor = 'middle';
+            _behaviorTextBase.dominantBaseline = 'hanging';
           } else {
-            _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
-            _behaviorTextBase.point!.y += _nPaddingTop;
+            _behaviorTextBase.point!.x += (_nLeftTotalSiblingsWidth + _nPaddingLeft);
           }
-          return (_behaviorTextBase as BehaviorText);
+          _behaviorTextBase.point!.y += _nPaddingTop;
+          break;
         case TextAlign.Right:
         case TextAlign.End:
         case TextAlign.RightTop:
           if (_bIsFitContent) {
-            _behaviorTextBase.point!.x += _parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth;
-            _behaviorTextBase.point!.y += _nPaddingTop;
+            _behaviorTextBase.point!.x += (_parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth);
             _behaviorTextBase.textAnchor = 'end';
-            _behaviorTextBase.isTextFitWidthCell = true;
+            _behaviorTextBase.dominantBaseline = 'hanging';
           } else {
-            _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
-            _behaviorTextBase.point!.y += _nPaddingTop;
+            _behaviorTextBase.point!.x += (_nLeftTotalSiblingsWidth + _nPaddingLeft);
           }
-          return (_behaviorTextBase as BehaviorText);
+          _behaviorTextBase.point!.y += _nPaddingTop;
+          break;
         //!Special case
         //?#Center
         case TextAlign.CenterCenter:
-
-          _behaviorTextBase.point!.y += (_parentRect.height / 2);
           if (_bIsFitContent) {
             if (_nCol === 0 && _panel.cellType === CellType.Cell && !_bIsGroup) {
-              _behaviorTextBase.point!.x += (_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth + _nPaddingLeft - _nPaddingRight) / 2;
+              _behaviorTextBase.point!.x += ((_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth + _nPaddingLeft - _nPaddingRight) / 2);
             } else {
-              _behaviorTextBase.point!.x += (_parentRect.width + _nLeftTotalSiblingsWidth + _nIndentGroup - _nRightTotalSiblingsWidth) / 2;
+              _behaviorTextBase.point!.x += ((_parentRect.width + _nLeftTotalSiblingsWidth + _nIndentGroup - _nRightTotalSiblingsWidth) / 2);
             }
             _behaviorTextBase.textAnchor = 'middle';
             _behaviorTextBase.dominantBaseline = 'middle';
           } else {
-            _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
+            _behaviorTextBase.point!.x += (_nLeftTotalSiblingsWidth + _nPaddingLeft);
           }
-          return (_behaviorTextBase as BehaviorText);
+          _behaviorTextBase.point!.y += ((_parentRect.height) / 2);
+          break;
         case TextAlign.CenterBottom:
-          _behaviorTextBase.point!.y += (_parentRect.height) - _nPaddingBottom;
           if (_bIsFitContent) {
             if (_nCol === 0 && _panel.cellType === CellType.Cell && !_bIsGroup) {
-              _behaviorTextBase.point!.x += (_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth + _nPaddingLeft - _nPaddingRight) / 2;
+              _behaviorTextBase.point!.x += ((_parentRect.width - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth + _nPaddingLeft - _nPaddingRight) / 2);
             } else {
-              _behaviorTextBase.point!.x += (_parentRect.width + _nLeftTotalSiblingsWidth + _nIndentGroup) / 2;
+              _behaviorTextBase.point!.x += ((_parentRect.width + _nLeftTotalSiblingsWidth + _nIndentGroup - _nRightTotalSiblingsWidth) / 2);
             }
             _behaviorTextBase.textAnchor = 'middle';
             _behaviorTextBase.dominantBaseline = 'auto';
           } else {
             _behaviorTextBase.point!.x += _nPaddingLeft;
           }
-          return (_behaviorTextBase as BehaviorText);
+          _behaviorTextBase.point!.y += ((_parentRect.height) - _nPaddingBottom);
+          break;
         //?#Left
         case TextAlign.LeftCenter:
-          _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
-          _behaviorTextBase.point!.y += _parentRect.height / 2;
+          _behaviorTextBase.point!.x += (_nLeftTotalSiblingsWidth + _nPaddingLeft);
+          _behaviorTextBase.point!.y += (_parentRect.height / 2);
           if (_bIsFitContent) {
             _behaviorTextBase.textAnchor = 'start';
             _behaviorTextBase.dominantBaseline = 'middle';
           }
-          return (_behaviorTextBase as BehaviorText);
+          break;
         case TextAlign.LeftBottom:
-          _behaviorTextBase.point!.x += _nLeftTotalSiblingsWidth + _nPaddingLeft;
-          _behaviorTextBase.point!.y += _parentRect.height - _nPaddingBottom;
+          _behaviorTextBase.point!.x += (_nLeftTotalSiblingsWidth + _nPaddingLeft);
+          _behaviorTextBase.point!.y += (_parentRect.height - _nPaddingBottom);
           if (_bIsFitContent) {
             _behaviorTextBase.textAnchor = 'start';
             _behaviorTextBase.dominantBaseline = 'auto';
           }
-          return (_behaviorTextBase as BehaviorText);
+          break;
         //?#Right
         case TextAlign.RightCenter:
-          _behaviorTextBase.point!.y += _parentRect.height / 2;
           if (_bIsFitContent) {
-            _behaviorTextBase.point!.x += _parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth;
+            _behaviorTextBase.point!.x += (_parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth);
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.dominantBaseline = 'middle';
           } else {
             _behaviorTextBase.point!.x += _nPaddingLeft;
           }
-          return (_behaviorTextBase as BehaviorText);
+          _behaviorTextBase.point!.y += (_parentRect.height / 2);
+          break;
         case TextAlign.RightBottom:
-          _behaviorTextBase.point!.y += _parentRect.height - _nPaddingBottom;
           if (_bIsFitContent) {
-            _behaviorTextBase.point!.x += _parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth;
+            _behaviorTextBase.point!.x += (_parentRect.width - _nPaddingRight - _nRightTotalSiblingsWidth);
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.dominantBaseline = 'auto';
           } else {
             _behaviorTextBase.point!.x += _nPaddingLeft;
           }
-          return (_behaviorTextBase as BehaviorText);
-        default:
-          _behaviorTextBase.isTextFitWidthCell = true;
-          return (_behaviorTextBase as BehaviorText);
+          _behaviorTextBase.point!.y += (_parentRect.height - _nPaddingBottom);
+          break;
       }
+      _behaviorTextBase.isTextFitWidthCell = _bIsFitContent;
+      return (_behaviorTextBase as BehaviorText);
     } catch (error) {
       console.error(error);
       throw new Error('Occurs when trying to calculate position text node!');
@@ -374,12 +370,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     try {
       const { parentStyles: _parentStyles, parentNode: _parentNode, parentBoundingRect: _parentRect } = this._getInformationParentNode(pTextNode, pPayload);
       const _rectSvg: Partial<DOMRect> = {};
+      const _textBehavior = pPayload.behaviorText;
       const { leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth, rightTotalSiblingsWidth: _nRightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(pTextNode, pPayload);
       let _nPaddingLeft = +pPayload.cellStyles.paddingLeft.replace('px', '') || 0;
       let _nPaddingRight = +pPayload.cellStyles.paddingRight.replace('px', '') || 0;
       let _nPaddingTop = +pPayload.cellStyles.paddingTop.replace('px', '') || 0;
       let _nPaddingBottom = +pPayload.cellStyles.paddingBottom.replace('px', '') || 0;
-      const _textBehavior = pPayload.behaviorText;
       let _nWidthText = pPayload.dimensionText?.width || 0;
       let _nHeightText = pPayload.dimensionText?.height || 0;
       let _bIsFitWidth = _nWidthText < (_parentRect.width - _nPaddingLeft - _nPaddingRight - _nLeftTotalSiblingsWidth - _nRightTotalSiblingsWidth);
@@ -390,31 +386,33 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       Tính toán lại padding bottom thực tế và padding right thực tế để tính chính xác tọa độ của text nằm trong svg wrapper
       và chiều cao thực tế!
       */
-      if (_bIsFitHeight) {
-        _nPaddingBottom = this.cellPadding.paddingBottom;
-      } else {
-        let actualPaddingBottom = _parentRect.height - _nHeightText - _nPaddingTop - 1;
+
+      if (!_bIsFitHeight) {
+        let actualPaddingBottom = _parentRect.height - _nHeightText - _nPaddingTop;
         _nPaddingBottom = actualPaddingBottom > 0 ? actualPaddingBottom : 0;
       }
-
       /*
       ?case 1 inline wrap text: width svg = phần còn lại của width trừ đi tổng chiều rộng các phần tử anh em nằm bên trái và padding left và phải
       ?case 2 nếu là text node duy nhất thì trừ đi cả chiều rộng của các phần tử nằm bên phải!.
       ?case 3 nếu là ko là text node duy nhất thì không trừ chiều rộng của các phần tử bên phải(trừ sẽ bị âm)
       */
-      if (isInline(_parentStyles)) {
+      if (isInline(_parentStyles, _parentNode)) {
+        //get left and right width total siblings width if is inline
         let { leftTotalSiblingsWidth: _leftTotalSiblingsWidth } = this._getTotalWidthSiblingNode(_parentNode, pPayload);
-        _rectSvg.width = _parentRect.width - _leftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight - 1;
+        _rectSvg.width = (_parentRect.width - _leftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight);
       } else {
-        _rectSvg.width = _parentRect.width - _nLeftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight - 1;
-        if (this.isOnlyNode(pTextNode, Node.TEXT_NODE)) {
-          if (this._zTextAlign.startsWith('right')) {
-            _rectSvg.width -= _nRightTotalSiblingsWidth;
-          }
+        _rectSvg.width = (_parentRect.width - _nLeftTotalSiblingsWidth - _nPaddingLeft);
+        if (this._zTextAlign.startsWith('center')) {
+          _rectSvg.width -= _nRightTotalSiblingsWidth;
+        } else if (this._zTextAlign.startsWith('right')) {
+          _rectSvg.width -= (_nRightTotalSiblingsWidth + _nPaddingRight);
         }
       }
       // _rectSvg.height = pPayload.cellElement.clientHeight || 0;
       _rectSvg.height = (_parentRect.height - _nPaddingTop - _nPaddingBottom) || 0;
+      if (pPayload.panel.cellType === CellType.ColumnHeader) {
+        console.log(_rectSvg.height);
+      }
       if (_rectSvg.width <= 0 || _rectSvg.height <= 0) {
         return null;
       }
@@ -430,15 +428,28 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         case TextAlign.Left:
         case TextAlign.Start:
         case TextAlign.LeftTop:
-        case TextAlign.Right:
-        case TextAlign.RightTop:
-        case TextAlign.End:
           _rectSvg.x = _textBehavior.point.x;
           _rectSvg.y = _textBehavior.point.y;
           _textSvgEl.setAttribute('x', '0');
           _textSvgEl.setAttribute('y', '0');
           _textSvgEl.setAttribute('dominant-baseline', 'hanging');
           _textSvgEl.setAttribute('text-anchor', 'start');
+          break;
+        case TextAlign.Right:
+        case TextAlign.RightTop:
+        case TextAlign.End:
+          _rectSvg.x = _textBehavior.point.x;
+          _rectSvg.y = _textBehavior.point.y;
+          console.log(_rectSvg.width.toString());
+          if (_bIsFitWidth) {
+            _textSvgEl.setAttribute('x', (_rectSvg.width).toString());
+            _textSvgEl.setAttribute('text-anchor', 'end');
+          } else {
+            _textSvgEl.setAttribute('x', '0');
+            _textSvgEl.setAttribute('text-anchor', 'start');
+          }
+          _textSvgEl.setAttribute('y', '0');
+          _textSvgEl.setAttribute('dominant-baseline', 'hanging');
           break;
         case TextAlign.Center:
         case TextAlign.CenterTop:
@@ -631,7 +642,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
   private _drawTextNodeInCell(pTextNode: Text, pPayload: Payload): SVGElement | null {
     try {
-      const { parentStyles: _parentStyles } = this._getInformationParentNode(pTextNode, pPayload);
+      const { parentStyles: _parentStyles, parentNode: _parentNode } = this._getInformationParentNode(pTextNode, pPayload);
       pPayload.behaviorText = this._calculateBehaviorTextNode(pTextNode, pPayload) as BehaviorText;
       let _nWidthTextNode = pPayload.dimensionText?.width || 0;
       /*
@@ -639,7 +650,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       ?Nếu width của cell nhỏ hơn tọa độ x của text return null ko draw
       ?Nếu width của cell nằm trong tọa độ x đến right thì thay đổi isTextFitWidthCell = false và switch case wrap svg
       */
-      if (!this.isOnlyNode(pTextNode, Node.TEXT_NODE) || isInline(_parentStyles)) {
+      if (!this.isOnlyNode(pTextNode, Node.TEXT_NODE) || isInline(_parentStyles, _parentNode)) {
         if (pPayload.cellBoundingRect.width < pPayload.behaviorText.point.x) {
           return null;
         } else if (pPayload.cellBoundingRect.width > pPayload.behaviorText.point.x && pPayload.cellElement.offsetWidth < pPayload.behaviorText.point.x + _nWidthTextNode) {
@@ -652,12 +663,12 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         return _svgWrap;
       }
       let _zTextContent = pTextNode.textContent || '';
-      // if (!this.isFirstNode(pTextNode, Node.TEXT_NODE)) {
-      //   _zTextContent = ' '.concat(_zTextContent);
-      // }
+      if (!this.isFirstNode(pTextNode, Node.TEXT_NODE)) {
+        _zTextContent = '  '.concat(_zTextContent);
+      }
       //fix case special character : &nbsp;
       pPayload.panel.cellType === CellType.ColumnHeader && (_zTextContent = _zTextContent.trimEnd().concat(' '));
-      const _textSvgEl = drawText(_zTextContent, pPayload.behaviorText, _parentStyles, 'default');
+      const _textSvgEl = drawText(_zTextContent, pPayload.behaviorText, _parentStyles, 'preserve');
       return _textSvgEl;
     } catch (error) {
       console.error(error);
@@ -690,7 +701,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   private _getTotalWidthSiblingNode(pNode: Node, pPayload: Payload) {
     let _nRightTotalSiblingsWidth = 0;
     let _nLeftTotalSiblingsWidth = 0;
-    const _siblings: ISiblings = this.scanSiblingsNode(pNode);
+    const _siblings: ISiblings = this.scanSiblingsNode(pNode, true);
     if (_siblings.leftSideCurrentNode.length === 0 && _siblings.rightSideCurrentNode.length === 0) return { rightTotalSiblingsWidth: _nRightTotalSiblingsWidth, leftTotalSiblingsWidth: _nLeftTotalSiblingsWidth };
     _nLeftTotalSiblingsWidth = this._calculateTotalWidthSiblings(_siblings.leftSideCurrentNode, pPayload);
     _nRightTotalSiblingsWidth = this._calculateTotalWidthSiblings(_siblings.rightSideCurrentNode, pPayload);
@@ -1698,5 +1709,4 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
     this.drawingTextHandler.hasHandlers && this.drawingTextHandler.removeAllHandlers();
     this.drewTextHandler.hasHandlers && this.drewTextHandler.removeAllHandlers();
   }
-
 }

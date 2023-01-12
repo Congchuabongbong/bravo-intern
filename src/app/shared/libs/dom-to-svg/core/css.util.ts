@@ -1,6 +1,13 @@
 import { TextAlign } from "./type.util";
 
-export const isInline = (pStyles: CSSStyleDeclaration): boolean => pStyles.display === 'inline' || pStyles.display.startsWith('inline-');
+export const isInline = (pStyles: CSSStyleDeclaration, pElement?: Element): boolean => {
+  if (!pElement) {
+    return pStyles.display === 'inline' || pStyles.display.startsWith('inline-');
+  } else {
+    const tagName = pElement.tagName;
+    return pStyles.display === 'inline' || pStyles.display.startsWith('inline-') || tagName === 'A' || tagName === 'B' || tagName === 'I' || tagName === 'STRONG' || tagName === 'BR' || tagName === 'IMG' || tagName === 'CODE';
+  }
+};
 //TODO: by me not complete
 //#Center
 export const isCenterTop = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
