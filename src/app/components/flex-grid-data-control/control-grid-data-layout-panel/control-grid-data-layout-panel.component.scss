@@ -76,22 +76,22 @@
 
 //#Right
 
-::ng-deep .wj-cell.wj-group {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  white-space: pre-wrap;
-}
+// ::ng-deep .wj-cell.wj-group {
+//   display: flex;
+//   justify-content: flex-start;
+//   align-items: flex-start;
+//   white-space: pre-wrap;
+// }
 
-::ng-deep .wj-flexgrid .wj-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-}
+// ::ng-deep .wj-flexgrid .wj-header {
+//   display: flex;
+//   justify-content: flex-start;
+//   align-items: flex-start;
+// }
 ::ng-deep .wj-cell {
   display: flex;
   justify-content: flex-end;
-  align-items: flex-end;
+  align-items: center;
 }
 
 ::ng-deep .wj-cell.wj-alt {

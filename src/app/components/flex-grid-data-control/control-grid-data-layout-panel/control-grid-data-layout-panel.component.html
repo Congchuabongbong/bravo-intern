@@ -1,4 +1,4 @@
-<div #svgContainer style="display: none;"></div>
+<div #svgContainer style="display: none;" (window:keyup.esc)="onDeleteSvg()"></div>
 <app-control-grid-container-layout-panel *ngIf="wijFlexLayout$ | async as wijFlexLayout"
   [layoutConfig]="wijFlexLayout.container" overflow="'hidden'">
   <!--** main grid data **-->
@@ -17,8 +17,8 @@
   <ng-container *ngIf="wijFlexLayout.tabGridData">
     <app-control-grid-item-layout-panel [position]="wijFlexLayout.tabGridData" [overflow]="'auto hidden'">
       <app-control-grid-tab-data-layout-panel [dataSource]="dataTabSource" (actionDelete)="onDeleteRowSelected()"
-        (flexTabInitialized)="flexTabInitialized($event)" (actionExportExcel)="onExportExcelAction()"
-        (actionExportSVG)="onExportSvgAction()">
+        (flexTabInitialized)="flexTabInitialized($event)" (actionExportSVG)="onExportSvgAction()"
+        (actionExportSVGRaw)="onExportSvgActionRaw()">
       </app-control-grid-tab-data-layout-panel>
     </app-control-grid-item-layout-panel>
   </ng-container>

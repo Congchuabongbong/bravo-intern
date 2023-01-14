@@ -117,7 +117,6 @@ export class ControlGridDataLayoutPanelComponent
     this.flex.allowMerging = 7;
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('ItemTypeName'));
     this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Unit'));
-    // this.flex.collectionView.groupDescriptions.push(new PropertyGroupDescription('Code'));
     flexGrid.getColumn('Image').cellTemplate = CellMaker.makeImage({
       label: 'image for ${item.Image}',
     });
@@ -565,6 +564,19 @@ export class ControlGridDataLayoutPanelComponent
   public onExportSvgAction() {
     console.time("Second call");
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
+    const svg = this.svgEngine.renderFlexSvgVisible();
+    this.svgContainer.nativeElement.style.display = 'block';
+    // const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    // const alink = document.createElement('a');
+    // const event = new MouseEvent('click');
+    // alink.download = 'download.svg';
+    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    // alink.dispatchEvent(event);
+    console.timeEnd("Second call");
+  }
+  public onExportSvgActionRaw() {
+    console.time("Second call");
+    this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
     this.svgEngine.isRawValue = true;
     const stylesSetup = new Map<CellStyleEnum, Record<string, string>>;
     stylesSetup.set(CellStyleEnum.Normal, normalStyles);
@@ -575,16 +587,20 @@ export class ControlGridDataLayoutPanelComponent
     stylesSetup.set(CellStyleEnum.Frozen, frozenStyles);
     stylesSetup.set(CellStyleEnum.RowHeader, rowsHeaderStyles);
     this.svgEngine.stylesSetup = stylesSetup;
-    const svg = this.svgEngine.renderFlexSvgVisible();
-    this.svgContainer.nativeElement.style.display = 'block';
-
-    //
+    const svg = this.svgEngine.renderFlexSvgRaw();
+    if (this.svgContainer.nativeElement.style.display !== 'block') {
+      this.svgContainer.nativeElement.style.display = 'block';
+    }
     // const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
     // const alink = document.createElement('a');
     // const event = new MouseEvent('click');
     // alink.download = 'download.svg';
     // alink.href = 'data:image/svg+xml;base64,' + base64doc;
     // alink.dispatchEvent(event);
-    // console.timeEnd("Second call");
+    console.timeEnd("Second call");
+  }
+
+  public onDeleteSvg() {
+    (this.svgContainer.nativeElement as HTMLElement).hasChildNodes && (this.svgContainer.nativeElement as HTMLElement).replaceChildren();
   }
 }

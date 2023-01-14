@@ -19,6 +19,8 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   @Output() actionAdd: EventEmitter<any> = new EventEmitter<any>();
   @Output() actionExportExcel: EventEmitter<any> = new EventEmitter<any>();
   @Output() actionExportSVG: EventEmitter<any> = new EventEmitter<any>();
+  @Output() actionExportSVGRaw: EventEmitter<any> = new EventEmitter<any>();
+  @Output() actionDeleteSVG: EventEmitter<any> = new EventEmitter<any>();
   //**Property declarations*/
   public productSelected$: Observable<any> = this._httpProductService.productSelectedWithTab$;
   public configLayout = {
@@ -67,4 +69,9 @@ export class ControlGridTabDataLayoutPanelComponent implements OnInit, OnDestroy
   public onExportSVG() {
     this.actionExportSVG.emit();
   }
+
+  public onExportSVGRaw() {
+    this.actionExportSVGRaw.emit();
+  }
+
 }
