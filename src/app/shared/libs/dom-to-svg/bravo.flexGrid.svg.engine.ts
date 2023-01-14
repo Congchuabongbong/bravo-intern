@@ -282,7 +282,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
           } else {
             _behaviorTextBase.point!.x += (_nLeftTotalSiblingsWidth + _nPaddingLeft);
           }
-          _behaviorTextBase.point!.y += _nPaddingTop;
+          // _behaviorTextBase.point!.y += _nPaddingTop;
           break;
         //!Special case
         //?#Center
@@ -338,7 +338,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.dominantBaseline = 'middle';
           } else {
-            _behaviorTextBase.point!.x += _nPaddingLeft;
+            // _behaviorTextBase.point!.x += _nPaddingLeft;
           }
           _behaviorTextBase.point!.y += (_parentRect.height / 2);
           break;
@@ -348,7 +348,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.dominantBaseline = 'auto';
           } else {
-            _behaviorTextBase.point!.x += _nPaddingLeft;
+            // _behaviorTextBase.point!.x += _nPaddingLeft;
           }
           _behaviorTextBase.point!.y += (_parentRect.height - _nPaddingBottom);
           break;
@@ -394,8 +394,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
 
       if (isInline(_parentStyles, _parentNode)) {
         //get left and right width total siblings width if is inline
-        let { leftTotalSiblingsWidth: _leftTotalSiblingsWidth } = this._getTotalWidthSiblingNode(_parentNode, pPayload);
-        _rectSvg.width = (_parentRect.width - _leftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight);
+        let { leftTotalSiblingsWidth: _leftTotalSiblingsWidth, rightTotalSiblingsWidth: _rightTotalSiblingsWidth } = this._getTotalWidthSiblingNode(_parentNode, pPayload);
+        _rectSvg.width = (_parentRect.width - _leftTotalSiblingsWidth - _nPaddingLeft - _nPaddingRight - _rightTotalSiblingsWidth);
       } else {
         /*
         -Trong trường hợp nếu là left-top/center/bottom thì chiều rộng của svg wrapper bằng chiều rộng của
@@ -404,7 +404,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         tọa độ cả svg luôn bằng tọa dộ x của rect + với padding left.
         */
         if (_bIsFitWidth) {
-          _rectSvg.width = (_parentRect.width - _nLeftTotalSiblingsWidth - _nPaddingLeft - _nRightTotalSiblingsWidth - _nPaddingRight);
+          _rectSvg.width = (_parentRect.width - _nPaddingRight - _nPaddingLeft);
         } else {
           _rectSvg.width = (_parentRect.width - _nLeftTotalSiblingsWidth - _nPaddingLeft);
           if (this._zTextAlign.startsWith('center')) {
@@ -547,7 +547,6 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
         case TextAlign.RightCenter:
           //case fit width?
           if (_bIsFitWidth) {
-
             _textSvgEl.setAttribute('x', (_rectSvg.width).toString());
             _textSvgEl.setAttribute('text-anchor', 'end');
           } else {
@@ -869,7 +868,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
    *                                               *
    *            Draw raw svg                       *
    *                                               *
-   ------------------------------------------------*/
+   *-----------------------------------------------*/
   //**Draw raw svg start here:
   //**declared property here */
   public cellPadding: CellPadding = { paddingBottom: 8, paddingLeft: 8, paddingTop: 8, paddingRight: 8 };
@@ -963,11 +962,10 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
       this.cleanEvents();
     }
   }
-
   /**
- * @desc: Hàm này dùng để export svg (tất cả data trong flex grid) vẽ theo panel (cells,columnsHeader,etc...)
- * @return : SvgElement
- */
+  * @desc: Hàm này dùng để export svg (tất cả data trong flex grid) vẽ theo panel (cells,columnsHeader,etc...)
+  * @return : SvgElement
+  */
   private _drawRawCellPanel(pPanel: GridPanel) {
     //!initialize pPayload object
     const pPayload = {} as Payload;
@@ -1165,7 +1163,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.isTextFitWidthCell = true;
           } else {
-            _behaviorTextBase.point!.x += _nPaddingLeft;
+            // _behaviorTextBase.point!.x += _nPaddingLeft;
           }
           break;
         //!Special case
@@ -1219,7 +1217,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.dominantBaseline = 'middle';
           } else {
-            _behaviorTextBase.point!.x += _nPaddingLeft;
+            // _behaviorTextBase.point!.x += _nPaddingLeft;
           }
           break;
         case TextAlign.RightBottom:
@@ -1229,7 +1227,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
             _behaviorTextBase.textAnchor = 'end';
             _behaviorTextBase.dominantBaseline = 'auto';
           } else {
-            _behaviorTextBase.point!.x += _nPaddingLeft;
+            // _behaviorTextBase.point!.x += _nPaddingLeft;
           }
           break;
       }
@@ -1528,6 +1526,7 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   * @description: Apply styles setup cho text, border, background rectangle
   * @param: pPayload : Payload
   */
+  private _stylesStore: Map<string | number, Record<string, string> | CSSStyleDeclaration> = new Map();
   private _applyStyleSetup(pPayload: Payload): void {
     const _panel = pPayload.panel;
     const _currentRow = pPayload.row;
