@@ -30,24 +30,26 @@ export const borderAttributes = new Set([
 ] as const);
 
 export enum TextAlign {
+  //#text-align
   Left = 'left',
   Center = 'center',
   Right = 'right',
   Start = 'start',
   End = 'end',
-
+  //#Flex
+  //#Center
   CenterTop = 'center-top',
   CenterCenter = 'center-center',
   CenterBottom = 'center-bottom',
-
+  //Left
   LeftTop = 'left-top',
   LeftCenter = 'left-center',
   LeftBottom = 'left-bottom',
-
+  //Right
   RightTop = 'right-top',
   RightCenter = 'right-center',
   RightBottom = 'right-bottom',
-
+  //General
   GeneralTop = 'general-top',
   GeneralCenter = 'general-center',
   GeneralBottom = 'general-bottom',

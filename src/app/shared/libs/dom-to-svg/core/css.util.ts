@@ -8,7 +8,6 @@ export const isInline = (pStyles: CSSStyleDeclaration, pElement?: Element): bool
     return pStyles.display === 'inline' || pStyles.display.startsWith('inline-') || tagName === 'A' || tagName === 'B' || tagName === 'I' || tagName === 'STRONG' || tagName === 'BR' || tagName === 'IMG' || tagName === 'CODE';
   }
 };
-//TODO: by me not complete
 //#Center
 export const isCenterTop = (pStyles: CSSStyleDeclaration | Record<string, string>): boolean => {
   if (pStyles instanceof CSSStyleDeclaration) {
@@ -83,7 +82,7 @@ export const isRightBottom = (pStyles: CSSStyleDeclaration | Record<string, stri
     return pStyles['display'] === 'flex' && pStyles['justifyContent'] === 'flex-end' && pStyles['alignItems'] === 'flex-end';
   }
 };
-//end
+
 export const isFlexDirectionRow = (pParentStyles: CSSStyleDeclaration) =>
   pParentStyles.display === 'flex' && pParentStyles.flexDirection === 'row';
 

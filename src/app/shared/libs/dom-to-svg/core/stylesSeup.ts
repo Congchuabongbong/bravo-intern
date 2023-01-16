@@ -11,7 +11,7 @@ export const normalStyles: Record<string, string> = {
   fontSize: '16px',
   display: 'flex',
   justifyContent: 'flex-end',
-  alignItems: 'center'
+  alignItems: 'flex-end'
 };
 
 

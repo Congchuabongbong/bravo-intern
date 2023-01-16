@@ -16,7 +16,6 @@ export function roundNumber(num: number) {
   return Math.round(num);
 }
 export class BravoSvgEngine extends wjChart._SvgRenderEngine {
-  //**TODO */
   constructor(_anchorElement: HTMLElement) {
     super(_anchorElement);
   }
