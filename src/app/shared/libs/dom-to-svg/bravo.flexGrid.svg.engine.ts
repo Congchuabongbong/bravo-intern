@@ -972,8 +972,8 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
   get stylesSetup() {
     return this._stylesStore;
   }
-  set stylesSetup(styles: Map<CellStyleEnum, Record<string, string> | CSSStyleDeclaration>) {
-    this._calculateInheritedStylesSetup(styles);
+  set stylesSetup(pStyles: Map<CellStyleEnum, Record<string, string> | CSSStyleDeclaration>) {
+    this._calculateInheritedStylesSetup(pStyles);
   }
   //*method raise event here:
   /**
@@ -1809,33 +1809,33 @@ export default class FlexGridSvgEngine extends BravoSvgEngine {
    * @param styles: Map<CellStyleEnum, Record<string, string> | CSSStyleDeclaration>
    * @returns void
    */
-  private _calculateInheritedStylesSetup(styles: Map<CellStyleEnum, Record<string, string> | CSSStyleDeclaration>): void {
+  private _calculateInheritedStylesSetup(pStyles: Map<CellStyleEnum, Record<string, string> | CSSStyleDeclaration>): void {
     //#normal
-    let _stylesNormal = (styles.has(CellStyleEnum.Normal) && styles.get(CellStyleEnum.Normal)) ? { ...this._stylesBase, ...styles.get(CellStyleEnum.Normal) } : this._stylesBase;
+    let _stylesNormal = (pStyles.has(CellStyleEnum.Normal) && pStyles.get(CellStyleEnum.Normal)) ? { ...this._stylesBase, ...pStyles.get(CellStyleEnum.Normal) } : this._stylesBase;
     //#alternate
-    let _stylesAlternate = (styles.has(CellStyleEnum.Alternate) && styles.get(CellStyleEnum.Alternate)) ? { ..._stylesNormal, ...styles.get(CellStyleEnum.Alternate) } : _stylesNormal;
+    let _stylesAlternate = (pStyles.has(CellStyleEnum.Alternate) && pStyles.get(CellStyleEnum.Alternate)) ? { ..._stylesNormal, ...pStyles.get(CellStyleEnum.Alternate) } : _stylesNormal;
     //#cols Header
-    let _stylesColsHeader = (styles.has(CellStyleEnum.Fixed) && styles.get(CellStyleEnum.Fixed)) ? { ..._stylesNormal, ...styles.get(CellStyleEnum.Fixed) } : _stylesNormal;
+    let _stylesColsHeader = (pStyles.has(CellStyleEnum.Fixed) && pStyles.get(CellStyleEnum.Fixed)) ? { ..._stylesNormal, ...pStyles.get(CellStyleEnum.Fixed) } : _stylesNormal;
     //#cols Footer
-    let _stylesColsFooter = (styles.has(CellStyleEnum.ColumnsFooter) && styles.get(CellStyleEnum.ColumnsFooter)) ? { ..._stylesColsHeader, ...styles.get(CellStyleEnum.ColumnsFooter) } : _stylesColsHeader;
+    let _stylesColsFooter = (pStyles.has(CellStyleEnum.ColumnsFooter) && pStyles.get(CellStyleEnum.ColumnsFooter)) ? { ..._stylesColsHeader, ...pStyles.get(CellStyleEnum.ColumnsFooter) } : _stylesColsHeader;
     //#rows header
-    let _stylesRowsHeader = (styles.has(CellStyleEnum.RowHeader) && styles.get(CellStyleEnum.RowHeader)) ? { ..._stylesNormal, ...styles.get(CellStyleEnum.RowHeader) } : _stylesNormal;
+    let _stylesRowsHeader = (pStyles.has(CellStyleEnum.RowHeader) && pStyles.get(CellStyleEnum.RowHeader)) ? { ..._stylesNormal, ...pStyles.get(CellStyleEnum.RowHeader) } : _stylesNormal;
     //#Frozent
-    let _stylesFrozen = (styles.has(CellStyleEnum.Frozen) && styles.get(CellStyleEnum.Frozen)) ? { ..._stylesAlternate, ...styles.get(CellStyleEnum.Frozen) } : _stylesAlternate;
+    let _stylesFrozen = (pStyles.has(CellStyleEnum.Frozen) && pStyles.get(CellStyleEnum.Frozen)) ? { ..._stylesAlternate, ...pStyles.get(CellStyleEnum.Frozen) } : _stylesAlternate;
     //#NewRow
-    let _stylesNewRow = (styles.has(CellStyleEnum.NewRow) && styles.get(CellStyleEnum.NewRow)) ? { ..._stylesNormal, ...styles.get(CellStyleEnum.NewRow) } : _stylesNormal;
+    let _stylesNewRow = (pStyles.has(CellStyleEnum.NewRow) && pStyles.get(CellStyleEnum.NewRow)) ? { ..._stylesNormal, ...pStyles.get(CellStyleEnum.NewRow) } : _stylesNormal;
     //GroupLv0
-    let _stylesGroupLv0 = (styles.has(CellStyleEnum.Subtotal0) && styles.get(CellStyleEnum.Subtotal0)) ? { ..._stylesFrozen, ...styles.get(CellStyleEnum.Subtotal0) } : _stylesFrozen;
+    let _stylesGroupLv0 = (pStyles.has(CellStyleEnum.Subtotal0) && pStyles.get(CellStyleEnum.Subtotal0)) ? { ..._stylesFrozen, ...pStyles.get(CellStyleEnum.Subtotal0) } : _stylesFrozen;
     //GroupLv1
-    let _stylesGroupLv1 = (styles.has(CellStyleEnum.Subtotal1) && styles.get(CellStyleEnum.Subtotal1)) ? { ..._stylesFrozen, ...styles.get(CellStyleEnum.Subtotal1) } : _stylesFrozen;
+    let _stylesGroupLv1 = (pStyles.has(CellStyleEnum.Subtotal1) && pStyles.get(CellStyleEnum.Subtotal1)) ? { ..._stylesFrozen, ...pStyles.get(CellStyleEnum.Subtotal1) } : _stylesFrozen;
     //GroupLv2
-    let _stylesGroupLv2 = (styles.has(CellStyleEnum.Subtotal2) && styles.get(CellStyleEnum.Subtotal2)) ? { ..._stylesFrozen, ...styles.get(CellStyleEnum.Subtotal2) } : _stylesFrozen;
+    let _stylesGroupLv2 = (pStyles.has(CellStyleEnum.Subtotal2) && pStyles.get(CellStyleEnum.Subtotal2)) ? { ..._stylesFrozen, ...pStyles.get(CellStyleEnum.Subtotal2) } : _stylesFrozen;
     //GroupLv1
-    let _stylesGroupLv3 = (styles.has(CellStyleEnum.Subtotal3) && styles.get(CellStyleEnum.Subtotal3)) ? { ..._stylesFrozen, ...styles.get(CellStyleEnum.Subtotal3) } : _stylesFrozen;
+    let _stylesGroupLv3 = (pStyles.has(CellStyleEnum.Subtotal3) && pStyles.get(CellStyleEnum.Subtotal3)) ? { ..._stylesFrozen, ...pStyles.get(CellStyleEnum.Subtotal3) } : _stylesFrozen;
     //GroupLv1
-    let _stylesGroupLv4 = (styles.has(CellStyleEnum.Subtotal4) && styles.get(CellStyleEnum.Subtotal4)) ? { ..._stylesFrozen, ...styles.get(CellStyleEnum.Subtotal4) } : _stylesFrozen;
+    let _stylesGroupLv4 = (pStyles.has(CellStyleEnum.Subtotal4) && pStyles.get(CellStyleEnum.Subtotal4)) ? { ..._stylesFrozen, ...pStyles.get(CellStyleEnum.Subtotal4) } : _stylesFrozen;
     //GroupLv1
-    let _stylesGroupLv5 = (styles.has(CellStyleEnum.Subtotal5) && styles.get(CellStyleEnum.Subtotal5)) ? { ..._stylesFrozen, ...styles.get(CellStyleEnum.Subtotal5) } : _stylesFrozen;
+    let _stylesGroupLv5 = (pStyles.has(CellStyleEnum.Subtotal5) && pStyles.get(CellStyleEnum.Subtotal5)) ? { ..._stylesFrozen, ...pStyles.get(CellStyleEnum.Subtotal5) } : _stylesFrozen;
     //**
     this._stylesStore.set(CellStyleEnum.Normal, _stylesNormal);
     this._stylesStore.set(CellStyleEnum.Alternate, _stylesAlternate);

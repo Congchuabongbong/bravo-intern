@@ -11,7 +11,7 @@ import { ProductGridDataComponent } from './pages/product-grid-data/product-grid
 import { TestBaseControlComponent } from './pages/test-base-control/test-base-control.component';
 import { DemoCollectionViewComponent } from './pages/demo-collection-view/demo-collection-view.component';
 import { DemoTrackingChangesComponent } from './pages/demo-tracking-changes/demo-tracking-changes.component';
-
+import { TestDecoratorsComponent } from './pages/test-decorators/test-decorators.component';
 
 const routes: Routes = [
   {
@@ -38,6 +38,11 @@ const routes: Routes = [
     path: 'demo-tracking',
     title: 'Demo Tracking Changes Component',
     component: DemoTrackingChangesComponent,
+  },
+  {
+    path: 'custom-decorators',
+    title: 'Demo Custom Decorators',
+    component: TestDecoratorsComponent,
   }
 ];
 
