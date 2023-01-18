@@ -145,14 +145,12 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     }
     return _attribute;
   }
-
   //TODO: Add By Me
   public static applyAttribute(pElement: Element, pAttribute: Record<string, any>) {
     Object.keys(pAttribute).forEach(key => {
       pElement.setAttribute(key, pAttribute[key]);
     });
   }
-
   public applyTextStyles(pSvgElement: SVGElement, pStyles: CSSStyleDeclaration): void {
     for (const textProperty of textAttributes) {
       const value = pStyles.getPropertyValue(textProperty);
@@ -162,9 +160,15 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     }
     pSvgElement.setAttribute('fill', pStyles.color);
   }
-
   //*scan sibling node nếu nó là inline hoặc flex direction rows hoặc float
-  public scanSiblingsNode(pNode: Node, pbIsCheckBelong = false): ISiblings {
+  /**
+  * @description: Quét tất cả các siblings của node, flag pbCheckBelong để check thêm trường hợp nếu siblings có tọa độ nằm ngoài phần tử cha của node thì bỏ qua.
+  * @param pbCheckBelong boolean
+  * @param pNode Node
+  * @default pbCheckBelong = false
+  * @returns ISiblings
+   */
+  public scanSiblingsNode(pNode: Node, pbCheckBelong = false): ISiblings {
     const _leftSideCurrentNode: ChildNode[] = [];
     const _rightSideCurrentNode: ChildNode[] = [];
     const _parenNode = <Element>pNode.parentNode;
@@ -186,8 +190,9 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
             break;
           case Node.ELEMENT_NODE:
             const _nextSiblingRect = (_nextSibling as Element).getBoundingClientRect();
-            /* Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua*/
-            if (pbIsCheckBelong && (((_parentRect.left + _parentRect.width) < (_nextSiblingRect.left + _nPaddingRight)) || ((_parentRect.top + _parentRect.height) < _nextSiblingRect.top) || (_parentRect.left > (_nextSiblingRect.left - _nPaddingLeft)) || (_parentRect.top > _nextSiblingRect.top))) break;
+            //!chưa check hết trường hợp
+            //Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua
+            if (pbCheckBelong && (((_parentRect.left + _parentRect.width) < (_nextSiblingRect.left + _nPaddingRight)) || ((_parentRect.top + _parentRect.height) < _nextSiblingRect.top) || (_parentRect.left > (_nextSiblingRect.left - _nPaddingLeft)) || (_parentRect.top > _nextSiblingRect.top))) break;
             const computedNode = getComputedStyle(_nextSibling as Element);
             if (isInFlow(computedNode) || isFlexDirectionRow(parentStyles) || isInline(computedNode)) {
               isFloatLeft(computedNode) ? _leftSideCurrentNode.push(_nextSibling) : _rightSideCurrentNode.push(_nextSibling);
@@ -210,8 +215,9 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
             break;
           case Node.ELEMENT_NODE:
             const _previousSiblingRect = (_previousSibling as Element).getBoundingClientRect();
-            /* Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua*/
-            if (pbIsCheckBelong && (((_parentRect.left + _parentRect.width) < (_previousSiblingRect.left + _nPaddingRight)) || ((_parentRect.top + _parentRect.height) < _previousSiblingRect.top) || (_parentRect.left > (_previousSiblingRect.left - _nPaddingLeft)) || (_parentRect.top > _previousSiblingRect.top))) break;
+            //!chưa check hết trường hợp
+            //Nếu  node có tọa độ nằm ngoài phần tử cha thì bỏ qua
+            if (pbCheckBelong && (((_parentRect.left + _parentRect.width) < (_previousSiblingRect.left + _nPaddingRight)) || ((_parentRect.top + _parentRect.height) < _previousSiblingRect.top) || (_parentRect.left > (_previousSiblingRect.left - _nPaddingLeft)) || (_parentRect.top > _previousSiblingRect.top))) break;
             const computedNode = getComputedStyle(_previousSibling as Element);
             if (isInFlow(computedNode) || isFlexDirectionRow(parentStyles) || isInline(computedNode)) {
               isFloatRight(computedNode) ? _rightSideCurrentNode.push(_previousSibling) : _leftSideCurrentNode.push(_previousSibling);
@@ -225,7 +231,12 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     }
     return { leftSideCurrentNode: _leftSideCurrentNode, rightSideCurrentNode: _rightSideCurrentNode };
   }
-
+  /**
+  * @description: Check xem node có phải là node con đầu tiên (cùng type) trong phần tử cha hay không?!.
+  * @param pNode: Node
+  * @param pnType: number
+  * @returns boolean
+  */
   public isFirstNode(pNode: Node, pnType: number): boolean {
     const _parentNode = pNode.parentNode;
     if (!_parentNode) return false;
@@ -236,7 +247,12 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     }
     return _firstChild === pNode;
   };
-
+  /**
+  * @description: Check xem node có phải là node con cuối cùng (cùng type) trong phần tử cha hay không?!.
+  * @param pNode: Node
+  * @param pnType: number
+  * @returns boolean
+  */
   public isLastNode(pNode: Node, pnType: number): boolean {
     const _parentNode = pNode.parentNode;
     if (!_parentNode) return false;
@@ -247,7 +263,12 @@ export class BravoSvgEngine extends wjChart._SvgRenderEngine {
     }
     return lastChild === pNode;
   };
-
+  /**
+  * @description: Check xem node có phải là node con (có cùng kiểu) duy nhất trong phần tử cha hay không?!.
+  * @param pNode: Node
+  * @param pnType: number
+  * @returns boolean
+  */
   public isOnlyNode(pNode: Node, pnType: number): boolean {
     return this.isFirstNode(pNode, pnType) && this.isLastNode(pNode, pnType);
   }

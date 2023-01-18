@@ -1,7 +1,6 @@
 
 import { SVG_NAMESPACE, XML_NAMESPACE, X_LINK_NAMESPACE } from './dom.util';
 import { BehaviorText, borderAttributes, ISize, textAttributes } from './type.util';
-
 export const setViewportSizeSVG = (pSvg: SVGElement, pSize: ISize): void => {
   pSvg.setAttribute('width', pSize.width.toString());
   pSvg.setAttribute('height', pSize.height.toString());

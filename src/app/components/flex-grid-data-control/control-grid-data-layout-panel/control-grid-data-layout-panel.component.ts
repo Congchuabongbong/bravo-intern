@@ -566,12 +566,12 @@ export class ControlGridDataLayoutPanelComponent
     this.svgEngine = new FlexGridSvgEngine(this.svgContainer.nativeElement, this.flex);
     const svg = this.svgEngine.renderFlexSvgVisible();
     this.svgContainer.nativeElement.style.display = 'block';
-    // const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    // const alink = document.createElement('a');
-    // const event = new MouseEvent('click');
-    // alink.download = 'download.svg';
-    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    // alink.dispatchEvent(event);
+    const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    const alink = document.createElement('a');
+    const event = new MouseEvent('click');
+    alink.download = 'download.svg';
+    alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    alink.dispatchEvent(event);
     console.timeEnd("Second call");
   }
   public onExportSvgActionRaw() {
@@ -591,12 +591,12 @@ export class ControlGridDataLayoutPanelComponent
     if (this.svgContainer.nativeElement.style.display !== 'block') {
       this.svgContainer.nativeElement.style.display = 'block';
     }
-    // const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
-    // const alink = document.createElement('a');
-    // const event = new MouseEvent('click');
-    // alink.download = 'download.svg';
-    // alink.href = 'data:image/svg+xml;base64,' + base64doc;
-    // alink.dispatchEvent(event);
+    const base64doc = btoa(unescape(encodeURIComponent(svg.outerHTML)));
+    const alink = document.createElement('a');
+    const event = new MouseEvent('click');
+    alink.download = 'download.svg';
+    alink.href = 'data:image/svg+xml;base64,' + base64doc;
+    alink.dispatchEvent(event);
     console.timeEnd("Second call");
   }
 
