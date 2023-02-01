@@ -1,4 +1,3 @@
-import { ControlContainer, FormGroup } from '@angular/forms';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -8,12 +7,13 @@ import {
   Input,
   OnInit,
   Renderer2,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
+import { ControlContainer, FormGroup } from '@angular/forms';
 import { GridLayoutData, GridLayoutFormData } from 'src/app/shared/data-type';
-import { GridLayout } from 'src/app/shared/utils/index.util';
-import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
 import { IStyleOptions } from 'src/app/shared/data-type/grid-layout.data.type';
+import { GridLayoutService } from 'src/app/shared/services/grid-layout.service';
+import { GridLayout } from 'src/app/shared/utils/index.util';
 
 @Component({
   selector: 'app-control-grid-container-layout-panel',

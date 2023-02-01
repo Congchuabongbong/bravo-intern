@@ -1,3 +1,4 @@
+import { Directive } from '@angular/core';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 
 export function confirmableAlert(configOpt?: SweetAlertOptions) {
